@@ -1,0 +1,10 @@
+{
+  "name": "MASAK APA HARI INI",
+  "short_name": "MasakApa",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fbf9f5",
+  "theme_color": "#d85a3d",
+  "description": "Resipi Malaysian mudah untuk masak hari ini.",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
