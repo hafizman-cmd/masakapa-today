@@ -1,4 +1,4 @@
-import { ingredientTranslations, instructionTranslations, recipeTranslations } from './translations'
+import { ingredientTranslations, instructionTranslations, recipeTranslations } from './translations.js'
 
 const bilingual = (ms, en = ingredientTranslations[ms] || ms) => ({ ms, en })
 

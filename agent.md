@@ -6,8 +6,57 @@
 - Lucide icons come from `lucide-react`.
 - The app is a state-based mobile PWA; there is no router.
 
+## Supabase Backend
+- `src/lib/supabase.js`: initializes the Supabase JS client from `import.meta.env.VITE_SUPABASE_URL` and `import.meta.env.VITE_SUPABASE_ANON_KEY`. Exports `isSupabaseConfigured` and a nullable `supabase` client so the UI can degrade gracefully.
+- `src/hooks/useRecipes.js`: React hook that loads recipes and ingredients from Supabase on mount, caches the last successful response in `localStorage` under `masakapa-recipes-cache`, and falls back to `src/data/recipes.js` when offline or when Supabase credentials are missing.
+- `scripts/seed-supabase.js`: Node seed script that reads `src/data/recipes.js`, upserts all ingredients into the `ingredients` table, generates 36-character UUIDs for every recipe, remaps `pairings` to those UUIDs, and upserts recipes into the `recipes` table.
+
+### Database Schema
+```sql
+create table ingredients (
+  id text primary key,
+  name_ms text not null,
+  name_en text not null,
+  group text not null,
+  is_staple boolean not null default false
+);
+
+create table recipes (
+  id uuid primary key default gen_random_uuid(),
+  slug text unique not null,
+  name_ms text not null,
+  name_en text not null,
+  style_ms text not null,
+  style_en text not null,
+  difficulty_ms text not null,
+  difficulty_en text not null,
+  time int not null,
+  servings int not null,
+  default_servings int not null,
+  equipment jsonb not null default '[]',
+  air_fryer boolean not null default false,
+  accent text not null,
+  pairings jsonb not null default '[]',
+  ingredients jsonb not null default '[]',
+  steps jsonb not null default '[]',
+  tip_ms text not null,
+  tip_en text not null,
+  sides jsonb not null default '[]',
+  created_at timestamp with time zone default now()
+);
+```
+
+### Seeding
+Run `node scripts/seed-supabase.js` after creating the tables above and ensuring `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are available in `.env`. The script persists the slug-to-UUID mapping in `scripts/recipe-uuid-map.json` (gitignored) so re-runs stay idempotent and pairings remain consistent.
+
+### Offline Fallback Strategy
+- `useRecipes()` starts from cached Supabase data or the static `src/data/recipes.js` catalog.
+- If credentials are missing or `navigator.onLine` is false, it skips the network request and keeps the static/local data.
+- On successful fetch it writes the transformed dataset to `localStorage` for faster subsequent starts.
+- Runtime IDs remain the stable recipe slugs (e.g. `ayam-goreng-kunyit`) so persisted favorites and grocery items continue to work; the seed script stores UUIDs only in Supabase and resolves them back to slugs inside the hook.
+
 ## Important Files
-- `src/App.jsx`: screen state, pantry persistence, matching, filters, favorites, grocery list, and the global master layout container.
+- `src/App.jsx`: screen state, pantry persistence, matching, filters, favorites, grocery list, and the global master layout container. Loads recipe data through `useRecipes()` and passes it down to `Matcher`, `Discover`, `Favorites`, and `RecipeDetail`.
 - `src/data/recipes.js`: ingredient catalog, staple definitions, and recipe data.
 - `src/data/translations.js`: shared Bahasa Melayu/English UI dictionary, recipe title/style translations, and bilingual text helpers.
 - Recipe catalog currently contains 53 unique recipes: the original 20 plus 12 Ayam, Daging & Kambing recipes, 12 Seafood & Fish recipes, and a 12-dish Express Noodles & Rice batch with three existing recipes refreshed rather than duplicated.
