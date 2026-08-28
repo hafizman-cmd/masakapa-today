@@ -43,7 +43,7 @@ graph TD
 
 ## Runtime Flow
 
-The recipe catalog contains 53 unique recipes, including 12 Ayam, Daging & Kambing recipes, 12 Seafood & Fish recipes, and a 12-dish Express Noodles & Rice batch added to the original 20. Three overlapping express dishes refresh existing stable IDs instead of creating duplicates.
+The recipe catalog contains 70 unique recipes: the original 53 plus 17 daily Malaysian recipes covering vegetables, eggs, soups, sambal, seafood, ayam, soto, and curry noodles.
 
 1. `src/main.jsx` mounts `App` and registers the service worker.
 2. `App` calls `useRecipes()`, which attempts to fetch recipes and ingredients from Supabase. On success it caches the transformed dataset in `localStorage` under `masakapa-recipes-cache`; on failure or when offline it falls back to `src/data/recipes.js`.

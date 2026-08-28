@@ -59,7 +59,7 @@ Run `node scripts/seed-supabase.js` after creating the tables above and ensuring
 - `src/App.jsx`: screen state, pantry persistence, matching, filters, favorites, grocery list, and the global master layout container. Loads recipe data through `useRecipes()` and passes it down to `Matcher`, `Discover`, `Favorites`, and `RecipeDetail`.
 - `src/data/recipes.js`: ingredient catalog, staple definitions, and recipe data.
 - `src/data/translations.js`: shared Bahasa Melayu/English UI dictionary, recipe title/style translations, and bilingual text helpers.
-- Recipe catalog currently contains 53 unique recipes: the original 20 plus 12 Ayam, Daging & Kambing recipes, 12 Seafood & Fish recipes, and a 12-dish Express Noodles & Rice batch with three existing recipes refreshed rather than duplicated.
+- Recipe catalog currently contains 70 unique recipes: the original 53 plus 17 daily Malaysian recipes covering vegetables, eggs, soups, sambal, seafood, ayam, soto, and curry noodles.
 - `src/components/RecipeCard.jsx`: reusable recipe card and favorite action.
 - `src/components/RecipeDetail.jsx`: `RecipeDetail` plus `PairingSection` and `MissingIngredients` exports.
 - `src/utils/portion.js`: pure ingredient quantity scaling and clean fraction formatting.
@@ -96,6 +96,7 @@ Run `node scripts/seed-supabase.js` after creating the tables above and ensuring
 - Ingredient options include the expanded poultry/meat proteins plus Rempah & Bahan Tumis and Sos & Perasa groups.
 - Ingredient options also include Siakap, Pari, Tilapia, Cencaru, Kembung, Sotong, Petai, seafood seasonings, and seafood garnishes.
 - Ingredient options include Karbo & Mi items, stir-fry vegetables, noodles/rice sauces, and express recipe complements.
+- Ingredient options also include minced chicken, minced beef, beef lungs, salted fish, eggplant, spinach, corn, kailan, green mango, rice cubes, glass noodles, tofu puffs, curry powder, Thai basil, dried shrimp, and peanuts.
 - Matcher ingredient selection uses horizontal category tabs, text search across all categories, a pantry-staples quick toggle, a removable selected-ingredient tray, and a Clear All action.
 - Compact recipe rows use a colored initials avatar, truncated title, metadata subtitle, optional missing-ingredient note, match percentage pill, favorite toggle, and right chevron.
 - `BottomNav` calls `App.handleNavigate`, which clears the active recipe before switching tabs.

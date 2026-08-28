@@ -47,10 +47,48 @@ export const recipeTranslations = {
   'ayam-goreng-kunyit': ['Turmeric Fried Chicken', 'Traditional'], 'masak-lemak-cili-api': ['Fiery Chili Coconut Chicken', 'Traditional'], 'asam-pedas-ikan': ['Spicy Tamarind Fish', 'Traditional'], 'sambal-tumis-udang': ['Sambal Fried Prawns', 'Traditional'], 'nasi-goreng-kampung': ['Village Fried Rice', 'Express'], 'telur-dadar-pedas': ['Onion Omelette', 'Express'], 'mee-goreng-mamak': ['Mamak Fried Noodles', 'Mamak'], 'roti-john': ['Roti John', 'Mamak'], 'ayam-madu-air-fryer': ['Air Fryer Honey Chicken', 'Western Fusion'], 'chicken-chop-lada-hitam': ['Black Pepper Chicken Chop', 'Western Fusion'], 'ayam-masak-kicap': ['Soy Sauce Chicken', 'Express'], 'telur-sambal': ['Eggs in Sambal', 'Express'], 'nasi-goreng-cina': ['Chinese Fried Rice', 'Express'], 'mee-goreng-express': ['Express Fried Noodles', 'Express'], 'ayam-sambal-hijau': ['Green Sambal Chicken', 'Traditional'], 'daging-kicap-pedas': ['Spicy Soy Beef', 'Traditional'], 'kangkung-belacan': ['Water Spinach with Shrimp Paste', 'Traditional'], 'gulai-ayam': ['Chicken Curry', 'Traditional'], 'ayam-goreng-berempah': ['Spiced Fried Chicken', 'Mamak'], 'air-fryer-chicken-wings-kicap-madu': ['Air Fryer Honey Soy Chicken Wings', 'Western Fusion'], 'ayam-masak-merah': ['Red Cooked Chicken', 'Traditional'], 'ayam-rendang-minang': ['Minang Chicken Rendang', 'Traditional'], 'ayam-penyet': ['Smashed Fried Chicken', 'Traditional'], 'ayam-kurma': ['Chicken Korma', 'Traditional'], 'ayam-singgang': ['Terengganu Sour Chicken Soup', 'Traditional'], 'ayam-pongteh': ['Pongteh Chicken', 'Traditional'], 'daging-masak-hitam': ['Dark Soy Beef', 'Traditional'], 'daging-dendeng': ['Dendeng Beef', 'Traditional'], 'daging-black-pepper': ['Black Pepper Beef', 'Western Fusion'], 'sup-daging-berempah': ['Spiced Beef Soup', 'Traditional'], 'daging-singgang-terengganu': ['Terengganu Sour Beef Soup', 'Traditional'], 'kambing-perap-air-fryer': ['Air Fryer Marinated Lamb', 'Air Fryer'], 'char-kway-teow-basah': ['Wet Char Kway Teow', 'Express'], 'bihun-goreng-singapore': ['Singapore Fried Vermicelli', 'Express'], 'nasi-goreng-usa': ['USA Fried Rice', 'Western Fusion'], 'maggi-goreng-tumis': ['Stir-Fried Instant Noodles', 'Express'], 'bihun-sup-daging': ['Beef Soup Vermicelli', 'Express'], 'kuey-teow-kung-fu': ['Kung Fu Flat Rice Noodles', 'Express'], 'nasi-goreng-pattaya': ['Pattaya Fried Rice', 'Express'], 'bihun-goreng-tomyam': ['Tom Yum Fried Vermicelli', 'Express'], 'nasi-goreng-cili-padi': ['Bird Eye Chili Fried Rice', 'Express'],
 }
 
+Object.assign(recipeTranslations, {
+  'kailan-ikan-masin': ['Chinese Broccoli with Salted Fish', 'Traditional'],
+  'terung-sambal-balado': ['Eggplant Balado', 'Traditional'],
+  'sup-bayam-jagung': ['Spinach and Corn Soup', 'Traditional'],
+  'sayur-lodeh-kampung': ['Village Vegetable Lodeh', 'Traditional'],
+  'kerabu-mangga-express': ['Express Green Mango Salad', 'Express'],
+  'telur-masak-kicap-bawang': ['Eggs in Soy Sauce with Onions', 'Express'],
+  'telur-bistik': ['Bistik Eggs', 'Express'],
+  'sambal-goreng-jawa': ['Javanese Sambal Goreng', 'Traditional'],
+  'sup-ayam-berempah': ['Spiced Chicken Soup', 'Traditional'],
+  'ayam-varuval': ['Chicken Varuval / Peratal', 'Mamak'],
+  'ayam-pad-kra-pao-express': ['Express Thai Basil Chicken', 'Express'],
+  'sambal-paru-goreng': ['Fried Beef Lung in Sambal', 'Traditional'],
+  'ikan-goreng-taucu': ['Fried Fish with Fermented Bean Paste', 'Traditional'],
+  'sotong-tumis-serai': ['Lemongrass Stir-Fried Squid', 'Traditional'],
+  'ikan-singgang-kunyit': ['Turmeric Fish Singgang', 'Traditional'],
+  'soto-ayam-express': ['Express Chicken Soto', 'Express'],
+  'mee-curry-express': ['Express Curry Noodles', 'Express'],
+})
+
 export const ingredientTranslations = {
   'Ikan Siakap': 'Sea bass', 'Ikan Pari': 'Stingray', 'Ikan Tilapia': 'Tilapia', 'Ikan Cencaru': 'Scad', 'Ikan Kembung': 'Mackerel', Sotong: 'Squid', Petai: 'Stink beans', 'Daun Kesum': 'Vietnamese coriander', 'Bunga Kantan': 'Torch ginger', 'Sos Ikan': 'Fish sauce', 'Limau Nipis': 'Lime', 'Serbuk Lada Sulah': 'Ground white pepper', 'Mentega': 'Butter', 'Daun Ketumbar': 'Coriander leaves', 'Cili Padi Hijau': 'Green bird eye chili', Bendi: 'Okra', 'Daun Pisang': 'Banana leaf', 'Tepung Beras': 'Rice flour', 'Tepung Jagung': 'Cornstarch', 'Daun Kari': 'Curry leaves', Bihun: 'Rice vermicelli', 'Kuey teow': 'Flat rice noodles', 'Mee segera / Maggi': 'Instant noodles', Sawi: 'Mustard greens', 'Daun kucai': 'Chinese chives', Fishcake: 'Fishcake', 'Lobak merah': 'Carrot', 'Pes tomyam': 'Tom yum paste', 'Sos cili': 'Chili sauce', 'Sos tiram': 'Oyster sauce', 'Serbuk lada sulah': 'Ground white pepper',
   Ayam: 'Chicken', 'Isi ayam': 'Chicken breast', 'Daging Lembu': 'Beef', 'Daging Kambing': 'Mutton', 'Kunyit hidup': 'Fresh turmeric', Kentang: 'Potato', Bawang: 'Onion', 'Bawang merah': 'Red onion', 'Bawang besar': 'Onion', Minyak: 'Oil', Garam: 'Salt', 'Daun sup': 'Celery leaves', Santan: 'Coconut milk', 'Cili padi': 'Birds eye chili', Serai: 'Lemongrass', 'Asam jawa': 'Tamarind', 'Asam gelugor': 'Garcinia cambogia slices', Tomato: 'Tomato', 'Sos tomato': 'Tomato sauce', 'Cili kisar': 'Blended chili', Udang: 'Prawns', 'Cili hiasan': 'Garnish chili', 'Nasi sejuk': 'Cold rice', Telur: 'Egg', 'Ikan merah': 'Red snapper', 'Ikan bilis': 'Anchovies', 'Kacang panjang': 'Long beans', 'Limau kasturi': 'Calamansi', 'Mee kuning': 'Yellow noodles', Taugeh: 'Bean sprouts', 'Roti panjang': 'Long bun', 'Daging kisar': 'Minced beef', 'Peha ayam': 'Chicken thighs', Madu: 'Honey', 'Bawang putih': 'Garlic', 'Dada ayam': 'Chicken breast', 'Kicap manis': 'Sweet soy sauce', 'Kicap pekat': 'Dark soy sauce', 'Sos lada hitam': 'Black pepper sauce', 'Daun limau purut': 'Kaffir lime leaves', 'Daun kesum': 'Vietnamese coriander', 'Bunga kantan': 'Torch ginger', 'Sayur campur': 'Mixed vegetables', 'Minyak bijan': 'Sesame oil', 'Daun bawang': 'Spring onion', 'Cili hijau': 'Green chili', 'Tomato hijau': 'Green tomato', 'Daging batang pinang': 'Lean beef', Kangkung: 'Water spinach', Belacan: 'Shrimp paste', 'Serbuk kari': 'Curry powder', 'Rempah kurma': 'Korma spice', 'Rempah sup / 4 beradik': 'Soup spices / whole spices', Kerisik: 'Toasted coconut', 'Daun kunyit': 'Turmeric leaf', Lengkuas: 'Galangal', Taucu: 'Fermented bean paste', 'Lada hitam': 'Black pepper', 'Serbuk lada hitam': 'Ground black pepper', Ketumbar: 'Coriander', 'Daun pandan': 'Pandan leaf', 'Gula Melaka': 'Palm sugar', Gula: 'Sugar', Tempe: 'Tempeh', Tauhu: 'Tofu', 'Bawang goreng': 'Fried shallots', Halia: 'Ginger', 'Tepung jagung': 'Cornstarch', 'Daun kari': 'Curry leaves', 'Kepak ayam': 'Chicken wings', 'Air fryer': 'Air fryer', Kuali: 'Wok', 'Dapur gas': 'Gas stove', Periuk: 'Pot', 'Lesung batu': 'Mortar and pestle', Pengisar: 'Blender', Penyepit: 'Tongs', 'Kuali leper': 'Flat pan', 'Periuk kecil': 'Small pot',
 }
+
+Object.assign(ingredientTranslations, {
+  'Ayam Kisar': 'Minced chicken',
+  'Daging Kisar': 'Minced beef',
+  Paru: 'Beef lungs',
+  'Ikan Masin': 'Salted fish',
+  Terung: 'Eggplant',
+  Bayam: 'Spinach',
+  Jagung: 'Corn',
+  Kailan: 'Chinese broccoli',
+  'Mangga Muda': 'Green mango',
+  'Nasi Impit': 'Rice cubes',
+  Suun: 'Glass noodles',
+  'Tahu Pok': 'Tofu puffs',
+  'Serbuk Kari Ayam/Daging': 'Chicken/beef curry powder',
+  'Daun Selasih': 'Thai basil',
+  'Udang Kering': 'Dried shrimp',
+})
 
 export const instructionTranslations = {
   'ayam-goreng-kunyit': ['Coat the chicken with turmeric and salt; marinate for 10 minutes.', 'Heat oil in a wok and fry the potatoes until crisp.', 'Fry the chicken until golden, then toss it with the potatoes.', 'Serve hot with rice and sliced cucumber.'],
@@ -95,5 +133,25 @@ export const instructionTranslations = {
   'bihun-goreng-tomyam': ['Soak the vermicelli until tender and drain.', 'Saute the red onion, bird eye chilies and tom yum paste until fragrant.', 'Add the prawns, kaffir lime leaves and mustard greens.', 'Add the vermicelli and toss until cooked and coated in tom yum seasoning.'],
   'nasi-goreng-cili-padi': ['Fry the anchovies until crisp and set aside.', 'Pound the bird eye chilies, red onion and garlic.', 'Saute the paste, then add the eggs and cold rice.', 'Toss until combined and sprinkle with the anchovies before serving.'],
 }
+
+Object.assign(instructionTranslations, {
+  'kailan-ikan-masin': ['Soak and fry the salted fish until crisp.', 'Saute the garlic and chilies until fragrant.', 'Add the kailan stems, followed by the leaves.', 'Season with oyster sauce, toss with the salted fish and serve.'],
+  'terung-sambal-balado': ['Cut and fry the eggplant until tender.', 'Pound the onion, tomato and blended chili coarsely.', 'Saute the paste until the oil separates.', 'Add the eggplant, season and toss until coated.'],
+  'sup-bayam-jagung': ['Saute the onion and garlic until fragrant.', 'Add water and corn, then boil until tender.', 'Add the spinach and season with salt and white pepper.', 'Pour in the beaten egg while stirring gently and serve.'],
+  'sayur-lodeh-kampung': ['Saute the onion, blended chili and lemongrass until fragrant.', 'Add coconut milk and a little water, then stir gently.', 'Add the carrot, eggplant, long beans and tofu puffs.', 'Simmer until tender, season and serve.'],
+  'kerabu-mangga-express': ['Julienne the green mango and set aside.', 'Pound the chilies, red onion and dried shrimp.', 'Mix the paste with sugar and lime juice.', 'Toss with the mango and sprinkle with peanuts before serving.'],
+  'telur-masak-kicap-bawang': ['Fry the eggs sunny-side up and set aside.', 'Saute the onion and garlic until soft.', 'Add the soy sauces and a little water, then bring to a boil.', 'Add the eggs and green chili, tossing gently until coated.'],
+  'telur-bistik': ['Beat the eggs and fry a thin omelette, then set aside.', 'Saute the onion and minced beef until cooked.', 'Add the tomato sauce, chili sauce, soy sauce and a little water.', 'Pour the beef gravy over the omelette and serve.'],
+  'sambal-goreng-jawa': ['Fry the tempeh and tofu puffs until golden.', 'Saute the onion and blended chili until the oil separates.', 'Add coconut milk, soy sauce and a little water, then simmer.', 'Add the glass noodles, long beans, tempeh and tofu puffs and toss.'],
+  'sup-ayam-berempah': ['Saute garlic, ginger, soup spices and curry powder until fragrant.', 'Add the chicken and toss until coated.', 'Add water and potatoes, then simmer until tender.', 'Season with salt and garnish with celery leaves.'],
+  'ayam-varuval': ['Coat the chicken with curry powder and a little salt.', 'Saute curry leaves, onion, garlic and ginger until fragrant.', 'Add the chicken and cook until dry and tender.', 'Add green chili and toss until coated in the dry spices.'],
+  'ayam-pad-kra-pao-express': ['Pound the garlic and bird eye chilies coarsely.', 'Saute the paste, add the minced chicken and cook through.', 'Add the fish sauce, oyster sauce and soy sauce.', 'Add the Thai basil, toss briefly and serve with rice.'],
+  'sambal-paru-goreng': ['Boil the beef lung until tender and slice thinly.', 'Fry the slices until crisp and set aside.', 'Saute the onion, lemongrass and blended chili until fragrant.', 'Add tamarind water, palm sugar and beef lung, then toss until coated.'],
+  'ikan-goreng-taucu': ['Season and fry the fish until cooked.', 'Saute the onion, garlic and ginger until fragrant.', 'Add the fermented bean paste, tomato, green chili and a little water.', 'Add the fried fish and simmer briefly until the sauce absorbs.'],
+  'sotong-tumis-serai': ['Clean the squid and cut it into rings.', 'Pound the lemongrass, chilies, onion and turmeric coarsely.', 'Saute the paste until fragrant.', 'Add the squid and fish sauce, then cook quickly until tender.'],
+  'ikan-singgang-kunyit': ['Pound the turmeric, galangal, garlic and bird eye chilies.', 'Add the paste, water and asam gelugor to a pot.', 'Bring the broth to a boil and season with salt.', 'Add the fish and simmer until fully cooked.'],
+  'soto-ayam-express': ['Saute the garlic, ginger, lemongrass and curry powder until fragrant.', 'Add the chicken and water, then boil until tender.', 'Shred the chicken and arrange rice cubes and glass noodles in bowls.', 'Pour over the hot soup and garnish with chicken, celery leaves and fried shallots.'],
+  'mee-curry-express': ['Saute the onion, garlic and curry powder.', 'Add the minced chicken and cook through.', 'Add coconut milk and water, then add tofu puffs and simmer.', 'Add the noodles and bean sprouts, cook briefly and serve.'],
+})
 
 export const text = (value, lang) => value && typeof value === 'object' ? value[lang] || value.ms : value
