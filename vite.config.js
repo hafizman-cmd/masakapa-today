@@ -12,11 +12,15 @@ export default defineConfig({
       name: 'MASAK APA HARI INI',
       short_name: 'MasakApa',
       description: 'Resipi Malaysian mudah untuk masak hari ini.',
-      theme_color: '#d85a3d',
-      background_color: '#fbf9f5',
+       theme_color: '#E05A47',
+       background_color: '#FDFBF7',
       display: 'standalone',
       start_url: '/',
-      icons: [{ src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any maskable' }],
+       icons: [
+         { src: '/favicon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any maskable' },
+         { src: '/pwa-192x192.png', sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+         { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+       ],
     },
     workbox: {
       globPatterns: ['**/*.{js,css,html,ico,png,svg,webmanifest}'],
