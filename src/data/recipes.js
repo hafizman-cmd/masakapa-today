@@ -1,4 +1,4 @@
-import { ingredientTranslations, instructionTranslations, recipeTranslations } from './translations.js'
+import { ingredientTranslations, instructionTranslations, recipeTranslations, tipTranslations } from './translations.js'
 
 const bilingual = (ms, en = ingredientTranslations[ms] || ms) => ({ ms, en })
 
@@ -54,7 +54,7 @@ export const ingredientOptions = [
   { id: 'cencaru', name: bilingual('Ikan Cencaru', 'Scad'), group: 'Protein' },
   { id: 'mackerel', name: bilingual('Ikan Kembung', 'Mackerel'), group: 'Protein' },
   { id: 'squid', name: bilingual('Sotong', 'Squid'), group: 'Seafood' },
-  { id: 'petai', name: bilingual('Petai'), group: 'Protein' },
+  { id: 'petai', name: bilingual('Petai', 'Stink beans'), group: 'Vegetables' },
   { id: 'fish-sauce', name: bilingual('Sos Ikan', 'Fish sauce'), group: 'Sauces' },
   { id: 'lime', name: bilingual('Limau Nipis', 'Lime'), group: 'Spices' },
   { id: 'white-pepper', name: bilingual('Serbuk Lada Sulah', 'Ground white pepper'), group: 'Spices' },
@@ -100,6 +100,39 @@ export const ingredientOptions = [
   { id: 'thai-basil', name: bilingual('Daun Selasih', 'Thai basil'), group: 'Aromatics' },
   { id: 'dried-shrimp', name: bilingual('Udang Kering', 'Dried shrimp'), group: 'Aromatics' },
   { id: 'peanut', name: bilingual('Kacang Tanah', 'Peanuts'), group: 'Spices' },
+  { id: 'cockles', name: bilingual('Kerang', 'Blood cockles'), group: 'Seafood' },
+  { id: 'crab', name: bilingual('Ketam', 'Crab'), group: 'Seafood' },
+  { id: 'patin', name: bilingual('Ikan Patin', 'Silver catfish'), group: 'Seafood' },
+  { id: 'spanish-mackerel', name: bilingual('Ikan Tenggiri', 'Spanish mackerel'), group: 'Seafood' },
+  { id: 'catfish', name: bilingual('Ikan Keli', 'Catfish'), group: 'Seafood' },
+  { id: 'mudcreeper-snails', name: bilingual('Siput Sedut', 'Mudcreeper snails'), group: 'Seafood' },
+  { id: 'clams', name: bilingual('Kepah/Lala', 'Clams'), group: 'Seafood' },
+  { id: 'venison', name: bilingual('Daging Rusa', 'Venison'), group: 'Protein' },
+  { id: 'chicken-liver-gizzard', name: bilingual('Hati & Pedal Ayam', 'Chicken liver & gizzard'), group: 'Protein' },
+  { id: 'fiddlehead-fern', name: bilingual('Pucuk Paku', 'Fiddlehead fern'), group: 'Vegetables' },
+  { id: 'tapioca-leaves', name: bilingual('Pucuk Ubi', 'Tapioca leaves'), group: 'Vegetables' },
+  { id: 'pegaga', name: bilingual('Pegaga', 'Indian pennywort'), group: 'Vegetables' },
+  { id: 'bamboo-shoots', name: bilingual('Rebung', 'Bamboo shoots'), group: 'Vegetables' },
+  { id: 'bitter-gourd', name: bilingual('Peria/Peria Katak', 'Bitter gourd'), group: 'Vegetables' },
+  { id: 'banana-blossom', name: bilingual('Jantung Pisang', 'Banana blossom'), group: 'Vegetables' },
+  { id: 'pumpkin', name: bilingual('Labu Kuning', 'Pumpkin'), group: 'Vegetables' },
+  { id: 'pineapple', name: bilingual('Nanas', 'Pineapple'), group: 'Vegetables' },
+  { id: 'jicama', name: bilingual('Sengkuang', 'Jicama'), group: 'Vegetables' },
+  { id: 'belacan-block', name: bilingual('Belacan', 'Shrimp paste block'), group: 'Sauces' },
+  { id: 'rempah-4-beradik', name: bilingual('Rempah 4 Beradik', 'Four whole spices'), group: 'Aromatics' },
+  { id: 'kaffir-lime-leaves', name: bilingual('Daun Limau Purut', 'Kaffir lime leaves'), group: 'Aromatics' },
+  { id: 'candlenut', name: bilingual('Buah Keras', 'Candlenut'), group: 'Aromatics' },
+  { id: 'tempoyak', name: bilingual('Tempoyak', 'Fermented durian'), group: 'Sauces' },
+  { id: 'budu', name: bilingual('Budu', 'Fermented fish sauce'), group: 'Sauces' },
+  { id: 'cencalok', name: bilingual('Cencalok', 'Fermented shrimp relish'), group: 'Sauces' },
+  { id: 'cumin-seeds', name: bilingual('Jintan Manis & Jintan Putih', 'Fennel & cumin seeds'), group: 'Spices' },
+  { id: 'fenugreek', name: bilingual('Halba', 'Fenugreek'), group: 'Spices' },
+  { id: 'wheat-flour', name: bilingual('Tepung Gandum', 'Wheat flour'), group: 'Flours' },
+  { id: 'glutinous-rice-flour', name: bilingual('Tepung Pulut', 'Glutinous rice flour'), group: 'Flours' },
+  { id: 'glutinous-rice', name: bilingual('Beras Pulut', 'Glutinous rice'), group: 'Carbs' },
+  { id: 'laksa-noodles', name: bilingual('Mee Laksa', 'Laksa noodles'), group: 'Carbs' },
+  { id: 'sago', name: bilingual('Sagu', 'Sago'), group: 'Carbs' },
+  { id: 'spring-roll-skin', name: bilingual('Kulit Popiah', 'Spring roll wrappers'), group: 'Flours' },
 ]
 
 const i = (name, amount, id, staple = false, optional = false) => ({ name: bilingual(name), amount, id, staple, optional })
@@ -386,7 +419,7 @@ const recipeData = [
     steps: ['Tumis bawang merah dan bawang putih hingga wangi.', 'Masukkan air dan jagung, kemudian rebus hingga empuk.', 'Masukkan bayam dan perasakan dengan garam serta lada sulah.', 'Tuang telur yang dipukul perlahan sambil dikacau dan terus hidangkan.'], tip: 'Masukkan bayam pada akhir masakan supaya warnanya kekal segar.', sides: ['Nasi putih', 'Ikan goreng']
   },
   {
-    id: 'sayur-lodeh-kampung', name: 'Sayur Lodeh Kampung', style: 'Masakan Kampung', difficulty: 'Complicated', time: 40, defaultServings: 4, servings: 4, equipment: ['Periuk'], accent: 'gold', pairings: ['sambal-tumis-udang', 'nasi-impit'],
+    id: 'sayur-lodeh-kampung', name: 'Sayur Lodeh Kampung', style: 'Masakan Kampung', difficulty: 'Complicated', time: 40, defaultServings: 4, servings: 4, equipment: ['Periuk'], accent: 'gold', pairings: ['sambal-tumis-udang', 'nasi-lemak'],
     ingredients: [i('Tahu pok', '6 keping', 'tofu-puffs'), i('Terung', '1 biji', 'eggplant'), i('Kacang panjang', '1 cawan', 'long-bean'), i('Lobak merah', '1 batang', 'carrot'), i('Santan', '400ml', 'coconut-milk'), i('Serai', '1 batang', 'lemongrass'), i('Bawang merah', '4 ulas', 'red-onion'), i('Cili kisar', '1 sudu besar', 'chilli-paste', true), i('Garam', 'secukup rasa', 'salt', true)],
     steps: ['Tumis bawang merah, cili kisar dan serai hingga wangi.', 'Masukkan santan serta sedikit air dan kacau perlahan.', 'Masukkan lobak merah, terung, kacang panjang dan tahu pok.', 'Reneh hingga sayur empuk, kemudian perasakan dan hidangkan.'], tip: 'Gunakan api kecil supaya santan tidak pecah.', sides: ['Nasi impit', 'Sambal belacan']
   },
@@ -406,7 +439,7 @@ const recipeData = [
     steps: ['Pukul telur dan goreng dadar nipis, kemudian ketepikan.', 'Tumis bawang dan daging kisar hingga masak.', 'Masukkan sos tomato, sos cili, kicap dan sedikit air.', 'Tuang kuah daging ke atas telur dadar dan hidangkan.'], tip: 'Lipat telur dadar sebelum menuang kuah supaya hidangan lebih kemas.', sides: ['Kentang goreng', 'Kacang peas']
   },
   {
-    id: 'sambal-goreng-jawa', name: 'Sambal Goreng Jawa', style: 'Masakan Kampung', difficulty: 'Complicated', time: 45, defaultServings: 4, servings: 4, equipment: ['Kuali'], accent: 'chilli', pairings: ['nasi-impit', 'ayam-goreng-berempah'],
+    id: 'sambal-goreng-jawa', name: 'Sambal Goreng Jawa', style: 'Masakan Kampung', difficulty: 'Complicated', time: 45, defaultServings: 4, servings: 4, equipment: ['Kuali'], accent: 'chilli', pairings: ['nasi-lemak', 'ayam-goreng-berempah'],
     ingredients: [i('Tahu pok', '6 keping', 'tofu-puffs'), i('Tempe', '1 papan', 'tempe'), i('Suun', '50g', 'glass-noodles'), i('Kacang panjang', '1 cawan', 'long-bean'), i('Cili kisar', '2 sudu besar', 'chilli-paste', true), i('Bawang merah', '5 ulas', 'red-onion'), i('Bawang putih', '3 ulas', 'garlic'), i('Santan', '200ml', 'coconut-milk'), i('Kicap manis', '2 sudu besar', 'soy-sauce', true)],
     steps: ['Goreng tempe dan tahu pok hingga keemasan.', 'Tumis bawang serta cili kisar hingga pecah minyak.', 'Masukkan santan, kicap dan sedikit air, kemudian renehkan.', 'Masukkan suun, kacang panjang, tempe dan tahu pok. Gaul hingga sebati.'], tip: 'Rendam suun sekejap sahaja supaya tidak hancur ketika digoreng.', sides: ['Nasi impit', 'Acar timun']
   },
@@ -446,7 +479,7 @@ const recipeData = [
     steps: ['Tumbuk kunyit, lengkuas, bawang putih dan cili padi.', 'Masukkan bahan tumbuk, air dan asam gelugor ke dalam periuk.', 'Didihkan kuah dan perasakan dengan garam.', 'Masukkan ikan dan reneh hingga ikan masak sepenuhnya.'], tip: 'Jangan kacau kuat selepas ikan dimasukkan supaya isinya tidak hancur.', sides: ['Nasi putih', 'Ulam-ulaman']
   },
   {
-    id: 'soto-ayam-express', name: 'Soto Ayam Express', style: 'Bujang/Express', difficulty: 'Simple', time: 35, defaultServings: 2, servings: 2, equipment: ['Periuk'], accent: 'gold', pairings: ['nasi-impit', 'telur-dadar-pedas'],
+    id: 'soto-ayam-express', name: 'Soto Ayam Express', style: 'Bujang/Express', difficulty: 'Simple', time: 35, defaultServings: 2, servings: 2, equipment: ['Periuk'], accent: 'gold', pairings: ['nasi-lemak', 'telur-dadar-pedas'],
     ingredients: [i('Ayam', '300g', 'chicken'), i('Nasi impit', '2 ketul', 'nasi-impit'), i('Suun', '50g', 'glass-noodles'), i('Serbuk Kari Ayam/Daging', '1 sudu besar', 'curry-powder'), i('Bawang putih', '3 ulas', 'garlic'), i('Halia', '2 cm', 'ginger'), i('Serai', '1 batang', 'lemongrass'), i('Daun Sup', 'sedikit', 'soup-leaves', false, true), i('Bawang Goreng', 'sedikit', 'fried-shallots', false, true)],
     steps: ['Tumis bawang putih, halia, serai dan serbuk kari hingga wangi.', 'Masukkan ayam serta air, kemudian rebus hingga ayam empuk.', 'Carikkan ayam dan susun nasi impit serta suun dalam mangkuk.', 'Tuang sup panas dan hiaskan dengan ayam, daun sup serta bawang goreng.'], tip: 'Gunakan stok ayam sedia ada untuk mempercepatkan penyediaan.', sides: ['Sambal kicap', 'Bergedil']
   },
@@ -455,9 +488,149 @@ const recipeData = [
     ingredients: [i('Mee kuning', '400g', 'yellow-noodles'), i('Serbuk Kari Ayam/Daging', '2 sudu besar', 'curry-powder'), i('Santan', '300ml', 'coconut-milk'), i('Tahu pok', '4 keping', 'tofu-puffs'), i('Taugeh', '1 cawan', 'bean-sprout'), i('Ayam kisar', '150g', 'minced-chicken'), i('Bawang merah', '3 ulas', 'red-onion'), i('Bawang putih', '2 ulas', 'garlic')],
     steps: ['Tumis bawang merah dan bawang putih bersama serbuk kari.', 'Masukkan ayam kisar dan kacau hingga masak.', 'Tuang santan serta air, kemudian masukkan tahu pok dan renehkan.', 'Masukkan mee dan taugeh, masak seketika lalu hidangkan.'], tip: 'Jangan rebus mee terlalu lama supaya kekal kenyal.', sides: ['Telur rebus', 'Sambal cili']
   },
+  {
+    id: 'nasi-lemak', name: 'Nasi Lemak', style: 'Masakan Kampung', difficulty: 'Complicated', time: 50, defaultServings: 4, servings: 4, equipment: ['Periuk', 'Pengukus'], accent: 'lime', pairings: ['sambal-tumis-udang', 'telur-sambal'],
+    ingredients: [i('Nasi sejuk', '3 cawan', 'cold-rice'), i('Santan', '200ml', 'coconut-milk'), i('Daun pandan', '2 helai', 'pandan'), i('Ikan bilis', '1 cawan', 'anchovy'), i('Telur', '4 biji', 'egg'), i('Timun', '1/2 biji', 'cucumber'), i('Kacang tanah', '1/2 cawan', 'peanut', false, true), i('Garam', 'secukup rasa', 'salt', true)],
+    steps: ['Masak nasi bersama santan, daun pandan dan sedikit garam.', 'Goreng ikan bilis serta kacang tanah hingga rangup.', 'Rebus telur dan hiris timun.', 'Hidangkan nasi dengan sambal, ikan bilis, kacang, telur dan timun.'], tip: 'Gunakan santan sederhana pekat supaya nasi berlemak tetapi tidak muak.', sides: ['Sambal tumis', 'Ayam goreng']
+  },
+  {
+    id: 'nasi-dagang', name: 'Nasi Dagang', style: 'Masakan Kampung', difficulty: 'Complicated', time: 75, defaultServings: 4, servings: 4, equipment: ['Periuk', 'Pengukus'], accent: 'coral', pairings: ['ikan-singgang-kunyit', 'nasi-lemak'],
+    ingredients: [i('Beras Pulut', '1 cawan', 'glutinous-rice'), i('Nasi sejuk', '2 cawan', 'cold-rice'), i('Santan', '300ml', 'coconut-milk'), i('Ikan Tenggiri', '400g', 'spanish-mackerel'), i('Serbuk Kari Ayam/Daging', '2 sudu besar', 'curry-powder'), i('Bawang merah', '5 ulas', 'red-onion'), i('Halba', '1 sudu teh', 'fenugreek')],
+    steps: ['Rendam beras pulut dan beras biasa, kemudian kukus hingga hampir masak.', 'Gaul nasi dengan santan, halba dan garam, lalu kukus semula.', 'Masak ikan bersama rempah kari, bawang dan santan sebagai gulai.', 'Hidangkan nasi dagang dengan gulai ikan dan acar.'], tip: 'Kacau nasi dengan santan secara berperingkat supaya biji nasi kekal berderai.', sides: ['Gulai ikan', 'Acar timun']
+  },
+  {
+    id: 'nasi-kerabu', name: 'Nasi Kerabu', style: 'Masakan Kampung', difficulty: 'Complicated', time: 60, defaultServings: 4, servings: 4, equipment: ['Periuk', 'Lesung batu'], accent: 'lime', pairings: ['ayam-percik', 'kerabu-pucuk-paku'],
+    ingredients: [i('Nasi sejuk', '4 cawan', 'cold-rice'), i('Ikan Keli', '1 ekor', 'catfish'), i('Serai', '2 batang', 'lemongrass'), i('Bawang merah', '5 ulas', 'red-onion'), i('Kelapa parut', '1 cawan', 'coconut-milk', false, true), i('Daun Selasih', 'sedikit', 'thai-basil', false, true), i('Garam', 'secukup rasa', 'salt', true)],
+    steps: ['Sediakan nasi dan gaul dengan herba cincang.', 'Bakar atau goreng ikan keli hingga masak, kemudian siatkan isinya.', 'Tumis serai dan bawang, lalu gaul bersama isi ikan serta kelapa.', 'Hidangkan nasi dengan lauk ikan, ulam dan sambal.'], tip: 'Gunakan bunga telang jika mahu nasi kerabu berwarna biru semula jadi.', sides: ['Sambal budu', 'Ulam-ulaman']
+  },
+  {
+    id: 'nasi-tomato', name: 'Nasi Tomato', style: 'Masakan Kampung', difficulty: 'Complicated', time: 55, defaultServings: 4, servings: 4, equipment: ['Periuk'], accent: 'coral', pairings: ['ayam-percik', 'nasi-lemak'],
+    ingredients: [i('Nasi sejuk', '4 cawan', 'cold-rice'), i('Tomato', '3 biji', 'tomato'), i('Sos tomato', '3 sudu besar', 'tomato-sauce'), i('Serbuk Kari Ayam/Daging', '1 sudu besar', 'curry-powder'), i('Bawang merah', '4 ulas', 'red-onion'), i('Mentega', '2 sudu besar', 'butter'), i('Daun pandan', '1 helai', 'pandan')],
+    steps: ['Tumis bawang dan serbuk kari dengan mentega hingga wangi.', 'Masukkan tomato kisar, sos tomato dan air.', 'Masukkan beras dan daun pandan, kemudian masak hingga nasi empuk.', 'Gemburkan nasi dan hidangkan bersama lauk pilihan.'], tip: 'Tambah sedikit sos tomato untuk warna merah yang lebih terang.', sides: ['Ayam masak merah', 'Acar timun']
+  },
+  {
+    id: 'nasi-minyak', name: 'Nasi Minyak', style: 'Masakan Kampung', difficulty: 'Complicated', time: 55, defaultServings: 4, servings: 4, equipment: ['Periuk'], accent: 'gold', pairings: ['ayam-percik', 'rendang-daging-tok'],
+    ingredients: [i('Nasi sejuk', '4 cawan', 'cold-rice'), i('Mentega', '3 sudu besar', 'butter'), i('Serbuk Kari Ayam/Daging', '1 sudu besar', 'curry-powder'), i('Rempah 4 Beradik', '1 sudu besar', 'rempah-4-beradik'), i('Bawang merah', '4 ulas', 'red-onion'), i('Santan', '150ml', 'coconut-milk'), i('Garam', 'secukup rasa', 'salt', true)],
+    steps: ['Tumis bawang, rempah empat beradik dan serbuk kari dengan mentega.', 'Masukkan beras, santan, air dan garam.', 'Masak hingga nasi empuk dan minyak naik di permukaan.', 'Gemburkan nasi sebelum dihidangkan.'], tip: 'Goreng beras seketika bersama rempah sebelum menambah air untuk aroma lebih dalam.', sides: ['Rendang daging', 'Acar jelatah']
+  },
+  {
+    id: 'nasi-ambeng', name: 'Nasi Ambeng', style: 'Masakan Kampung', difficulty: 'Complicated', time: 70, defaultServings: 4, servings: 4, equipment: ['Periuk', 'Kuali'], accent: 'brown', pairings: ['sambal-goreng-jawa', 'ayam-goreng-berempah'],
+    ingredients: [i('Nasi sejuk', '4 cawan', 'cold-rice'), i('Ayam', '500g', 'chicken'), i('Tahu pok', '4 keping', 'tofu-puffs'), i('Tempe', '1 papan', 'tempe'), i('Suun', '50g', 'glass-noodles'), i('Kacang panjang', '1 cawan', 'long-bean'), i('Kelapa parut', '1 cawan', 'coconut-milk', false, true)],
+    steps: ['Sediakan nasi putih dan lauk ayam berempah.', 'Goreng tempe serta tahu pok hingga keemasan.', 'Masak suun dan kacang panjang dengan sambal goreng.', 'Susun semua lauk di sekeliling nasi untuk dihidangkan bersama.'], tip: 'Hidangkan di atas dulang besar supaya semua lauk mudah dikongsi.', sides: ['Sambal goreng Jawa', 'Serunding kelapa']
+  },
+  {
+    id: 'assam-laksa', name: 'Assam Laksa', style: 'Masakan Kampung', difficulty: 'Complicated', time: 60, defaultServings: 4, servings: 4, equipment: ['Periuk', 'Pengisar'], accent: 'coral', pairings: ['kerabu-mangga-express', 'sambal-belacan'],
+    ingredients: [i('Ikan Kembung', '4 ekor', 'mackerel'), i('Mee Laksa', '400g', 'laksa-noodles'), i('Asam jawa', '3 sudu besar', 'asam'), i('Serai', '3 batang', 'lemongrass'), i('Bawang merah', '6 ulas', 'red-onion'), i('Cili kisar', '3 sudu besar', 'chilli-paste', true), i('Daun Kesum', '1 tangkai', 'kesum-leaves'), i('Bunga Kantan', '1 kuntum', 'torch-ginger')],
+    steps: ['Rebus ikan, asingkan isi dan simpan air rebusan.', 'Kisar bawang, cili dan serai, kemudian masak dalam stok ikan.', 'Tambah air asam, daun kesum dan bunga kantan lalu renehkan.', 'Hidangkan kuah bersama mee laksa dan ulam.'], tip: 'Reneh kuah lebih lama untuk rasa ikan yang lebih pekat dan seimbang.', sides: ['Timun', 'Nanas']
+  },
+  {
+    id: 'laksa-johor', name: 'Laksa Johor', style: 'Masakan Kampung', difficulty: 'Complicated', time: 75, defaultServings: 4, servings: 4, equipment: ['Periuk', 'Pengisar'], accent: 'orange', pairings: ['sambal-belacan', 'kerabu-mangga-express'],
+    ingredients: [i('Ikan Tenggiri', '500g', 'spanish-mackerel'), i('Mee Laksa', '400g', 'laksa-noodles'), i('Santan', '300ml', 'coconut-milk'), i('Serbuk Kari Ayam/Daging', '2 sudu besar', 'curry-powder'), i('Serai', '2 batang', 'lemongrass'), i('Bawang merah', '6 ulas', 'red-onion'), i('Daun Selasih', '1 cawan', 'thai-basil', false, true)],
+    steps: ['Rebus ikan, siat isinya dan kisar bersama sedikit stok.', 'Tumis bawang serta rempah kari, kemudian masukkan ikan kisar.', 'Tambah santan dan stok, lalu reneh hingga kuah pekat.', 'Hidangkan bersama mee laksa dan ulam cincang.'], tip: 'Gaulkan mee dengan sedikit minyak supaya tidak melekat sebelum dihidang.', sides: ['Bawang merah', 'Limau kasturi']
+  },
+  {
+    id: 'laksa-sarawak', name: 'Laksa Sarawak', style: 'Masakan Kampung', difficulty: 'Complicated', time: 60, defaultServings: 4, servings: 4, equipment: ['Periuk'], accent: 'brown', pairings: ['telur-dadar-pedas', 'sambal-belacan'],
+    ingredients: [i('Suun', '200g', 'glass-noodles'), i('Udang', '250g', 'shrimp'), i('Ayam', '250g', 'chicken'), i('Telur', '3 biji', 'egg'), i('Serbuk Kari Ayam/Daging', '2 sudu besar', 'curry-powder'), i('Santan', '300ml', 'coconut-milk'), i('Bawang putih', '4 ulas', 'garlic'), i('Taugeh', '1 cawan', 'bean-sprout')],
+    steps: ['Tumis bawang putih dan rempah kari hingga wangi.', 'Masukkan stok, ayam dan santan, kemudian renehkan.', 'Masukkan udang dan masak hingga bertukar warna.', 'Hidangkan sup bersama suun, telur hiris dan taugeh.'], tip: 'Masukkan udang pada akhir masakan supaya tidak liat.', sides: ['Limau kasturi', 'Sambal belacan']
+  },
+  {
+    id: 'mee-bandung-muar', name: 'Mee Bandung Muar', style: 'Bujang/Express', difficulty: 'Complicated', time: 35, defaultServings: 2, servings: 2, equipment: ['Periuk'], accent: 'coral', pairings: ['telur-dadar-pedas', 'sambal-belacan'],
+    ingredients: [i('Mee kuning', '400g', 'yellow-noodles'), i('Udang', '150g', 'shrimp'), i('Daging Kisar', '150g', 'minced-beef'), i('Telur', '2 biji', 'egg'), i('Sos tomato', '3 sudu besar', 'tomato-sauce'), i('Cili kisar', '2 sudu besar', 'chilli-paste', true), i('Bawang merah', '4 ulas', 'red-onion')],
+    steps: ['Tumis bawang merah dan cili kisar hingga pecah minyak.', 'Masukkan daging kisar, udang, sos tomato dan air.', 'Didihkan kuah, masukkan mee serta telur dan masak hingga sebati.', 'Perasakan lalu hidangkan panas.'], tip: 'Gunakan stok udang untuk kuah yang lebih manis dan beraroma.', sides: ['Limau kasturi', 'Cili jeruk']
+  },
+  {
+    id: 'mee-rebus', name: 'Mee Rebus', style: 'Bujang/Express', difficulty: 'Complicated', time: 40, defaultServings: 2, servings: 2, equipment: ['Periuk'], accent: 'gold', pairings: ['telur-dadar-pedas', 'kerabu-mangga-express'],
+    ingredients: [i('Mee kuning', '400g', 'yellow-noodles'), i('Kentang', '3 biji', 'potato'), i('Telur', '2 biji', 'egg'), i('Udang Kering', '2 sudu besar', 'dried-shrimp'), i('Cili kisar', '2 sudu besar', 'chilli-paste', true), i('Kacang tanah', '1/2 cawan', 'peanut'), i('Taugeh', '1 cawan', 'bean-sprout')],
+    steps: ['Rebus kentang, lenyekkan dan kisar bersama udang kering serta kacang.', 'Tumis cili kisar, masukkan bahan kisar dan air lalu didihkan.', 'Masukkan mee dan masak hingga kuah memekat.', 'Hidangkan dengan taugeh, telur dan hirisan limau.'], tip: 'Lenturkan mee dalam air panas dahulu supaya kuah cepat meresap.', sides: ['Telur rebus', 'Limau kasturi']
+  },
+  {
+    id: 'kl-hokkien-mee', name: 'KL Hokkien Mee', style: 'Bujang/Express', difficulty: 'Complicated', time: 30, defaultServings: 2, servings: 2, equipment: ['Kuali'], accent: 'brown', pairings: ['kailan-ikan-masin', 'telur-dadar-pedas'],
+    ingredients: [i('Mee kuning', '400g', 'yellow-noodles'), i('Udang', '150g', 'shrimp'), i('Sotong', '150g', 'squid'), i('Kicap pekat', '2 sudu besar', 'dark-soy-sauce'), i('Sos tiram', '1 sudu besar', 'oyster-sauce'), i('Kailan', '1 cawan', 'kailan'), i('Bawang putih', '3 ulas', 'garlic')],
+    steps: ['Tumis bawang putih hingga wangi dan masukkan udang serta sotong.', 'Tambah mee, kicap pekat, sos tiram dan sedikit stok.', 'Masukkan kailan dan gaul atas api besar.', 'Masak hingga mee berkilat dan kuah pekat lalu hidangkan.'], tip: 'Gunakan api besar dan stok yang cukup untuk rasa wok hei.', sides: ['Cili potong', 'Limau kasturi']
+  },
+  {
+    id: 'gulai-ikan-patin-tempoyak', name: 'Gulai Ikan Patin Tempoyak', style: 'Masakan Kampung', difficulty: 'Complicated', time: 45, defaultServings: 4, servings: 4, equipment: ['Periuk'], accent: 'lime', pairings: ['nasi-goreng-kampung', 'kerabu-pucuk-paku'],
+    ingredients: [i('Ikan Patin', '600g', 'patin'), i('Tempoyak', '3 sudu besar', 'tempoyak'), i('Cili padi', '10 biji', 'bird-eye-chilli'), i('Kunyit', '2 cm', 'turmeric'), i('Serai', '1 batang', 'lemongrass'), i('Daun Kesum', '1 tangkai', 'kesum-leaves'), i('Garam', 'secukup rasa', 'salt', true)],
+    steps: ['Tumbuk cili padi dan kunyit hingga halus.', 'Masukkan bahan tumbuk, tempoyak, serai dan air ke dalam periuk.', 'Didihkan kuah dan masukkan ikan patin serta daun kesum.', 'Reneh perlahan hingga ikan masak dan perasakan.'], tip: 'Laraskan tempoyak mengikut tahap masam yang disukai.', sides: ['Nasi putih', 'Ulam pucuk paku']
+  },
+  {
+    id: 'daging-salai-masak-lemak', name: 'Daging Salai Masak Lemak Cili Api', style: 'Masakan Kampung', difficulty: 'Complicated', time: 75, defaultServings: 4, servings: 4, equipment: ['Periuk'], accent: 'lime', pairings: ['nasi-minyak', 'kerabu-pucuk-paku'],
+    ingredients: [i('Daging Lembu', '500g', 'beef'), i('Santan', '500ml', 'coconut-milk'), i('Cili padi', '12 biji', 'bird-eye-chilli'), i('Kunyit', '2 cm', 'turmeric'), i('Serai', '2 batang', 'lemongrass'), i('Pucuk Ubi', '1 ikat', 'tapioca-leaves', false, true), i('Garam', 'secukup rasa', 'salt', true)],
+    steps: ['Salai atau panggang daging hingga beraroma, kemudian hiris nipis.', 'Tumbuk cili padi dan kunyit, lalu masukkan ke dalam periuk bersama santan.', 'Tambah serai dan daging, kemudian renehkan perlahan.', 'Masukkan pucuk ubi jika digunakan dan perasakan sebelum dihidang.'], tip: 'Reneh dengan api kecil supaya santan tidak pecah dan daging lembut.', sides: ['Nasi putih', 'Pucuk ubi celur']
+  },
+  {
+    id: 'rendang-daging-tok', name: 'Rendang Daging Tok', style: 'Masakan Kampung', difficulty: 'Complicated', time: 120, defaultServings: 4, servings: 4, equipment: ['Kuali', 'Lesung batu'], accent: 'brown', pairings: ['nasi-minyak', 'nasi-lemak'],
+    ingredients: [i('Daging Lembu', '700g', 'beef'), i('Santan', '500ml', 'coconut-milk'), i('Serbuk Kari Ayam/Daging', '2 sudu besar', 'curry-powder'), i('Rempah 4 Beradik', '1 sudu besar', 'rempah-4-beradik'), i('Kerisik', '3 sudu besar', 'kerisik'), i('Bawang merah', '8 ulas', 'red-onion'), i('Buah Keras', '3 biji', 'candlenut'), i('Daun Kunyit', '1 helai', 'turmeric-leaf')],
+    steps: ['Kisar bawang, buah keras dan rempah bersama sedikit air.', 'Tumis bahan kisar hingga pecah minyak.', 'Masukkan daging dan santan, kemudian masak perlahan hingga empuk.', 'Tambah kerisik serta daun kunyit dan kacau hingga rendang kering.'], tip: 'Masak lama dengan api kecil untuk tekstur rendang Tok yang lembut dan pekat.', sides: ['Nasi minyak', 'Acar jelatah']
+  },
+  {
+    id: 'ayam-percik', name: 'Ayam Percik', style: 'Masakan Kampung', difficulty: 'Complicated', time: 60, defaultServings: 4, servings: 4, equipment: ['Pemanggang', 'Periuk'], airFryer: true, accent: 'coral', pairings: ['nasi-kerabu', 'kerabu-pucuk-paku'],
+    ingredients: [i('Ayam', '4 ketul', 'chicken'), i('Santan', '400ml', 'coconut-milk'), i('Cili kisar', '3 sudu besar', 'chilli-paste', true), i('Serai', '2 batang', 'lemongrass'), i('Bawang merah', '6 ulas', 'red-onion'), i('Halia', '2 cm', 'ginger'), i('Kunyit', '1 cm', 'turmeric'), i('Gula Melaka', '1 sudu besar', 'palm-sugar')],
+    steps: ['Kisar bawang, halia, kunyit dan serai, kemudian tumis bersama cili.', 'Masukkan santan dan gula Melaka lalu masak hingga kuah pekat.', 'Lumurkan ayam dengan kuah dan panggang hingga hampir masak.', 'Sapu kuah berulang kali dan panggang hingga ayam masak serta berkilat.'], tip: 'Sapu kuah selepas setiap pusingan panggang untuk lapisan percik yang lebih tebal.', sides: ['Nasi kerabu', 'Acar timun']
+  },
+  {
+    id: 'kam-heong-crab-prawns', name: 'Kam Heong Crab/Prawns', style: 'Western Fusion', difficulty: 'Complicated', time: 35, defaultServings: 2, servings: 2, equipment: ['Kuali'], accent: 'gold', pairings: ['nasi-goreng-kampung', 'kailan-ikan-masin'],
+    ingredients: [i('Ketam', '2 ekor', 'crab'), i('Udang', '250g', 'shrimp'), i('Udang Kering', '2 sudu besar', 'dried-shrimp'), i('Cili kisar', '2 sudu besar', 'chilli-paste', true), i('Bawang putih', '4 ulas', 'garlic'), i('Bawang merah', '4 ulas', 'red-onion'), i('Sos tiram', '1 sudu besar', 'oyster-sauce'), i('Kicap manis', '1 sudu besar', 'soy-sauce')],
+    steps: ['Goreng ketam dan udang seketika, kemudian ketepikan.', 'Tumis bawang, udang kering dan cili kisar hingga wangi.', 'Masukkan sos tiram, kicap dan sedikit air.', 'Masukkan makanan laut dan gaul hingga kuah melekat.'], tip: 'Goreng udang kering hingga rangup untuk aroma kam heong yang lebih kuat.', sides: ['Nasi putih', 'Timun']
+  },
+  {
+    id: 'pajeri-nenas-terung', name: 'Pajeri Nenas/Terung', style: 'Masakan Kampung', difficulty: 'Complicated', time: 40, defaultServings: 4, servings: 4, equipment: ['Periuk'], accent: 'gold', pairings: ['nasi-minyak', 'ayam-percik'],
+    ingredients: [i('Nanas', '1/2 biji', 'pineapple'), i('Terung', '2 biji', 'eggplant'), i('Santan', '300ml', 'coconut-milk'), i('Serbuk Kari Ayam/Daging', '2 sudu besar', 'curry-powder'), i('Bawang merah', '5 ulas', 'red-onion'), i('Bawang putih', '3 ulas', 'garlic'), i('Kerisik', '1 sudu besar', 'kerisik'), i('Gula Melaka', '1 sudu besar', 'palm-sugar')],
+    steps: ['Goreng terung hingga sedikit lembut dan ketepikan.', 'Tumis bawang serta serbuk kari hingga pecah minyak.', 'Masukkan santan, nanas, gula Melaka dan kerisik.', 'Masukkan terung dan reneh hingga kuah pekat serta sebati.'], tip: 'Pilih nanas yang masam manis supaya pajeri tidak terlalu manis.', sides: ['Nasi minyak', 'Ayam masak merah']
+  },
+  {
+    id: 'sup-tulang-merah', name: 'Sup Tulang Merah', style: 'Mamak', difficulty: 'Complicated', time: 120, defaultServings: 4, servings: 4, equipment: ['Periuk'], accent: 'coral', pairings: ['roti-canai-murtabak', 'telur-dadar-pedas'],
+    ingredients: [i('Daging Lembu', '500g', 'beef'), i('Serbuk Kari Ayam/Daging', '2 sudu besar', 'curry-powder'), i('Sos tomato', '5 sudu besar', 'tomato-sauce'), i('Cili kisar', '2 sudu besar', 'chilli-paste', true), i('Rempah 4 Beradik', '1 sudu besar', 'rempah-4-beradik'), i('Bawang merah', '5 ulas', 'red-onion'), i('Kentang', '2 biji', 'potato'), i('Gula Melaka', '1 sudu besar', 'palm-sugar')],
+    steps: ['Rebus tulang dan daging hingga empuk, kemudian simpan stoknya.', 'Tumis bawang, rempah dan cili kisar hingga wangi.', 'Masukkan stok, sos tomato, gula Melaka dan kentang.', 'Masukkan daging dan reneh hingga kuah merah pekat.'], tip: 'Gunakan periuk tekanan untuk memendekkan masa merebus tulang.', sides: ['Roti putih', 'Acar timun']
+  },
+  {
+    id: 'sambal-belacan', name: 'Sambal Belacan', style: 'Masakan Kampung', difficulty: 'Simple', time: 10, defaultServings: 4, servings: 4, equipment: ['Lesung batu'], accent: 'chilli', pairings: ['nasi-kerabu', 'ikan-goreng-taucu'],
+    ingredients: [i('Belacan', '1 keping', 'belacan-block'), i('Cili padi', '10 biji', 'bird-eye-chilli'), i('Tomato', '1 biji', 'tomato'), i('Limau Nipis', '2 biji', 'lime'), i('Garam', 'secukup rasa', 'salt', true), i('Gula', '1 sudu teh', 'palm-sugar')],
+    steps: ['Bakar belacan seketika hingga wangi.', 'Tumbuk cili padi, tomato dan belacan hingga lumat.', 'Tambah garam, gula dan jus limau.', 'Gaul hingga sebati dan hidangkan sebagai pencicah.'], tip: 'Bakar belacan di dalam foil untuk mengurangkan bau di dapur.', sides: ['Ulam-ulaman', 'Ikan goreng']
+  },
+  {
+    id: 'sambal-hitam-pahang', name: 'Sambal Hitam Pahang', style: 'Masakan Kampung', difficulty: 'Complicated', time: 90, defaultServings: 4, servings: 4, equipment: ['Kuali'], accent: 'pepper', pairings: ['nasi-lemak', 'telur-sambal'],
+    ingredients: [i('Belimbing Buluh', '500g', 'green-mango'), i('Ikan Bilis', '1 cawan', 'anchovy'), i('Cili padi', '10 biji', 'bird-eye-chilli'), i('Bawang merah', '6 ulas', 'red-onion'), i('Minyak', '4 sudu besar', 'oil', true), i('Garam', 'secukup rasa', 'salt', true)],
+    steps: ['Rebus belimbing buluh hingga lembut, toskan dan cincang.', 'Tumbuk cili, bawang dan ikan bilis secara kasar.', 'Tumis bahan tumbuk hingga wangi dan masukkan belimbing.', 'Masak perlahan hingga sambal menjadi hitam dan kering.'], tip: 'Masak perlahan dan kacau selalu supaya sambal tidak melekat di kuali.', sides: ['Nasi putih', 'Telur rebus']
+  },
+  {
+    id: 'kerabu-pucuk-paku', name: 'Kerabu Pucuk Paku', style: 'Masakan Kampung', difficulty: 'Simple', time: 20, defaultServings: 4, servings: 4, equipment: ['Periuk', 'Mangkuk'], accent: 'lime', pairings: ['gulai-ikan-patin-tempoyak', 'ayam-percik'],
+    ingredients: [i('Pucuk Paku', '2 ikat', 'fiddlehead-fern'), i('Udang Kering', '2 sudu besar', 'dried-shrimp'), i('Kelapa parut', '1 cawan', 'coconut-milk'), i('Cili padi', '6 biji', 'bird-eye-chilli'), i('Bawang merah', '3 ulas', 'red-onion'), i('Limau Nipis', '2 biji', 'lime'), i('Garam', 'secukup rasa', 'salt', true)],
+    steps: ['Celur pucuk paku dan toskan.', 'Sangai kelapa serta udang kering hingga harum.', 'Tumbuk cili dan bawang, kemudian campur dengan jus limau.', 'Gaul semua bahan bersama pucuk paku dan perasakan.'], tip: 'Celur pucuk paku sekejap sahaja supaya kekal rangup dan hijau.', sides: ['Nasi putih', 'Ikan goreng']
+  },
+  {
+    id: 'botok-botok-ikan', name: 'Botok-Botok Ikan', style: 'Masakan Kampung', difficulty: 'Complicated', time: 55, defaultServings: 4, servings: 4, equipment: ['Pengukus'], accent: 'lime', pairings: ['nasi-kerabu', 'sambal-belacan'],
+    ingredients: [i('Ikan Tenggiri', '500g', 'spanish-mackerel'), i('Pucuk Paku', '1 ikat', 'fiddlehead-fern'), i('Daun Pisang', '4 helai', 'banana-leaf'), i('Serbuk Kari Ayam/Daging', '1 sudu besar', 'curry-powder'), i('Serai', '2 batang', 'lemongrass'), i('Bawang merah', '5 ulas', 'red-onion'), i('Daun Kunyit', '1 helai', 'turmeric-leaf', false, true)],
+    steps: ['Kisar bawang, serai dan rempah kari menjadi pes.', 'Gaul ikan serta pucuk paku dengan pes rempah.', 'Bungkus adunan dalam daun pisang.', 'Kukus selama 25 minit hingga ikan masak dan wangi.'], tip: 'Layurkan daun pisang dahulu supaya mudah dilipat dan tidak koyak.', sides: ['Nasi putih', 'Sambal belacan']
+  },
+  {
+    id: 'roti-canai-murtabak', name: 'Roti Canai/Murtabak', style: 'Mamak', difficulty: 'Complicated', time: 45, defaultServings: 4, servings: 4, equipment: ['Kuali leper'], accent: 'gold', pairings: ['sup-tulang-merah', 'gulai-ayam'],
+    ingredients: [i('Tepung Gandum', '500g', 'wheat-flour'), i('Telur', '3 biji', 'egg'), i('Daging Kisar', '250g', 'minced-beef'), i('Bawang merah', '1 biji', 'red-onion'), i('Serbuk Kari Ayam/Daging', '1 sudu besar', 'curry-powder'), i('Minyak', 'secukupnya', 'oil', true), i('Garam', '1 sudu teh', 'salt', true)],
+    steps: ['Uli tepung, garam dan air menjadi doh lembut, kemudian rehatkan.', 'Tumis daging kisar, bawang dan serbuk kari hingga masak.', 'Leperkan doh, letakkan inti dan telur, kemudian lipat.', 'Goreng di atas kuali leper hingga kedua-dua sisi garing.'], tip: 'Rehatkan doh lebih lama untuk menghasilkan lapisan roti yang lebih nipis.', sides: ['Kuah dhal', 'Acar bawang']
+  },
+  {
+    id: 'karipap', name: 'Karipap', style: 'Bujang/Express', difficulty: 'Complicated', time: 50, defaultServings: 6, servings: 6, equipment: ['Kuali'], accent: 'gold', pairings: ['telur-dadar-pedas', 'sambal-belacan'],
+    ingredients: [i('Tepung Gandum', '300g', 'wheat-flour'), i('Kentang', '3 biji', 'potato'), i('Ayam Kisar', '200g', 'minced-chicken'), i('Serbuk Kari Ayam/Daging', '2 sudu besar', 'curry-powder'), i('Bawang merah', '4 ulas', 'red-onion'), i('Minyak', 'secukupnya', 'oil', true), i('Garam', 'secukup rasa', 'salt', true)],
+    steps: ['Tumis bawang, ayam kisar, kentang dan serbuk kari hingga kering.', 'Uli tepung dengan air, garam dan sedikit minyak.', 'Canai doh, isi inti dan kelimkan tepinya.', 'Goreng dalam minyak sederhana panas hingga keemasan.'], tip: 'Sejukkan inti sepenuhnya sebelum mengisi doh supaya karipap tidak pecah.', sides: ['Sos cili', 'Teh panas']
+  },
+  {
+    id: 'ondeh-ondeh', name: 'Ondeh-Ondeh', style: 'Masakan Kampung', difficulty: 'Complicated', time: 45, defaultServings: 6, servings: 6, equipment: ['Periuk'], accent: 'lime', pairings: ['cendol', 'kuih-seri-muka'],
+    ingredients: [i('Tepung Pulut', '250g', 'glutinous-rice-flour'), i('Gula Melaka', '100g', 'palm-sugar'), i('Kelapa parut', '1 cawan', 'coconut-milk'), i('Daun Pandan', '2 helai', 'pandan'), i('Garam', 'secubit', 'salt', true)],
+    steps: ['Gaul tepung pulut dengan air pandan hingga menjadi doh.', 'Bulatkan doh dan isi sedikit gula Melaka di tengahnya.', 'Rebus bebola hingga timbul di permukaan air.', 'Salutkan dengan kelapa parut yang digaul garam.'], tip: 'Pastikan doh ditutup rapat supaya gula Melaka tidak bocor ketika direbus.', sides: ['Teh panas', 'Kopi']
+  },
+  {
+    id: 'kuih-seri-muka', name: 'Kuih Seri Muka', style: 'Masakan Kampung', difficulty: 'Complicated', time: 75, defaultServings: 8, servings: 8, equipment: ['Pengukus'], accent: 'lime', pairings: ['ondeh-ondeh', 'cendol'],
+    ingredients: [i('Beras Pulut', '300g', 'glutinous-rice'), i('Santan', '500ml', 'coconut-milk'), i('Telur', '3 biji', 'egg'), i('Tepung Gandum', '3 sudu besar', 'wheat-flour'), i('Gula', '150g', 'palm-sugar'), i('Daun Pandan', '5 helai', 'pandan'), i('Garam', 'secubit', 'salt', true)],
+    steps: ['Kukus beras pulut bersama santan dan garam sebagai lapisan bawah.', 'Kisar pandan, santan, telur, gula dan tepung.', 'Tuang adunan hijau di atas pulut yang telah ditekan.', 'Kukus semula hingga lapisan atas set dan sejukkan sebelum dipotong.'], tip: 'Sejukkan sepenuhnya sebelum memotong untuk lapisan yang kemas.', sides: ['Teh panas', 'Kopi']
+  },
+  {
+    id: 'cendol', name: 'Cendol', style: 'Bujang/Express', difficulty: 'Simple', time: 25, defaultServings: 4, servings: 4, equipment: ['Periuk'], accent: 'lime', pairings: ['ondeh-ondeh', 'kuih-seri-muka'],
+    ingredients: [i('Sagu', '100g', 'sago'), i('Santan', '400ml', 'coconut-milk'), i('Gula Melaka', '150g', 'palm-sugar'), i('Daun Pandan', '2 helai', 'pandan'), i('Garam', 'secubit', 'salt', true)],
+    steps: ['Masak gula Melaka bersama daun pandan dan sedikit air hingga menjadi sirap.', 'Didihkan santan bersama garam dan ketepikan.', 'Rebus sagu hingga jernih, kemudian bilas dengan air sejuk.', 'Hidangkan sagu dengan santan, sirap gula Melaka dan ais.'], tip: 'Sejukkan santan sebelum dihidang supaya cendol lebih menyegarkan.', sides: ['Kacang merah', 'Jagung manis']
+  },
 ]
 
-export const groups = ['Protein', 'Vegetables', 'Seafood', 'Spices', 'Aromatics', 'Sauces', 'Carbs']
+export const groups = ['Protein', 'Vegetables', 'Seafood', 'Spices', 'Aromatics', 'Sauces', 'Carbs', 'Flours']
 
 const difficultyTranslations = { Simple: 'Easy', Complicated: 'Advanced' }
 export const recipes = recipeData.map(recipe => {
@@ -469,7 +642,7 @@ export const recipes = recipeData.map(recipe => {
     difficulty: bilingual(recipe.difficulty, difficultyTranslations[recipe.difficulty] || recipe.difficulty),
     equipment: recipe.equipment.map(item => bilingual(item)),
     steps: recipe.steps.map((step, index) => bilingual(step, instructionTranslations[recipe.id]?.[index] || step)),
-    tip: bilingual(recipe.tip),
+    tip: bilingual(recipe.tip, tipTranslations[recipe.id]),
     sides: recipe.sides.map(side => bilingual(side)),
   }
 })
