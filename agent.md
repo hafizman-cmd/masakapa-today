@@ -47,6 +47,7 @@
 - Ingredient options include the expanded poultry/meat proteins plus Rempah & Bahan Tumis and Sos & Perasa groups.
 - Ingredient options also include Siakap, Pari, Tilapia, Cencaru, Kembung, Sotong, Petai, seafood seasonings, and seafood garnishes.
 - Ingredient options include Karbo & Mi items, stir-fry vegetables, noodles/rice sauces, and express recipe complements.
+- Matcher ingredient selection uses horizontal category tabs, text search across all categories, a pantry-staples quick toggle, a removable selected-ingredient tray, and a Clear All action.
 - Compact recipe rows use a colored initials avatar, truncated title, metadata subtitle, optional missing-ingredient note, match percentage pill, favorite toggle, and right chevron.
 - `BottomNav` calls `App.handleNavigate`, which clears the active recipe before switching tabs.
 - `BottomNav` is a frame-bound shrink-to-content footer bar with exactly four evenly spaced tabs: Peti Sejuk, Cari Resepi, Senarai Pasar, and Kegemaran. The grocery tab shows the persisted item count badge; Kegemaran opens the dedicated Favorites view.

@@ -59,3 +59,4 @@ The recipe catalog contains 53 unique recipes, including 12 Ayam, Daging & Kambi
 19. The ingredient pool also includes Siakap, Pari, Tilapia, Cencaru, Kembung, Sotong, Petai, seafood seasonings, and seafood garnishes for the seafood expansion.
 20. The ingredient pool includes Karbo & Mi items, stir-fry vegetables, noodles/rice sauces, and express recipe complements for the expanded noodle and fried rice dishes.
 21. The Express Noodles & Rice batch contains 12 requested dishes; Mee Goreng Mamak, Nasi Goreng Kampung, and Nasi Goreng Cina retain their stable IDs and refreshed ingredient sets, while nine additional dishes use new IDs.
+22. Matcher ingredient selection is organized by horizontal category tabs with text search, a pantry-staples quick-select helper, a removable selected tray, and Clear All reset behavior.
