@@ -55,3 +55,21 @@ h1, h2, h3, p { margin: 0; }
 .detail-grocery-add { margin-top: 13px; }
 .nav-icon { position: relative; display: inline-flex; }.nav-badge { position: absolute; top: -8px; right: -11px; min-width: 16px; height: 16px; border-radius: 10px; padding: 0 4px; display: grid; place-items: center; color: #fff; background: #d6573a; font-size: 9px; }
 .grocery-toolbar { display: flex; justify-content: space-between; align-items: center; color: #68766a; font-size: 12px; margin: 3px 0 15px; }.grocery-toolbar button, .clear-all-button { border: 0; background: transparent; color: #d6573a; font-size: 11px; font-weight: 700; }.grocery-items { background: #fff; border-radius: 16px; padding: 4px 15px; }.grocery-item { width: 100%; display: flex; gap: 11px; align-items: center; text-align: left; padding: 13px 0; border: 0; border-bottom: 1px solid #f0ede8; background: transparent; color: #465649; }.grocery-item:last-child { border-bottom: 0; }.grocery-item > span:last-child { display: flex; flex-direction: column; gap: 3px; }.grocery-item strong { font-size: 13px; font-weight: 600; }.grocery-item small { color: #a0a69f; font-size: 10px; }.grocery-item.checked strong { color: #a2aaa1; text-decoration: line-through; }.grocery-item.checked .check-box { color: #fff; background: #679166; border-color: #679166; }.clear-all-button { display: block; margin: 20px auto; }.empty-list-icon { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; margin: auto; color: #679166; background: #e9f0df; }
+
+@media (min-width: 768px) {
+  .app-shell > div { max-width: 56rem; height: 92vh; margin-top: 4vh; margin-bottom: 4vh; border-radius: 1rem; }
+  .content { padding-left: 28px; padding-right: 28px; }
+  .page-header { padding-left: 28px; padding-right: 28px; }
+  .results-section { margin-top: 3px; }
+  .results-section .recipe-list { max-height: calc(92vh - 280px); overflow-y: auto; padding-right: 4px; }
+  .detail-content { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-content: start; }
+  .detail-content .detail-meta { grid-column: 1 / -1; }
+  .detail-content .pairings-section { grid-column: 1 / -1; }
+  .recipe-list.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+}
+
+@media (min-width: 1024px) {
+  .app-shell > div { max-width: 72rem; }
+  .page-header { padding-top: 42px; }
+  .detail-hero { min-height: 340px; }
+}

@@ -18,7 +18,7 @@ graph TD
   App --> Update[App update toast]
   Detail[src/components/RecipeDetail.jsx] --> Portions[Portion scaler]
   Portions --> Grocery
-  App --> Frame[Master max-w-md container]
+  App --> Frame[Responsive max-w-md / md:max-w-4xl / lg:max-w-6xl container]
   Card --> Frame
   Nav --> Frame
   Detail --> Frame
@@ -29,6 +29,10 @@ graph TD
   Nav --> Tabs[Four-tab locked flex footer navigation]
   App --> Scroll[Main scroll reset on tab/detail changes]
   App --> Language[Persisted ms/en language state]
+  Matcher --> Split[md 7/5 ingredient and sticky results split]
+  Discover --> DesktopGrid[md two-column recipe grid]
+  Favorites --> DesktopGrid
+  Detail --> DetailGrid[md two-column ingredients and instructions]
   Detail --> History[window.history pushState/popstate]
   Vite --> Capacitor[capacitor.config.json]
   Index[index.html] --> Manifest[public/manifest.webmanifest]
@@ -62,6 +66,9 @@ The recipe catalog contains 98 unique recipes: the original 70 plus 28 iconic Ma
 15. `App` resets the main scroll container to the top when the active tab or selected recipe changes.
 16. Recipe entry uses `pushState({ view: 'detail' })`; browser/Android back uses `popstate` to clear the selected recipe.
 17. `App` owns the persisted `ms`/`en` language state; the shared translation dictionary and bilingual recipe fields flow through every view and navigation label.
+18. The app shell remains `max-w-md` on mobile, expands to `md:max-w-4xl` on tablets, expands to `lg:max-w-6xl` on desktop, and uses a centered 92vh rounded surface from the `md` breakpoint.
+19. Matcher becomes a 12-column `md` grid with ingredient selection in seven columns and a sticky live-results pane in five columns.
+20. Discover and Favorites render two-column recipe grids at `md`; RecipeDetail uses a two-column content grid for ingredients and step-by-step instructions/tips.
 18. The dedicated Favorites view omits Search controls and renders only recipes whose IDs are present in `favorites`; its empty state includes a Heart icon and an Explore Recipes/Cari Resipi action that navigates to Discover.
 19. Discover and Matcher filter chips exclude Favorite/Kegemaran; the remaining four category chips use the padded horizontal scroller `flex overflow-x-auto flex-nowrap scrollbar-none px-4 pr-8 py-2 space-x-2 w-full items-center`.
 20. The ingredient pool includes the expanded poultry/meat proteins, Rempah & Bahan Tumis, and Sos & Perasa categories used by the new recipes.

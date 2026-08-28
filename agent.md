@@ -69,13 +69,16 @@ Run `node scripts/seed-supabase.js` after creating the tables above and ensuring
 - `capacitor.config.json`: mobile packaging identity and `dist` web directory.
 
 ## Layout Rule (Important)
-- ALL views (Matcher, Discover, RecipeDetail, GroceryList) render inside ONE locked flex mobile container in `src/App.jsx`:
-  `h-screen max-w-md mx-auto flex flex-col overflow-hidden bg-[#FDFBF7] shadow-2xl relative`.
+- ALL views (Matcher, Discover, RecipeDetail, GroceryList) render inside ONE responsive flex container in `src/App.jsx`:
+  `max-w-md md:max-w-4xl lg:max-w-6xl mx-auto h-screen md:h-[92vh] md:my-[4vh] md:rounded-2xl md:shadow-2xl overflow-hidden`.
+- Mobile remains a full-height `max-w-md` frame. At `md` the frame becomes an iPad-friendly `max-w-4xl` surface with a 92vh rounded presentation; at `lg` it expands to `max-w-6xl` for desktop.
+- Matcher uses a `grid md:grid-cols-12 gap-6` split view: ingredient selection occupies `md:col-span-7`, while live results occupy a sticky `md:col-span-5` pane.
+- Discover and Favorites use one-column cards on mobile and a two-column `md` grid. Recipe detail content uses a two-column `md` grid for ingredients and instructions/tips.
 - The active view renders inside the sole `flex-1 overflow-y-auto px-4 py-3` main region; the bottom navigation is outside it in a `shrink-0` footer.
 - `App` resets that main region's `scrollTop` to `0` whenever the active tab or selected recipe view state changes.
 - Do NOT use viewport-relative widths or root-level absolute/fixed positioning in new views.
 - Anchor sticky/absolute elements to this container: the update toast is `position: absolute` within the container. Bottom navigation positioning comes from the locked flex footer, not sticky or fixed positioning.
-- Never add `w-screen`, `100vw`, or root-level `position: fixed` in new views — they must stay within the `max-w-md` frame.
+- Never add `w-screen`, `100vw`, or root-level `position: fixed` in new views — they must stay within the responsive app frame.
 
 ## Conventions
 - Use `apply_patch` for manual edits.
