@@ -34,6 +34,85 @@ h1, h2, h3, p { margin: 0; }
 .update-toast { position: absolute; z-index: 20; left: 0; right: 0; bottom: 84px; margin: auto; width: min(340px, calc(100% - 32px)); display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid #eadfd2; border-radius: 13px; background: #fffdf9; box-shadow: 0 8px 28px #26382b20; color: #526653; font-size: 12px; }.update-toast button { border: 0; border-radius: 8px; padding: 7px 10px; background: #d6573a; color: #fff; font-size: 11px; font-weight: 700; }
 .filter-row { flex-wrap: nowrap; gap: .5rem; margin-left: -20px; margin-right: -20px; padding: .25rem 1rem; overflow-x: auto; }
 .scrollbar-none { scrollbar-width: none; }.scrollbar-none::-webkit-scrollbar { display: none; }
+
+/* Keep nested flex/grid content inside the viewport on narrow screens. */
+.app-shell,
+.app-shell > div,
+.screen,
+.content,
+.screen > header,
+.screen > main,
+.staples-panel,
+.ingredient-section,
+.results-section,
+.recipe-list,
+.recipe-card,
+.page-header,
+.banner {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.app-shell {
+  overflow-x: hidden;
+}
+
+.screen > main {
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.filter-row,
+.ingredient-section > .flex,
+.ingredient-section > .mt-2,
+.selected-ingredients,
+.staple-list {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  flex-wrap: nowrap;
+}
+
+.filter-row::-webkit-scrollbar,
+.ingredient-section > .flex::-webkit-scrollbar,
+.ingredient-section > .mt-2::-webkit-scrollbar,
+.selected-ingredients::-webkit-scrollbar,
+.staple-list::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-row > *,
+.ingredient-section > .flex > *,
+.ingredient-section > .mt-2 > *,
+.selected-ingredients > *,
+.staple-list > * {
+  flex-shrink: 0;
+}
+
+.grid,
+.md\:col-span-7,
+.md\:col-span-5,
+.section-heading,
+.discover-intro {
+  min-width: 0;
+}
+
+.grocery-content .max-w-md::before {
+  content: 'Petua Import: Tampal (paste) kod senarai pasar yang disalin dari WhatsApp ke dalam ruang di bawah, kemudian tekan Import Senarai.';
+  display: block;
+  margin-bottom: .75rem;
+  padding: .75rem;
+  border-radius: .5rem;
+  background: #fffbeb;
+  color: #78350f;
+  font-size: .75rem;
+  line-height: 1.4;
+}
 .recipe-list { display: flex; flex-direction: column; }
 .recipe-list.grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; padding-left: 1rem; padding-right: 1rem; }
 .bottom-nav { position: static; z-index: 50; background: rgb(255 255 255 / 95%); box-shadow: 0 4px 18px rgb(38 56 43 / 12%); }

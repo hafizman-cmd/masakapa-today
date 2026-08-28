@@ -2,11 +2,11 @@ export const translations = {
   ms: {
     appName: 'MASAK APA HARI INI',
     nav: { matcher: 'Peti Sejuk', discover: 'Cari Resepi', grocery: 'Senarai Pasar', favorites: 'Kegemaran' },
-    categories: { all: 'Semua', express: 'Bujang Express', traditional: 'Masakan Kampung', airFryer: 'Air Fryer Only', favorites: 'Kegemaran' }, groups: { Protein: 'Protein', Vegetables: 'Sayur-sayuran', Seafood: 'Makanan laut', Spices: 'Rempah', Aromatics: 'Rempah & Bahan Tumis', Sauces: 'Sos & Perasa', Carbs: 'Karbo & Mi' },
+    categories: { all: 'Semua', express: 'Bujang Express', traditional: 'Masakan Kampung', airFryer: 'Air Fryer Only', favorites: 'Kegemaran' }, groups: { Protein: 'Protein', Vegetables: 'Sayur-sayuran', Seafood: 'Makanan Laut', Spices: 'Rempah & Tumis', Aromatics: 'Rempah & Bahan Tumis', Sauces: 'Sos & Perasa', Carbs: 'Karbo & Mi' },
     headers: {
       matcher: ['Ada Apa Dalam Peti?', 'Pilih bahan yang ada, kami carikan lauknya.'],
       discover: ['Cari resipi', 'Rasa macam makan di rumah.'],
-      grocery: ['Senarai Pasar', 'Semua bahan yang perlu dibeli, di satu tempat.'],
+      grocery: ['Senarai Pasar', 'Semua barang keperluan dalam satu tempat.'],
     },
     ui: {
       pantryMark: 'MASAK APA HARI INI', pantry: 'Dapur Staples', pantryHint: 'Barang wajib yang biasanya ada di dapur.', on: 'ON', off: 'OFF',
@@ -17,15 +17,16 @@ export const translations = {
       ingredients: 'Bahan-bahan', servings: 'orang', portion: 'Pelaras porsi', needed: 'APA YANG DIPERLUKAN',
       pairings: 'SET NASI CAMPUR', completeMeal: 'Lengkapkan hidangan', pairingsCount: 'padanan', pairingHint: 'Tambah lauk ini untuk meja yang lebih meriah.',
       groceryCount: 'barang perlu dibeli', clearChecked: 'Padam yang selesai', clearAll: 'Kosongkan senarai', emptyGrocery: 'Senarai pasar kamu masih kosong.', emptyGroceryHint: 'Tambah bahan daripada mana-mana resipi.',
-      update: 'App Update Available', refresh: 'Refresh', pax: ['1 Pax (Bujang)', '2 Pax (Pasangan)', '4 Pax (Keluarga)'],
+      update: 'Kemas Kini Aplikasi Tersedia', refresh: 'Muat Semula', pax: ['1 Pax (Bujang)', '2 Pax (Pasangan)', '4 Pax (Keluarga)'],
+      clearButton: 'Kosongkan', matchSummary: count => `${count} resipi sepadan`, missingLabel: 'Tiada', availableBadge: '✓ Ada', missingBadge: '✕ Tiada', missingItemPrompt: '💡 Tiada bahan ini?', chefTip: 'Petua Chef', addMissing: count => `+ Tambah ${count} Bahan Tiada ke Senarai Pasar`, importTitle: 'Eksport / Import', importGuide: 'Petua Import: Tampal kod senarai pasar yang disalin dari WhatsApp ke dalam ruang di bawah, kemudian tekan Import Senarai.', invalidImport: 'Kod import tidak sah.', shareWhatsApp: 'Kongsi ke WhatsApp', clearList: 'Kosongkan Senarai', groceryEmpty: 'Senarai pasar kamu masih kosong.', minutes: 'minit',
     },
   },
   en: {
     appName: 'WHAT TO COOK TODAY',
     nav: { matcher: 'Fridge', discover: 'Search', grocery: 'Grocery List', favorites: 'Favorites' },
-    categories: { all: 'All', express: 'Express', traditional: 'Traditional', airFryer: 'Air Fryer', favorites: 'Favorites' }, groups: { Protein: 'Protein', Vegetables: 'Vegetables', Seafood: 'Seafood', Spices: 'Spices', Aromatics: 'Spices & Aromatics', Sauces: 'Sauces & Seasonings', Carbs: 'Carbs & Noodles' },
+    categories: { all: 'All', express: 'Express', traditional: 'Traditional', airFryer: 'Air Fryer', favorites: 'Favorites' }, groups: { Protein: 'Protein', Vegetables: 'Vegetables', Seafood: 'Seafood', Spices: 'Spices & Aromatics', Aromatics: 'Spices & Aromatics', Sauces: 'Sauces & Condiments', Carbs: 'Carbs & Noodles' },
     headers: {
-      matcher: ["What's In The Fridge?", 'Choose what you have and we will find a dish.'],
+      matcher: ["What's in Your Fridge?", 'Select what you have and we will find a dish.'],
       discover: ['Search recipes', 'Tastes like home.'],
       grocery: ['Grocery List', 'Everything you need to buy, in one place.'],
     },
@@ -38,7 +39,8 @@ export const translations = {
       ingredients: 'Ingredients', servings: 'servings', portion: 'Serving size', needed: 'WHAT YOU NEED',
       pairings: 'COMPLETE THE TABLE', completeMeal: 'Complete your meal', pairingsCount: 'pairings', pairingHint: 'Add these dishes for a livelier table.',
       groceryCount: 'items to buy', clearChecked: 'Remove completed', clearAll: 'Clear list', emptyGrocery: 'Your grocery list is empty.', emptyGroceryHint: 'Add ingredients from any recipe.',
-      update: 'App update available', refresh: 'Refresh', pax: ['1 serving', '2 servings', '4 servings'],
+      update: 'App update available', refresh: 'Refresh', pax: ['1 Pax (Solo)', '2 Pax (Couple)', '4 Pax (Family)'],
+      clearButton: 'Clear All', matchSummary: count => `${count} recipes matched`, missingLabel: 'Missing', availableBadge: '✓ In Stock', missingBadge: '✕ Missing', missingItemPrompt: '💡 Missing this item?', chefTip: "Chef's Tip", addMissing: count => `+ Add ${count} Missing Items to Grocery List`, importTitle: 'Export / Import', importGuide: 'Import tip: Paste the grocery list code copied from WhatsApp into the space below, then press Import List.', invalidImport: 'Invalid import code.', shareWhatsApp: 'Share to WhatsApp', clearList: 'Clear List', groceryEmpty: 'Your grocery list is empty.', minutes: 'min',
     },
   },
 }
