@@ -8,7 +8,7 @@ import {
 import { supabase, isSupabaseConfigured } from '../lib/supabase.js'
 
 const CACHE_KEY = 'masakapa-recipes-cache'
-const CACHE_VERSION = 1
+const CACHE_VERSION = 2
 
 function bilingual(ms, en) {
   return { ms, en: en || ms }

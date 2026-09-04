@@ -8,18 +8,24 @@ const ENGLISH_AMOUNT_REPLACEMENTS = [
 ]
 
 export function translateGroceryAmount(amount, lang) {
-  if (lang !== 'en' || typeof amount !== 'string') return amount
+  const amountText = String(amount || '')
+  if (lang !== 'en') return amountText
   return ENGLISH_AMOUNT_REPLACEMENTS.reduce(
-    (translated, [pattern, replacement]) => translated.replace(pattern, replacement),
-    amount,
+    (translated, [pattern, replacement]) => translated?.replace(pattern, replacement),
+    amountText,
   ).replace(/\s+/g, ' ').trim()
 }
 
-export function getGroceryIngredientName(item, ingredients, lang) {
-  const ingredient = ingredients.find(option => option.id === item.ingredientId)
-  if (!ingredient) return item.name
-  const names = ingredient.name || {}
+export function getGroceryIngredientName(item, ingredients = [], lang) {
+  const matchedIng = Array.isArray(ingredients)
+    ? ingredients.find(ing => ing?.id === item?.ingredientId)
+    : null
+  const itemName = typeof item?.name === 'object'
+    ? (item.name?.[lang] || item.name?.ms || '')
+    : String(item?.name || item?.ingredientId || 'Unknown')
+  if (!matchedIng) return itemName
+  const names = matchedIng.name || {}
   return lang === 'en'
-    ? ingredient.name_en || names.en || item.name
-    : ingredient.name_ms || names.ms || item.name
+    ? matchedIng.name_en || names.en || itemName
+    : matchedIng.name_ms || names.ms || itemName
 }
