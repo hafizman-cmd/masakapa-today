@@ -23,7 +23,11 @@ import {
   formatGrocery,
   readUrlGrocery,
 } from "./utils/groceryShare";
-import { matchesIngredient } from "./components/Matcher";
+import {
+  activeName,
+  matchesIngredient,
+  sortByActiveName,
+} from "./components/Matcher";
 
 const readStorage = (key, fallback) => {
   try {
@@ -66,7 +70,30 @@ function matchesFilter(recipe, query, filter, favorites, lang) {
               : rawStyle === filter;
   return searchable.includes(query.toLowerCase()) && category;
 }
-function Filters({ query, setQuery, filter, setFilter, lang }) {
+const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+
+function LetterFilter({ value, onChange }) {
+  return (
+    <div className="flex overflow-x-auto flex-nowrap scrollbar-none gap-1 px-4 py-2">
+      {["All", ...ALPHABET].map((letter) => (
+        <button
+          key={letter}
+          type="button"
+          onClick={() => onChange(letter === "All" ? "" : letter)}
+          className={`shrink-0 px-3 py-1 text-xs rounded-full border transition-all ${
+            (value || "All") === letter
+              ? "border-[#d6573a] bg-[#d6573a] text-white"
+              : "border-stone-200 bg-white text-stone-600 hover:border-[#d6573a]"
+          }`}
+        >
+          {letter}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function Filters({ query, setQuery, filter, setFilter, lang, letter, setLetter }) {
   const t = translations[lang];
   const options = [
     [t.categories.all, "Semua"],
@@ -85,6 +112,7 @@ function Filters({ query, setQuery, filter, setFilter, lang }) {
         />
         <kbd>/</kbd>
       </div>
+      {setLetter && <LetterFilter value={letter} onChange={setLetter} />}
       <div className="filter-row flex overflow-x-auto flex-nowrap scrollbar-none px-4 pr-8 py-2 space-x-2 w-full items-center">
         {options.map(([label, value]) => (
           <button
@@ -135,6 +163,7 @@ function IngredientSelector({
   const isMalay = lang === "ms";
   const [category, setCategory] = useState("all");
   const [search, setSearch] = useState("");
+  const [letter, setLetter] = useState("");
   const selectableIngredients = [...stapleIngredients, ...ingredientOptions];
   const tabs = [
     ["all", isMalay ? "Semua" : "All"],
@@ -151,7 +180,8 @@ function IngredientSelector({
         ? "Aromatics"
         : "Sauces"
       : item.group;
-  const visibleIngredients = selectableIngredients.filter((item) => {
+  const sortedIngredients = sortByActiveName(selectableIngredients, lang);
+  const visibleIngredients = sortedIngredients.filter((item) => {
     const query = search.trim().toLowerCase();
     const matchesCategory =
       query ||
@@ -160,7 +190,9 @@ function IngredientSelector({
         ? ["Spices", "Aromatics"].includes(categoryFor(item))
         : categoryFor(item) === category);
     return (
-      matchesCategory && text(item.name, lang).toLowerCase().includes(query)
+      matchesCategory &&
+      text(item.name, lang).toLowerCase().includes(query) &&
+      (!letter || activeName(item, lang).trim().toLocaleUpperCase().startsWith(letter))
     );
   });
   const quickStapleIds = [
@@ -193,10 +225,10 @@ function IngredientSelector({
       <div className="section-heading">
         <div>
           <span className="section-kicker">{translations[lang].ui.fridge}</span>
-          <h2>{isMalay ? "Pilih bahan kamu" : "Choose your ingredients"}</h2>
+          <h2>{translations[lang].ui.chooseIngredients}</h2>
         </div>
         <button className="clear-all-button" onClick={() => setSelected([])}>
-          {isMalay ? "Kosongkan" : "Clear All"}
+          {translations[lang].ui.clearIngredients}
         </button>
       </div>
       <div className="flex gap-2 overflow-x-auto scrollbar-none py-3 -mx-1 px-1">
@@ -220,24 +252,23 @@ function IngredientSelector({
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder={
-            isMalay
-              ? "Cari bahan dalam peti..."
-              : "Search fridge ingredients..."
+            isMalay ? "Cari bahan dalam peti..." : "Search fridge ingredients..."
           }
         />
       </div>
+      <LetterFilter value={letter} onChange={setLetter} />
       <button
         className="mt-3 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-700"
         onClick={toggleQuickStaples}
       >
-        {"⚡"} {isMalay ? "Pilih Asas Dapur" : "Auto-select Staples"}
+        {"⚡"} {translations[lang].ui.autoStaples}
       </button>
       <div className="mt-4 flex items-center justify-between">
         <span className="selected-count">
-          {selected.length} {isMalay ? "bahan dipilih" : "ingredients selected"}
+          {translations[lang].ui.selectedCount(selected.length)}
         </span>
         <span className="text-[10px] text-stone-400">
-          {selectedIngredients.length} {isMalay ? "dipaparkan" : "shown"}
+          {translations[lang].ui.shownCount(selectedIngredients.length)}
         </span>
       </div>
       {selectedIngredients.length > 0 && (
@@ -602,8 +633,11 @@ function Discover({
   onToggleLanguage,
 }) {
   const t = translations[lang];
-  const visible = recipes.filter((recipe) =>
-    matchesFilter(recipe, query, filter, favorites, lang),
+  const [letter, setLetter] = useState("");
+  const visible = sortByActiveName(recipes, lang).filter(
+    (recipe) =>
+      matchesFilter(recipe, query, filter, favorites, lang) &&
+      (!letter || activeName(recipe, lang).trim().toLocaleUpperCase().startsWith(letter)),
   );
   const favoriteFilter =
     filter === "Favorite" || filter === "Kegemaran" || filter === "Favorites";
@@ -622,6 +656,8 @@ function Discover({
           filter={filter}
           setFilter={setFilter}
           lang={lang}
+          letter={letter}
+          setLetter={setLetter}
         />
         <div className="discover-intro">
           <div>
@@ -669,19 +705,14 @@ function Favorites({
   onToggleLanguage,
   onExplore,
 }) {
-  const isMalay = lang === "ms";
   const savedRecipes = recipes.filter((recipe) =>
     favorites.includes(recipe.id),
   );
   return (
     <div className="screen">
       <Header
-        title={isMalay ? "Resipi Kegemaran" : "Saved Recipes"}
-        subtitle={
-          isMalay
-            ? "Koleksi resipi tersimpan anda"
-            : "Your personal recipe collection"
-        }
+         title={translations[lang].ui.favoriteTitle}
+         subtitle={translations[lang].ui.favoriteSubtitle}
         lang={lang}
         onToggleLanguage={onToggleLanguage}
       />
@@ -705,15 +736,13 @@ function Favorites({
               <Heart size={24} fill="currentColor" />
             </span>
             <p className="text-sm leading-6 text-stone-600">
-              {isMalay
-                ? "Belum ada resipi kegemaran. Tekan ikon hati pada mana-mana resipi untuk simpan di sini."
-                : "No saved recipes yet. Tap the heart icon on any recipe to bookmark it here."}
+              {translations[lang].ui.favoriteEmpty}
             </p>
             <button
               className="mt-5 rounded-lg bg-[#d6573a] px-4 py-2 text-xs font-bold text-white"
               onClick={onExplore}
             >
-              {isMalay ? "Cari Resipi" : "Explore Recipes"}
+              {translations[lang].ui.exploreRecipes}
             </button>
           </div>
         )}
@@ -825,7 +854,7 @@ export default function App() {
           <div className="flex flex-col items-center gap-3 text-stone-500">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-[#d6573a]" />
             <p className="text-sm">
-              {lang === "ms" ? "Memuatkan resipi..." : "Loading recipes..."}
+             {translations[lang].ui.loading}
             </p>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { ingredientTranslations, instructionTranslations, recipeTranslations, tipTranslations } from './translations.js'
+import { equipmentTranslations, ingredientTranslations, instructionTranslations, recipeTranslations, sideTranslations, tipTranslations } from './translations.js'
 
 const bilingual = (ms, en = ingredientTranslations[ms] || ms) => ({ ms, en })
 
@@ -650,9 +650,9 @@ export const recipes = recipeData.map(recipe => {
     name: bilingual(recipe.name, englishName),
     style: bilingual(recipe.style, englishStyle),
     difficulty: bilingual(recipe.difficulty, difficultyTranslations[recipe.difficulty] || recipe.difficulty),
-    equipment: recipe.equipment.map(item => bilingual(item)),
-    steps: recipe.steps.map((step, index) => bilingual(step, instructionTranslations[recipe.id]?.[index] || step)),
-    tip: bilingual(recipe.tip, tipTranslations[recipe.id]),
-    sides: recipe.sides.map(side => bilingual(side)),
+    equipment: recipe.equipment.map(item => bilingual(item, equipmentTranslations[item] || item)),
+    steps: recipe.steps.map((step, index) => bilingual(step, instructionTranslations[recipe.id]?.[index] || 'Follow this step until the ingredients are cooked through.')),
+    tip: bilingual(recipe.tip, tipTranslations[recipe.id] || 'For best results, adjust the seasoning to taste and serve while warm.'),
+    sides: recipe.sides.map(side => bilingual(side, sideTranslations[side] || side)),
   }
 })

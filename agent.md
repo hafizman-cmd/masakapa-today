@@ -106,4 +106,6 @@ Run `node scripts/seed-supabase.js` after creating the tables above and ensuring
 - `BottomNav` calls `App.handleNavigate`, which clears the active recipe before switching tabs.
 - `BottomNav` is a frame-bound shrink-to-content footer bar with exactly four evenly spaced tabs: Peti Sejuk, Cari Resepi, Senarai Pasar, and Kegemaran. The grocery tab shows the persisted item count badge; Kegemaran opens the dedicated Favorites view.
 - Language state is stored under `masakapa-language`, defaults to `ms`, and flows from `App` through headers, navigation, recipe cards/details, and grocery content. The header BM/EN toggle updates it immediately.
+- UI copy is centralized in `src/data/translations.js`; recipe equipment, sides, steps, tips, ingredients, and metadata are normalized with BM/EN values so changing language does not fall back to the other language.
 - Opening a recipe pushes `{ view: 'detail' }` into browser history; the `popstate` listener closes the detail view for browser and Android back actions.
+- Fridge ingredients and Search recipes use `sortByActiveName` for locale-aware A-Z ordering in the active BM/EN language. Both views expose a horizontally scrollable All/A-Z letter filter below their search input.

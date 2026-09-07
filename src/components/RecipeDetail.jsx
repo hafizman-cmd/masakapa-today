@@ -144,7 +144,7 @@ export function PairingSection({ pairings, onOpenRecipe, lang }) {
             <div>
               <strong>{text(pairing.name, lang)}</strong>
               <small>
-                <Clock3 size={12} /> {pairing.time} min
+                 <Clock3 size={12} /> {pairing.time} {t.ui.minutes}
               </small>
             </div>
             <ChevronRight size={16} />
@@ -223,7 +223,7 @@ export default function RecipeDetail({
         <button
           className="detail-back"
           onClick={onBack}
-          aria-label={lang === "ms" ? "Kembali" : "Back"}
+           aria-label={t.ui.back}
         >
           <ArrowLeft size={20} />
         </button>
@@ -252,7 +252,7 @@ export default function RecipeDetail({
       <main className="content detail-content grid md:grid-cols-2 gap-6 w-full max-w-full min-w-0 overflow-hidden">
         <div className="detail-meta md:col-span-2 min-w-0">
           <span>
-            <Clock3 size={16} /> {recipe.time} min
+             <Clock3 size={16} /> {recipe.time} {t.ui.minutes}
           </span>
           <span>
             <Flame size={16} /> {text(recipe.difficulty, lang)}
@@ -294,9 +294,9 @@ export default function RecipeDetail({
           </div>
           <div className="mb-3 flex items-center justify-between rounded-xl bg-amber-50/70 p-3 text-xs font-medium text-amber-900">
             <span>
-              {lang === "ms"
-                ? `Ada ${availableIngredients.length} daripada ${recipe.ingredients.length} bahan dalam peti kamu`
-                : `You have ${availableIngredients.length} of ${recipe.ingredients.length} ingredients`}
+                 {lang === "ms"
+                   ? `Ada ${availableIngredients.length} daripada ${recipe.ingredients.length} bahan dalam peti kamu`
+                   : `You have ${availableIngredients.length} of ${recipe.ingredients.length} ingredients`}
             </span>
           </div>
           <div className="checklist">
@@ -330,12 +330,8 @@ export default function RecipeDetail({
                         }
                       >
                         {isAvailable
-                          ? lang === "ms"
-                            ? "✓ Ada"
-                            : "✓ In Pantry"
-                          : lang === "ms"
-                            ? "✕ Tiada"
-                            : "✕ Missing"}
+                           ? t.ui.inPantry
+                           : t.ui.missingBadge}
                       </span>
                       {substitution && (
                         <button
@@ -349,9 +345,7 @@ export default function RecipeDetail({
                             );
                           }}
                         >
-                          {lang === "ms"
-                            ? "💡 Tiada bahan ini?"
-                            : "💡 No stock?"}
+                           {t.ui.noStock}
                         </button>
                       )}
                     </span>
@@ -386,7 +380,7 @@ export default function RecipeDetail({
           />
         </section>
         <section className="detail-section min-w-0">
-          <h2>{lang === "ms" ? "Cara memasak" : "Instructions"}</h2>
+           <h2>{t.ui.instructions}</h2>
           <ol className="mt-5 space-y-4">
             {recipe.steps.map((step, index) => (
               <li className="flex items-start gap-3 w-full max-w-full min-w-0 mb-4" key={index}>
@@ -403,7 +397,7 @@ export default function RecipeDetail({
             <Sparkles size={18} className="mt-0.5 shrink-0" />
             <div className="min-w-0 break-words">
               <h3 className="text-sm font-bold">
-                {lang === "ms" ? "Petua Chef" : "Chef Tip"}
+                 {t.ui.chefTip}
               </h3>
               <p className="mt-1 text-sm leading-6 break-words">
                 {text(recipe.tip, lang)}

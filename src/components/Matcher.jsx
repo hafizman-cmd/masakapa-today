@@ -12,3 +12,17 @@ export function isFishIngredient(id) {
 export function matchesIngredient(id, availableIds) {
   return availableIds.has(id) || (isFishIngredient(id) && [...availableIds].some(isFishIngredient))
 }
+
+export function activeName(item, language) {
+  if (language === 'en' && item.name_en) return item.name_en
+  if (language !== 'en' && item.name_ms) return item.name_ms
+  const value = item.name ?? item
+  if (typeof value === 'object') return value[language] || value.ms || value.en || ''
+  return language === 'en' ? item.name_en || value : item.name_ms || value
+}
+
+export function sortByActiveName(items, language) {
+  return [...items].sort((a, b) =>
+    activeName(a, language).localeCompare(activeName(b, language), language),
+  )
+}

@@ -2,7 +2,7 @@ export const translations = {
   ms: {
     appName: 'MASAK APA HARI INI',
     nav: { matcher: 'Peti Sejuk', discover: 'Cari Resepi', grocery: 'Senarai Pasar', favorites: 'Kegemaran' },
-    categories: { all: 'Semua', express: 'Bujang Express', traditional: 'Masakan Kampung', airFryer: 'Air Fryer Only', favorites: 'Kegemaran' }, groups: { Protein: 'Protein', Vegetables: 'Sayur-sayuran', Seafood: 'Makanan Laut', Spices: 'Rempah & Tumis', Aromatics: 'Rempah & Bahan Tumis', Sauces: 'Sos & Perasa', Carbs: 'Karbo & Mi' },
+    categories: { all: 'Semua', express: 'Bujang Express', traditional: 'Masakan Kampung', airFryer: 'Air Fryer Sahaja', favorites: 'Kegemaran' }, groups: { Protein: 'Protein', Vegetables: 'Sayur-sayuran', Seafood: 'Makanan Laut', Spices: 'Rempah & Tumis', Aromatics: 'Rempah & Bahan Tumis', Sauces: 'Sos & Perasa', Carbs: 'Karbo & Mi' },
     headers: {
       matcher: ['Ada Apa Dalam Peti?', 'Pilih bahan yang ada, kami carikan lauknya.'],
       discover: ['Cari resipi', 'Rasa macam makan di rumah.'],
@@ -10,7 +10,7 @@ export const translations = {
     },
     ui: {
       pantryMark: 'MASAK APA HARI INI', pantry: 'Dapur Staples', pantryHint: 'Barang wajib yang biasanya ada di dapur.', on: 'ON', off: 'OFF',
-      fridge: 'DALAM PETI SEJUK', chooseIngredients: 'Pilih bahan kamu', selected: 'dipilih', recommendations: 'CADANGAN UNTUK KAMU', matches: 'resipi sepadan',
+      fridge: 'DALAM PETI SEJUK', selected: 'dipilih', recommendations: 'CADANGAN UNTUK KAMU', matches: 'resipi sepadan',
       today: 'UNTUK HARI INI', choices: 'resipi pilihan', easiest: 'Paling mudah', searchPlaceholder: 'Cari ayam, sambal, nasi...',
       noOptional: 'Tiada', missing: 'Tiada', coreMissing: 'bahan utama tiada', optionalMissing: 'bahan pilihan tiada', complete: 'Boleh masak',
       addToGrocery: 'Tambah ke Senarai Pasar', startCooking: 'Mula Memasak', removeFavorite: 'Buang dari kegemaran', saveRecipe: 'Simpan resipi',
@@ -18,7 +18,7 @@ export const translations = {
       pairings: 'SET NASI CAMPUR', completeMeal: 'Lengkapkan hidangan', pairingsCount: 'padanan', pairingHint: 'Tambah lauk ini untuk meja yang lebih meriah.',
       groceryCount: 'barang perlu dibeli', clearChecked: 'Padam yang selesai', clearAll: 'Kosongkan senarai', emptyGrocery: 'Senarai pasar kamu masih kosong.', emptyGroceryHint: 'Tambah bahan daripada mana-mana resipi.',
       update: 'Kemas Kini Aplikasi Tersedia', refresh: 'Muat Semula', pax: ['1 Pax (Bujang)', '2 Pax (Pasangan)', '4 Pax (Keluarga)'],
-      clearButton: 'Kosongkan', matchSummary: count => `${count} resipi sepadan`, missingLabel: 'Tiada', availableBadge: '✓ Ada', missingBadge: '✕ Tiada', missingItemPrompt: '💡 Tiada bahan ini?', chefTip: 'Petua Chef', addMissing: count => `+ Tambah ${count} Bahan Tiada ke Senarai Pasar`, importTitle: 'Eksport / Import', importGuide: 'Petua Import: Tampal kod senarai pasar yang disalin dari WhatsApp ke dalam ruang di bawah, kemudian tekan Import Senarai.', invalidImport: 'Kod import tidak sah.', shareWhatsApp: 'Kongsi ke WhatsApp', clearList: 'Kosongkan Senarai', groceryEmpty: 'Senarai pasar kamu masih kosong.', minutes: 'minit',
+      clearButton: 'Kosongkan', matchSummary: count => `${count} resipi sepadan`, missingLabel: 'Tiada', availableBadge: '✓ Ada', missingBadge: '✕ Tiada', missingItemPrompt: '💡 Tiada bahan ini?', noStock: '💡 Tiada stok?', inPantry: '✓ Ada dalam peti', instructions: 'Cara memasak', chefTip: 'Petua Chef', addMissing: count => `+ Tambah ${count} Bahan Tiada ke Senarai Pasar`, importTitle: 'Eksport / Import', importGuide: 'Petua Import: Tampal kod senarai pasar yang disalin dari WhatsApp ke dalam ruang di bawah, kemudian tekan Import Senarai.', invalidImport: 'Kod import tidak sah.', invalidImportDetail: 'Alamak! Kod tidak sah. Sila pastikan anda menyalin keseluruhan mesej dari WhatsApp.', pasteGroceryCode: 'Sila tampal kod senarai pasar anda dalam ruang di atas.', shareWhatsApp: 'Kongsi ke WhatsApp', clearList: 'Kosongkan Senarai', cancel: 'Batal', importList: 'Import Senarai', pasteCode: 'Tampal kod di sini...', groceryEmpty: 'Senarai pasar kamu masih kosong.', minutes: 'minit', loading: 'Memuatkan resipi...', chooseIngredients: 'Pilih bahan kamu', clearIngredients: 'Kosongkan', autoStaples: 'Pilih Asas Dapur', selectedCount: count => `${count} bahan dipilih`, shownCount: count => `${count} dipaparkan`, favoriteEmpty: 'Belum ada resipi kegemaran. Tekan ikon hati pada mana-mana resipi untuk simpan di sini.', exploreRecipes: 'Cari Resipi', favoriteTitle: 'Resipi Kegemaran', favoriteSubtitle: 'Koleksi resipi tersimpan anda', back: 'Kembali',
     },
   },
   en: {
@@ -32,7 +32,7 @@ export const translations = {
     },
     ui: {
       pantryMark: 'WHAT TO COOK TODAY', pantry: 'Pantry Staples', pantryHint: 'Everyday essentials usually found in the kitchen.', on: 'ON', off: 'OFF',
-      fridge: 'IN THE FRIDGE', chooseIngredients: 'Choose your ingredients', selected: 'selected', recommendations: 'RECOMMENDED FOR YOU', matches: 'matching recipes',
+      fridge: 'IN THE FRIDGE', selected: 'selected', recommendations: 'RECOMMENDED FOR YOU', matches: 'matching recipes',
       today: 'FOR TODAY', choices: 'recipe picks', easiest: 'Easiest first', searchPlaceholder: 'Search chicken, sambal, rice...',
       noOptional: 'None', missing: 'Missing', coreMissing: 'core ingredients missing', optionalMissing: 'optional ingredients missing', complete: 'Cookable',
       addToGrocery: 'Add to Grocery List', startCooking: 'Start Cooking', removeFavorite: 'Remove from favorites', saveRecipe: 'Save recipe',
@@ -40,7 +40,7 @@ export const translations = {
       pairings: 'COMPLETE THE TABLE', completeMeal: 'Complete your meal', pairingsCount: 'pairings', pairingHint: 'Add these dishes for a livelier table.',
       groceryCount: 'items to buy', clearChecked: 'Remove completed', clearAll: 'Clear list', emptyGrocery: 'Your grocery list is empty.', emptyGroceryHint: 'Add ingredients from any recipe.',
       update: 'App update available', refresh: 'Refresh', pax: ['1 Pax (Solo)', '2 Pax (Couple)', '4 Pax (Family)'],
-      clearButton: 'Clear All', matchSummary: count => `${count} recipes matched`, missingLabel: 'Missing', availableBadge: '✓ In Stock', missingBadge: '✕ Missing', missingItemPrompt: '💡 Missing this item?', chefTip: "Chef's Tip", addMissing: count => `+ Add ${count} Missing Items to Grocery List`, importTitle: 'Export / Import', importGuide: 'Import tip: Paste the grocery list code copied from WhatsApp into the space below, then press Import List.', invalidImport: 'Invalid import code.', shareWhatsApp: 'Share to WhatsApp', clearList: 'Clear List', groceryEmpty: 'Your grocery list is empty.', minutes: 'min',
+      clearButton: 'Clear All', matchSummary: count => `${count} recipes matched`, missingLabel: 'Missing', availableBadge: '✓ In Stock', missingBadge: '✕ Missing', missingItemPrompt: '💡 Missing this item?', noStock: '💡 No stock?', inPantry: '✓ In Pantry', instructions: 'Instructions', chefTip: "Chef's Tip", addMissing: count => `+ Add ${count} Missing Items to Grocery List`, importTitle: 'Export / Import', importGuide: 'Import tip: Paste the grocery list code copied from WhatsApp into the space below, then press Import List.', invalidImport: 'Invalid import code.', invalidImportDetail: "Oops! That code doesn't seem valid. Please make sure you copied the full message from WhatsApp.", pasteGroceryCode: 'Please paste your grocery code into the box above.', shareWhatsApp: 'Share to WhatsApp', clearList: 'Clear List', cancel: 'Cancel', importList: 'Import List', pasteCode: 'Paste code here...', groceryEmpty: 'Your grocery list is empty.', minutes: 'min', loading: 'Loading recipes...', chooseIngredients: 'Choose your ingredients', clearIngredients: 'Clear All', autoStaples: 'Auto-select Staples', selectedCount: count => `${count} ingredients selected`, shownCount: count => `${count} shown`, favoriteEmpty: 'No saved recipes yet. Tap the heart icon on any recipe to bookmark it here.', exploreRecipes: 'Explore Recipes', favoriteTitle: 'Saved Recipes', favoriteSubtitle: 'Your personal recipe collection', back: 'Back',
     },
   },
 }
@@ -152,6 +152,10 @@ Object.assign(ingredientTranslations, {
   'Kulit Popiah': 'Spring roll wrappers',
   'Kelapa parut': 'Grated coconut',
   'Belimbing Buluh': 'Bilimbi',
+})
+
+Object.assign(ingredientTranslations, {
+  Kunyit: 'Turmeric', 'Rempah Kurma': 'Korma spice', 'Rempah Sup / 4 Beradik': 'Soup spices / whole spices', 'Asam Gelugor': 'Garcinia slices', 'Daun Kunyit': 'Turmeric leaf', 'Lada Hitam / Serbuk Lada Hitam': 'Black pepper / ground black pepper', 'Kicap Pekat': 'Dark soy sauce', 'Sos Lada Hitam': 'Black pepper sauce', Kicap: 'Soy sauce', 'Daging lembu': 'Beef', 'Daging kambing': 'Lamb', 'Ikan pari': 'Stingray', 'Ikan siakap': 'Sea bass', 'Sos ikan': 'Fish sauce', 'Limau nipis': 'Lime', 'Daun ketumbar': 'Coriander leaves', 'Ikan cencaru': 'Scad', 'Tepung beras': 'Rice flour', 'Daun pisang': 'Banana leaf', 'Ikan kembung': 'Mackerel', 'Cili padi hijau': 'Green bird eye chili', Fishcake: 'Fishcake', Timun: 'Cucumber', 'Sambal kicap': 'Soy sauce sambal', 'Ikan masin': 'Salted fish', 'Tahu pok': 'Tofu puffs', 'Mangga muda': 'Green mango', 'Udang kering': 'Dried shrimp', 'Kacang tanah': 'Peanuts', 'Daun Sup': 'Celery leaves', 'Ayam kisar': 'Minced chicken', 'Daun selasih': 'Thai basil', 'Nasi impit': 'Rice cubes', 'Bawang Goreng': 'Fried shallots', 'Ikan Bilis': 'Anchovies', 'Daun Pandan': 'Pandan leaves', Tomato: 'Tomato',
 })
 
 export const instructionTranslations = {
@@ -278,3 +282,11 @@ export const tipTranslations = {
 }
 
 export const text = (value, lang) => value && typeof value === 'object' ? value[lang] || value.ms : value
+
+export const equipmentTranslations = {
+  Kuali: 'Wok', 'Kuali leper': 'Flat pan', Periuk: 'Pot', Mangkuk: 'Bowl', Pengukus: 'Steamer', Pemanggang: 'Grill', 'Lesung batu': 'Mortar and pestle', 'Air fryer': 'Air fryer', 'Air Fryer': 'Air fryer', 'Kuali besar': 'Large wok', 'Dapur gas': 'Gas stove', Pengisar: 'Blender', Penyepit: 'Tongs', 'Periuk kecil': 'Small pot',
+}
+
+export const sideTranslations = {
+  'Telur dadar bawang': 'Onion omelette', 'Ulam timun': 'Cucumber ulam', 'Kacang panjang celur': 'Blanched long beans', 'Ikan masin goreng': 'Fried salted fish', 'Bendi rebus': 'Boiled okra', 'Telur masin': 'Salted egg', 'Kangkung belacan': 'Water spinach with shrimp paste', 'Acar timun': 'Cucumber pickle', 'Telur mata': 'Fried egg', Timun: 'Cucumber', 'Sambal kicap': 'Soy sauce sambal', 'Sup kosong': 'Clear soup', 'Ayam goreng': 'Fried chicken', 'Salad kubis': 'Cabbage salad', 'Kentang goreng': 'French fries', 'Coleslaw limau': 'Lime coleslaw', 'Jagung bakar': 'Grilled corn', 'Kentang putar': 'Mashed potatoes', 'Salad segar': 'Fresh salad', 'Ayam masak kicap': 'Soy sauce chicken', 'Sup telur': 'Egg drop soup', 'Telur sambal': 'Eggs in sambal', 'Telur dadar': 'Omelette', 'Acar jelatah': 'Pickled vegetables', 'Nasi putih': 'Steamed rice', 'Nasi minyak': 'Ghee rice', 'Sambal hijau': 'Green sambal', 'Ulam-ulaman': 'Fresh herbs', 'Sambal belacan': 'Shrimp paste sambal', 'Sayur kailan': 'Stir-fried kailan', 'Acar bawang': 'Pickled onions', 'Roti bawang putih': 'Garlic bread', 'Air asam': 'Tamarind dipping sauce', 'Cili jeruk': 'Pickled chili', 'Teh ais': 'Iced tea', 'Cili potong': 'Sliced chili', Keropok: 'Crackers', 'Teh panas': 'Hot tea', 'Limau nipis': 'Lime', 'Limau kasturi': 'Calamansi', 'Ikan goreng': 'Fried fish', 'Nasi impit': 'Rice cubes', 'Kangkung goreng': 'Stir-fried water spinach', 'Kacang peas': 'Peas', 'Raita timun': 'Cucumber raita', 'Kailan goreng': 'Stir-fried kailan', Bergedel: 'Potato fritters', Bergedil: 'Potato fritters', 'Telur rebus': 'Boiled egg', 'Sambal cili': 'Chili sambal', 'Sambal tumis': 'Fried sambal', 'Gulai ikan': 'Fish curry', 'Sambal budu': 'Budu sambal', 'Ayam masak merah': 'Red cooked chicken', 'Rendang daging': 'Beef rendang', 'Sambal goreng Jawa': 'Javanese sambal goreng', 'Serunding kelapa': 'Coconut floss', 'Ulam pucuk paku': 'Fiddlehead fern salad', 'Pucuk ubi celur': 'Blanched tapioca leaves', 'Nasi kerabu': 'Herb rice salad', 'Roti putih': 'White bread', 'Kuah dhal': 'Dhal curry', Kopi: 'Coffee', 'Kacang merah': 'Red beans', 'Jagung manis': 'Sweet corn', Nanas: 'Pineapple', 'Bawang merah': 'Red onion', 'Sos cili': 'Chili sauce',
+}
