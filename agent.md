@@ -6,6 +6,69 @@
 - Lucide icons come from `lucide-react`.
 - The app is a state-based mobile PWA; there is no router.
 
+## Product Purpose
+- MASAK APA HARI INI helps users choose Malaysian meals from ingredients available in their fridge.
+- The app supports Bahasa Melayu (`ms`, displayed as BM) and English (`en`, displayed as EN).
+- The primary user actions are selecting available ingredients, finding matching recipes, browsing the full recipe catalog, saving favorites, managing a grocery list, and opening recipe details.
+
+## Usage Flow
+1. The app starts on the Fridge screen (`screen: "matcher"`). The user can enable or disable pantry staples, search ingredients, filter by category or A-Z letter, and select ingredients.
+2. The Fridge screen calculates recipe matches from the selected ingredients. Recipes with no more than two missing core ingredients and at least a 40% core match are shown in the recommendations pane.
+3. The user can search recommended recipes, filter by category, open a recipe, favorite it, or tap a missing-ingredient action to add missing items to the grocery list.
+4. The Search screen (`screen: "discover"`) shows the complete recipe catalog sorted alphabetically in the active language. Search, category filters, and the A-Z letter filter can be combined.
+5. Selecting a recipe opens the detail view without a router. Browser history receives a `{ view: "detail" }` state so browser/Android back closes the detail view correctly.
+6. Recipe Detail shows the bilingual recipe title/style, time, difficulty, serving controls, ingredient checklist, availability against the saved pantry selection, substitutions, cooking instructions, chef tip, and pairings.
+7. The Grocery List screen displays unchecked and checked grocery items, supports sharing through WhatsApp, importing a shared list, clearing completed items, and clearing the entire list.
+8. Favorites shows only recipes whose IDs are in the persisted favorites array. If there are no favorites, it links back to Search.
+9. The bottom navigation switches between Fridge, Search, Grocery List, and Favorites. Switching screens clears the active recipe; moving to Search resets its category filter to All.
+10. The BM/EN toggle is available in screen headers and Recipe Detail. It updates the active language immediately and re-renders UI labels, recipe content, sorting, search behavior, and grocery names.
+
+## Application/System Flow
+- `src/main.jsx` mounts the React application in `StrictMode`.
+- `src/App.jsx` owns global screen state, active recipe state, language state, search/category state, favorites, grocery items, update notifications, and browser history behavior.
+- `App` calls `useRecipes()` once and passes the resulting recipes and ingredient catalogs into the active view.
+- The Fridge, Search, and Favorites view functions currently live inside `src/App.jsx`; they are not separate `Matcher.jsx` or `Discover.jsx` view files.
+- `src/components/Matcher.jsx` contains shared ingredient matching plus active-language sorting helpers used by the embedded Fridge/Search views.
+- `RecipeCard` is the shared compact recipe row/card used by Fridge, Search, and Favorites.
+- `RecipeDetail` owns detail-specific serving, checklist, substitution, pairing, and recipe-content rendering.
+- `BottomNav` is rendered outside the scrollable view area as the fixed flex-footer navigation surface.
+- `App` resets the main scroll position when the active screen or active recipe changes.
+
+## Data Flow
+- Static catalog data is defined in `src/data/recipes.js`.
+- Static data is stored in BM-first form and normalized into bilingual `{ ms, en }` values for recipe names, styles, difficulty, ingredients, equipment, steps, tips, and sides.
+- `src/data/translations.js` contains UI translations plus English recipe, ingredient, instruction, tip, equipment, and side translations.
+- `text(value, lang)` resolves bilingual values for rendering. New user-facing text must be added to both `translations.ms` and `translations.en` rather than hardcoded in JSX.
+- Recipe filtering uses the active language for names and styles. Recipe sorting uses `localeCompare()` with the active language.
+- Ingredient matching uses stable ingredient IDs, not translated names. Fish variants are handled by `matchesIngredient()` in `src/components/Matcher.jsx`.
+- Favorites and grocery identity use stable recipe/ingredient IDs. Never replace these IDs with translated names.
+
+## Backend And Offline System
+- Supabase is optional. `src/lib/supabase.js` creates the client only when `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are configured.
+- `src/hooks/useRecipes.js` loads `ingredients` and `recipes` from Supabase in parallel when credentials exist and the browser is online.
+- Supabase rows are transformed into the same runtime shape as the static catalog. Supabase recipe UUID pairings are resolved back to stable recipe slugs.
+- Successful Supabase responses are cached in `localStorage` under `masakapa-recipes-cache` with a cache version.
+- Startup order is cached data first, then static fallback data, followed by a background Supabase request when available.
+- If Supabase is not configured, the device is offline, or the request fails, the app continues with cached/static data and remains usable.
+- `scripts/seed-supabase.js` seeds ingredients and recipes from `src/data/recipes.js`, generates stable recipe UUID mappings, remaps pairings, and upserts the database rows.
+- Runtime IDs remain recipe slugs even when the database uses UUID primary keys. This preserves favorites, grocery references, and pairing navigation.
+
+## Persistence
+- `masakapa-language`: selected language; defaults to `ms`.
+- `masakapa-selected-ingredients`: selected fridge ingredient IDs.
+- `masakapa-staples-on`: pantry-staples toggle.
+- `masakapa-favorites`: favorited recipe IDs.
+- `masakapa-grocery-list`: grocery items.
+- `masakapa-recipes-cache`: versioned cached backend/catalog data.
+- Storage helpers are defensive and tolerate unavailable or malformed localStorage data.
+
+## Backend Environment And Schema
+- Required optional environment variables are `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+- The `ingredients` table stores `id`, `name_ms`, `name_en`, `group`, and `is_staple`.
+- The `recipes` table stores `id`, `slug`, bilingual names/styles/difficulty, time/serving fields, equipment, flags, accent, pairings, ingredients, steps, tips, sides, and `created_at`.
+- JSON fields must preserve the shapes expected by `useRecipes.js`; especially `pairings`, `ingredients`, `steps`, and `sides`.
+- Database seed changes should be made from the static source catalog first, then applied with `node scripts/seed-supabase.js`.
+
 ## Supabase Backend
 - `src/lib/supabase.js`: initializes the Supabase JS client from `import.meta.env.VITE_SUPABASE_URL` and `import.meta.env.VITE_SUPABASE_ANON_KEY`. Exports `isSupabaseConfigured` and a nullable `supabase` client so the UI can degrade gracefully.
 - `src/hooks/useRecipes.js`: React hook that loads recipes and ingredients from Supabase on mount, caches the last successful response in `localStorage` under `masakapa-recipes-cache`, and falls back to `src/data/recipes.js` when offline or when Supabase credentials are missing.
@@ -94,6 +157,8 @@ Run `node scripts/seed-supabase.js` after creating the tables above and ensuring
 - The product title displayed in headers and manifests is `MASAK APA HARI INI`; the short title remains `MasakApa`.
 - Matcher results use the explicit `flex flex-col space-y-2 px-4 pb-24` layout with compact horizontal recipe rows; filter chips use a padded non-wrapping horizontal scroller.
 - Discovery uses the same single-column compact horizontal row list and horizontally scrollable filter row.
+- The Fridge view includes `src/components/RecipeSpinner.jsx`, a bilingual random-recipe modal. It filters the recipe pool by All, under 20 minutes, Bujang/Express, Masakan Kampung, or kids-friendly core ingredients, then spins for a random result and opens the normal Recipe Detail flow.
+- Recipe Spinner filter logic uses runtime recipe fields (`recipe.time`, bilingual `recipe.style`, and core ingredient IDs/names), not translated display labels. Keep stable ingredient IDs when extending kids-friendly detection.
 - The dedicated Favorites screen renders only recipes whose IDs are in the persisted `favorites` array (`favorites.includes(recipe.id)`), without the Search bar or category chips.
 - Search filter chips are limited to All/Semua, Express/Bujang Express, Traditional/Masakan Kampung, and Air Fryer/Air Fryer Only; the chip scroller uses `flex overflow-x-auto flex-nowrap scrollbar-none px-4 pr-8 py-2 space-x-2 w-full items-center`.
 - Ingredient options include the expanded poultry/meat proteins plus Rempah & Bahan Tumis and Sos & Perasa groups.

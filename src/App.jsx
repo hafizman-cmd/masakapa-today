@@ -14,6 +14,7 @@ import { registerSW } from "virtual:pwa-register";
 import BottomNav from "./components/BottomNav";
 import RecipeCard from "./components/RecipeCard";
 import RecipeDetail from "./components/RecipeDetail";
+import RecipeSpinner from "./components/RecipeSpinner";
 import GroceryListView from "./components/GroceryList";
 import { text, translations } from "./data/translations";
 import useRecipes from "./hooks/useRecipes";
@@ -127,7 +128,10 @@ function Filters({ query, setQuery, filter, setFilter, lang, letter, setLetter }
     </>
   );
 }
-function Header({ title, subtitle, lang, onToggleLanguage }) {
+function Header({ title, subtitle, lang, onToggleLanguage, onOpenSpinner }) {
+  const spinnerLabel =
+    translations?.[lang]?.ui?.spinner?.headerTrigger ||
+    (lang === "en" ? "Spinner" : "Tak Tahu?");
   return (
     <div className="shrink-0">
       <header className="page-header">
@@ -145,6 +149,17 @@ function Header({ title, subtitle, lang, onToggleLanguage }) {
             <span>|</span>
             <b className={lang === "en" ? "active" : ""}>EN</b>
           </button>
+          {onOpenSpinner && (
+            <button
+              type="button"
+              onClick={onOpenSpinner}
+              className="flex items-center gap-1.5 rounded-full bg-amber-100/80 px-3 py-1 text-xs font-semibold text-amber-900 transition-all hover:bg-amber-200"
+              aria-label={spinnerLabel}
+            >
+              <Sparkles className="h-3.5 w-3.5 text-amber-700" />
+              <span>{spinnerLabel}</span>
+            </button>
+          )}
         </div>
         <h1>{title}</h1>
         <p>{subtitle}</p>
@@ -491,6 +506,7 @@ function Matcher({
       "turmeric",
     ]),
   );
+  const [showSpinner, setShowSpinner] = useState(false);
   useEffect(() => writeStorage("masakapa-staples-on", staplesOn), [staplesOn]);
   useEffect(
     () => writeStorage("masakapa-selected-ingredients", selected),
@@ -542,10 +558,19 @@ function Matcher({
         subtitle={t.headers.matcher[1]}
         lang={lang}
         onToggleLanguage={onToggleLanguage}
+        onOpenSpinner={() => setShowSpinner(true)}
       />
       <main className="content pb-24">
         <div className="grid md:grid-cols-12 gap-6">
           <div className="md:col-span-7">
+            <RecipeSpinner
+              recipes={recipes}
+              language={lang}
+              onSelectRecipe={openRecipe}
+              open={showSpinner}
+              onClose={() => setShowSpinner(false)}
+              showTrigger={false}
+            />
             <section className="staples-panel">
               <div>
                 <span className="section-kicker">{t.ui.pantryMark}</span>
