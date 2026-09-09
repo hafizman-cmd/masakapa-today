@@ -15,7 +15,7 @@ import { registerSW } from "virtual:pwa-register";
 import BottomNav from "./components/BottomNav";
 import RecipeCard from "./components/RecipeCard";
 import RecipeDetail from "./components/RecipeDetail";
-import RecipeSpinner from "./components/RecipeSpinner";
+import TudungSajiModal from "./components/TudungSajiModal";
 import GroceryListView from "./components/GroceryList";
 import FeedbackModal from "./components/FeedbackModal";
 import Admin from "./components/Admin";
@@ -590,13 +590,12 @@ function Matcher({
       <main className="content pb-24">
         <div className="grid md:grid-cols-12 gap-6">
           <div className="md:col-span-7">
-            <RecipeSpinner
+            <TudungSajiModal
               recipes={recipes}
               language={lang}
               onSelectRecipe={openRecipe}
-              open={showSpinner}
+              isOpen={showSpinner}
               onClose={() => setShowSpinner(false)}
-              showTrigger={false}
             />
             <section className="staples-panel">
               <div>
