@@ -9,6 +9,7 @@ export const translations = {
       grocery: ['Senarai Pasar', 'Semua barang keperluan dalam satu tempat.'],
     },
     ui: {
+      showAllIngredients: count => `Lihat Semua Bahan (${count}+) ↓`, showLess: 'Tunjukkan Sedikit ↑', viewMatchedRecipes: count => `Lihat ${count} Resipi Sepadan ↓`,
       pantryMark: 'MASAK APA HARI INI', pantry: 'Dapur Staples', pantryHint: 'Barang wajib yang biasanya ada di dapur.', on: 'ON', off: 'OFF',
       fridge: 'DALAM PETI SEJUK', selected: 'dipilih', recommendations: 'CADANGAN UNTUK KAMU', matches: 'resipi sepadan',
       today: 'UNTUK HARI INI', choices: 'resipi pilihan', easiest: 'Paling mudah', searchPlaceholder: 'Cari ayam, sambal, nasi...',
@@ -31,6 +32,7 @@ export const translations = {
       grocery: ['Grocery List', 'Everything you need to buy, in one place.'],
     },
     ui: {
+      showAllIngredients: count => `Show All Ingredients (${count}+) ↓`, showLess: 'Show Less ↑', viewMatchedRecipes: count => `View ${count} Matched Recipes ↓`,
       pantryMark: 'WHAT TO COOK TODAY', pantry: 'Pantry Staples', pantryHint: 'Everyday essentials usually found in the kitchen.', on: 'ON', off: 'OFF',
       fridge: 'IN THE FRIDGE', selected: 'selected', recommendations: 'RECOMMENDED FOR YOU', matches: 'matching recipes',
       today: 'FOR TODAY', choices: 'recipe picks', easiest: 'Easiest first', searchPlaceholder: 'Search chicken, sambal, rice...',

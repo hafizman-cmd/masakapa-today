@@ -128,10 +128,7 @@ function Filters({ query, setQuery, filter, setFilter, lang, letter, setLetter }
     </>
   );
 }
-function Header({ title, subtitle, lang, onToggleLanguage, onOpenSpinner }) {
-  const spinnerLabel =
-    translations?.[lang]?.ui?.spinner?.headerTrigger ||
-    (lang === "en" ? "Spinner" : "Tak Tahu?");
+function Header({ title, subtitle, lang, onToggleLanguage }) {
   return (
     <div className="shrink-0">
       <header className="page-header">
@@ -149,17 +146,6 @@ function Header({ title, subtitle, lang, onToggleLanguage, onOpenSpinner }) {
             <span>|</span>
             <b className={lang === "en" ? "active" : ""}>EN</b>
           </button>
-          {onOpenSpinner && (
-            <button
-              type="button"
-              onClick={onOpenSpinner}
-              className="flex items-center gap-1.5 rounded-full bg-amber-100/80 px-3 py-1 text-xs font-semibold text-amber-900 transition-all hover:bg-amber-200"
-              aria-label={spinnerLabel}
-            >
-              <Sparkles className="h-3.5 w-3.5 text-amber-700" />
-              <span>{spinnerLabel}</span>
-            </button>
-          )}
         </div>
         <h1>{title}</h1>
         <p>{subtitle}</p>
@@ -179,6 +165,7 @@ function IngredientSelector({
   const [category, setCategory] = useState("all");
   const [search, setSearch] = useState("");
   const [letter, setLetter] = useState("");
+  const [isExpanded, setIsExpanded] = useState(false);
   const selectableIngredients = [...stapleIngredients, ...ingredientOptions];
   const tabs = [
     ["all", isMalay ? "Semua" : "All"],
@@ -235,6 +222,17 @@ function IngredientSelector({
   const selectedIngredients = selectableIngredients.filter((item) =>
     selected.includes(item.id),
   );
+  const unselectedIngredients = visibleIngredients.filter(
+    (item) => !selected.includes(item.id),
+  );
+  const ingredientGridLimit = 12;
+  const remainingCount = Math.max(
+    0,
+    unselectedIngredients.length - ingredientGridLimit,
+  );
+  const ingredientsToShow = isExpanded
+    ? unselectedIngredients
+    : unselectedIngredients.slice(0, ingredientGridLimit);
   return (
     <section className="ingredient-section">
       <div className="section-heading">
@@ -300,22 +298,32 @@ function IngredientSelector({
           ))}
         </div>
       )}
-      <div className="chip-grid">
-        {visibleIngredients.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => toggleIngredient(item.id)}
-            className={
-              selected.includes(item.id)
-                ? "ingredient-chip selected"
-                : "ingredient-chip"
-            }
-          >
-            {selected.includes(item.id) && <Check size={14} />}
-            {text(item.name, lang)}
-          </button>
-        ))}
+      <div className={`relative ${isExpanded ? "" : "max-h-56 overflow-hidden"}`}>
+        <div className="chip-grid">
+          {ingredientsToShow.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => toggleIngredient(item.id)}
+              className="ingredient-chip"
+            >
+              {text(item.name, lang)}
+            </button>
+          ))}
+        </div>
+        {!isExpanded && remainingCount > 0 && (
+          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#FAF7F2] to-transparent pointer-events-none" />
+        )}
       </div>
+      {remainingCount > 0 && (
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-full py-2.5 mt-2 flex items-center justify-center gap-1.5 text-xs font-semibold text-amber-900 bg-amber-100/70 hover:bg-amber-200/80 rounded-xl transition-all"
+        >
+          {isExpanded
+            ? translations[lang].ui.showLess
+            : translations[lang].ui.showAllIngredients(remainingCount)}
+        </button>
+      )}
     </section>
   );
 }
@@ -551,6 +559,8 @@ function Matcher({
   const visible = matches.filter((match) =>
     matchesFilter(match.recipe, query, filter, favorites, lang),
   );
+  const hasSelected = selected.length > 0;
+  const showMatchCta = selected.length > 0 && visible.length > 0;
   return (
     <div className="screen">
       <Header
@@ -558,7 +568,6 @@ function Matcher({
         subtitle={t.headers.matcher[1]}
         lang={lang}
         onToggleLanguage={onToggleLanguage}
-        onOpenSpinner={() => setShowSpinner(true)}
       />
       <main className="content pb-24">
         <div className="grid md:grid-cols-12 gap-6">
@@ -608,7 +617,10 @@ function Matcher({
               lang={lang}
             />
           </div>
-          <section className="results-section md:col-span-5 md:sticky md:top-4 md:self-start">
+          <section
+            id="recipe-results"
+            className="results-section md:col-span-5 md:sticky md:top-4 md:self-start"
+          >
             <Filters
               query={query}
               setQuery={setQuery}
@@ -641,6 +653,38 @@ function Matcher({
           </section>
         </div>
       </main>
+      {showMatchCta && (
+        <button
+          type="button"
+          onClick={() => {
+            document
+              .getElementById("recipe-results")
+              ?.scrollIntoView({ behavior: "smooth" });
+          }}
+          className="fixed md:absolute bottom-20 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-5 py-2.5 bg-[#E05A47] hover:bg-[#c84e3c] text-white rounded-full shadow-xl font-bold text-xs tracking-wide animate-bounce transition-all"
+        >
+          <span className="max-w-[85vw] truncate">
+            {t.ui.viewMatchedRecipes(visible.length)}
+          </span>
+        </button>
+      )}
+        <button
+          type="button"
+          onClick={() => setShowSpinner(true)}
+          title={lang === "en" ? "Surprise Me!" : "Tak Tahu Nak Masak?"}
+          className={`absolute bottom-20 right-4 z-40 flex items-center justify-center rounded-full shadow-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white transform hover:scale-105 active:scale-95 transition-all duration-300 ease-in-out ${hasSelected ? "w-12 h-12 p-0" : "gap-2 px-4 py-3"}`}
+        >
+          {hasSelected ? (
+            <Sparkles className="w-6 h-6 text-yellow-100" />
+          ) : (
+            <>
+              <Sparkles className="w-5 h-5 text-yellow-200" />
+              <span className="font-bold text-sm tracking-wide">
+                {lang === "en" ? "Surprise Me!" : "Tak Tahu Nak Masak?"}
+              </span>
+            </>
+          )}
+        </button>
     </div>
   );
 }
@@ -960,7 +1004,7 @@ export default function App() {
   );
   return (
     <div className="app-shell">
-      <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto h-screen md:h-[92vh] md:my-[4vh] md:rounded-2xl md:shadow-2xl flex flex-col overflow-hidden bg-[#FDFBF7] relative">
+      <div className="relative flex flex-col max-w-md md:max-w-4xl lg:max-w-6xl mx-auto h-screen md:h-[92vh] md:my-[4vh] md:rounded-2xl md:shadow-2xl overflow-hidden bg-[#FAF7F2]">
         <main ref={mainRef} className="flex-1 overflow-y-auto px-4 py-3">
           {view}
         </main>
