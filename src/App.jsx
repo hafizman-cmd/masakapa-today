@@ -18,6 +18,7 @@ import RecipeDetail from "./components/RecipeDetail";
 import RecipeSpinner from "./components/RecipeSpinner";
 import GroceryListView from "./components/GroceryList";
 import FeedbackModal from "./components/FeedbackModal";
+import Admin from "./components/Admin";
 import { text, translations } from "./data/translations";
 import useRecipes from "./hooks/useRecipes";
 import {
@@ -74,6 +75,8 @@ function matchesFilter(recipe, query, filter, favorites, lang) {
   return searchable.includes(query.toLowerCase()) && category;
 }
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+const isAdminRoute = () =>
+  window.location.pathname.toLowerCase().replace(/\/$/, "") === "/admin";
 
 function LetterFilter({ value, onChange }) {
   return (
@@ -846,7 +849,12 @@ export default function App() {
   const [lang, setLang] = useState(() =>
     readStorage("masakapa-language", "ms") === "en" ? "en" : "ms",
   );
-  const [screen, setScreen] = useState("matcher");
+  const [currentScreen, setCurrentScreen] = useState(() =>
+    isAdminRoute() ? "admin" : "main",
+  );
+  const [screen, setScreen] = useState(() =>
+    "matcher",
+  );
   const [activeRecipe, setActiveRecipe] = useState(null);
   const [feedbackState, setFeedbackState] = useState({
     isOpen: false,
@@ -877,6 +885,12 @@ export default function App() {
   useEffect(() => {
     if (mainRef.current) mainRef.current.scrollTop = 0;
   }, [screen, activeRecipe]);
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      if (isAdminRoute()) setCurrentScreen("admin");
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
   const toggleFavorite = (id) =>
     setFavorites((items) =>
       items.includes(id) ? items.filter((item) => item !== id) : [...items, id],
@@ -931,6 +945,11 @@ export default function App() {
   const closeFeedback = () => {
     setFeedbackState({ isOpen: false, recipeId: null, recipeTitle: "" });
   };
+  const goToApp = () => {
+    window.history.pushState({}, "", "/");
+    setCurrentScreen("main");
+    setScreen("matcher");
+  };
   const language = lang;
   const t = translations[lang];
   const nav = (
@@ -947,6 +966,9 @@ export default function App() {
       <button onClick={() => updateSW(true)}>{t.ui.refresh}</button>
     </div>
   );
+  if (currentScreen === "admin" || isAdminRoute()) {
+    return <Admin onBackToApp={goToApp} />;
+  }
   if (loading)
     return (
       <div className="app-shell">
