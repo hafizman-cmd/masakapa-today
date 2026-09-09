@@ -164,6 +164,7 @@ export default function RecipeDetail({
   onToggleFavorite,
   onOpenRecipe,
   onAddMissing,
+  onOpenFeedback,
   lang = "ms",
   onToggleLanguage,
   selectedIngredients = [],
@@ -410,6 +411,19 @@ export default function RecipeDetail({
           onOpenRecipe={onOpenRecipe}
           lang={lang}
         />
+        {onOpenFeedback && (
+          <button
+            type="button"
+            onClick={() =>
+              onOpenFeedback?.(recipe?.id, text(recipe?.name, lang))
+            }
+            className="w-full py-2.5 mt-6 border border-dashed border-amber-300 bg-amber-50/50 hover:bg-amber-50 text-amber-900 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all md:col-span-2"
+          >
+            {lang === "en"
+              ? "Flag an Issue with this Recipe"
+              : "Nampak Kesilapan Dalam Resipi Ini?"}
+          </button>
+        )}
       </main>
     </div>
   );

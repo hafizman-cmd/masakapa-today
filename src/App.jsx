@@ -4,6 +4,7 @@ import {
   ChevronRight,
   Heart,
   Leaf,
+  MessageSquarePlus,
   Search,
   Sparkles,
   ToggleLeft,
@@ -16,6 +17,7 @@ import RecipeCard from "./components/RecipeCard";
 import RecipeDetail from "./components/RecipeDetail";
 import RecipeSpinner from "./components/RecipeSpinner";
 import GroceryListView from "./components/GroceryList";
+import FeedbackModal from "./components/FeedbackModal";
 import { text, translations } from "./data/translations";
 import useRecipes from "./hooks/useRecipes";
 import {
@@ -128,7 +130,7 @@ function Filters({ query, setQuery, filter, setFilter, lang, letter, setLetter }
     </>
   );
 }
-function Header({ title, subtitle, lang, onToggleLanguage }) {
+function Header({ title, subtitle, lang, onToggleLanguage, onOpenFeedback }) {
   return (
     <div className="shrink-0">
       <header className="page-header">
@@ -145,6 +147,15 @@ function Header({ title, subtitle, lang, onToggleLanguage }) {
             <b className={lang === "ms" ? "active" : ""}>BM</b>
             <span>|</span>
             <b className={lang === "en" ? "active" : ""}>EN</b>
+          </button>
+          <button
+            type="button"
+            onClick={() => onOpenFeedback()}
+            className="p-1.5 rounded-full text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-all"
+            title="Maklum Balas"
+            aria-label="Maklum Balas"
+          >
+            <MessageSquarePlus size={17} />
           </button>
         </div>
         <h1>{title}</h1>
@@ -347,6 +358,7 @@ function GroceryListLegacy({
   },
   lang,
   onToggleLanguage,
+  onOpenFeedback,
 }) {
   const t = translations[lang];
   const [showShare, setShowShare] = useState(false);
@@ -387,6 +399,7 @@ function GroceryListLegacy({
         subtitle={t.headers.grocery[1]}
         lang={lang}
         onToggleLanguage={onToggleLanguage}
+        onOpenFeedback={onOpenFeedback}
       />
       <main className="content grocery-content">
         <div className="grocery-toolbar">
@@ -501,6 +514,7 @@ function Matcher({
   toggleFavorite,
   lang,
   onToggleLanguage,
+  onOpenFeedback,
 }) {
   const t = translations[lang];
   const allStapleIds = stapleIngredients.map((item) => item.id);
@@ -568,6 +582,7 @@ function Matcher({
         subtitle={t.headers.matcher[1]}
         lang={lang}
         onToggleLanguage={onToggleLanguage}
+        onOpenFeedback={onOpenFeedback}
       />
       <main className="content pb-24">
         <div className="grid md:grid-cols-12 gap-6">
@@ -700,6 +715,7 @@ function Discover({
   toggleFavorite,
   lang,
   onToggleLanguage,
+  onOpenFeedback,
 }) {
   const t = translations[lang];
   const [letter, setLetter] = useState("");
@@ -717,6 +733,7 @@ function Discover({
         subtitle={t.headers.discover[1]}
         lang={lang}
         onToggleLanguage={onToggleLanguage}
+        onOpenFeedback={onOpenFeedback}
       />
       <main className="content pb-24">
         <Filters
@@ -772,6 +789,7 @@ function Favorites({
   toggleFavorite,
   lang,
   onToggleLanguage,
+  onOpenFeedback,
   onExplore,
 }) {
   const savedRecipes = recipes.filter((recipe) =>
@@ -784,6 +802,7 @@ function Favorites({
          subtitle={translations[lang].ui.favoriteSubtitle}
         lang={lang}
         onToggleLanguage={onToggleLanguage}
+        onOpenFeedback={onOpenFeedback}
       />
       <main className="content pb-24">
         {savedRecipes.length ? (
@@ -829,6 +848,11 @@ export default function App() {
   );
   const [screen, setScreen] = useState("matcher");
   const [activeRecipe, setActiveRecipe] = useState(null);
+  const [feedbackState, setFeedbackState] = useState({
+    isOpen: false,
+    recipeId: null,
+    recipeTitle: "",
+  });
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("Semua");
   const [favorites, setFavorites] = useState(() =>
@@ -901,6 +925,13 @@ export default function App() {
   };
   const onToggleLanguage = () =>
     setLang((value) => (value === "ms" ? "en" : "ms"));
+  const openFeedback = (recipeId = null, recipeTitle = "") => {
+    setFeedbackState({ isOpen: true, recipeId, recipeTitle });
+  };
+  const closeFeedback = () => {
+    setFeedbackState({ isOpen: false, recipeId: null, recipeTitle: "" });
+  };
+  const language = lang;
   const t = translations[lang];
   const nav = (
     <BottomNav
@@ -944,6 +975,7 @@ export default function App() {
       onAddMissing={addMissing}
       lang={lang}
       onToggleLanguage={onToggleLanguage}
+      onOpenFeedback={openFeedback}
     />
   ) : screen === "matcher" ? (
     <Matcher
@@ -959,6 +991,7 @@ export default function App() {
       toggleFavorite={toggleFavorite}
       lang={lang}
       onToggleLanguage={onToggleLanguage}
+      onOpenFeedback={openFeedback}
     />
   ) : screen === "grocery" ? (
     <GroceryList
@@ -977,6 +1010,7 @@ export default function App() {
       onClearAll={() => setGroceryList([])}
       lang={lang}
       onToggleLanguage={onToggleLanguage}
+      onOpenFeedback={openFeedback}
     />
   ) : screen === "favorites" ? (
     <Favorites
@@ -986,6 +1020,7 @@ export default function App() {
       toggleFavorite={toggleFavorite}
       lang={lang}
       onToggleLanguage={onToggleLanguage}
+      onOpenFeedback={openFeedback}
       onExplore={() => handleNavigate("discover")}
     />
   ) : (
@@ -1000,6 +1035,7 @@ export default function App() {
       toggleFavorite={toggleFavorite}
       lang={lang}
       onToggleLanguage={onToggleLanguage}
+      onOpenFeedback={openFeedback}
     />
   );
   return (
@@ -1012,6 +1048,15 @@ export default function App() {
           {nav}
         </footer>
         {toast}
+        {feedbackState.isOpen && (
+          <FeedbackModal
+            isOpen={feedbackState.isOpen}
+            onClose={closeFeedback}
+            initialRecipeId={feedbackState.recipeId}
+            recipeTitle={feedbackState.recipeTitle}
+            language={language}
+          />
+        )}
       </div>
     </div>
   );
