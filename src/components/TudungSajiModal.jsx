@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Check, Sparkles, X } from "lucide-react";
 import { text } from "../data/translations";
 
@@ -8,7 +8,8 @@ function chooseRecipe(recipes) {
 }
 
 function recipeName(recipe, language) {
-  return text(recipe?.name, language) || recipe?.name_en || recipe?.name_ms || "Recipe";
+  const localizedName = language === "en" ? recipe?.name_en : recipe?.name_ms;
+  return localizedName || text(recipe?.name, language) || recipe?.name_en || recipe?.name_ms || "Recipe";
 }
 
 export default function TudungSajiModal({
@@ -21,7 +22,23 @@ export default function TudungSajiModal({
   const activeLanguage = language === "en" ? "en" : "ms";
   const [isCoverLifted, setIsCoverLifted] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(() => chooseRecipe(recipes));
+  const [isRerolling, setIsRerolling] = useState(false);
+  const rerollTimerRef = useRef(null);
+  const pendingRecipeRef = useRef(null);
   const hasRecipe = Boolean(selectedRecipe);
+
+  const finishReroll = () => {
+    if (!pendingRecipeRef.current) return;
+    setSelectedRecipe(pendingRecipeRef.current);
+    pendingRecipeRef.current = null;
+    setIsRerolling(false);
+    window.clearTimeout(rerollTimerRef.current);
+  };
+
+  useEffect(() => () => {
+    window.clearTimeout(rerollTimerRef.current);
+    pendingRecipeRef.current = null;
+  }, []);
 
   if (!isOpen) return null;
 
@@ -39,7 +56,10 @@ export default function TudungSajiModal({
 
   const reroll = () => {
     setIsCoverLifted(false);
-    setSelectedRecipe(chooseRecipe(recipes));
+    setIsRerolling(true);
+    pendingRecipeRef.current = chooseRecipe(recipes);
+    window.clearTimeout(rerollTimerRef.current);
+    rerollTimerRef.current = window.setTimeout(finishReroll, 850);
   };
 
   const openRecipe = () => {
@@ -69,7 +89,7 @@ export default function TudungSajiModal({
           <div className="absolute bottom-12 left-1/2 flex h-24 w-44 -translate-x-1/2 items-center justify-center rounded-[50%] bg-gradient-to-br from-[#d96f3f] to-[#8f422c] shadow-inner">
           </div>
           {hasRecipe && (
-            <div className={`absolute bottom-12 left-1/2 z-[5] flex w-[88%] max-w-[280px] -translate-x-1/2 flex-col items-center justify-center rounded-2xl border border-amber-200/80 bg-amber-50/95 px-4 py-3 text-center shadow-md backdrop-blur-xs transition-all duration-700 ${isCoverLifted ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}>
+            <div onTransitionEnd={(event) => event.propertyName === "opacity" && finishReroll()} className={`absolute bottom-12 left-1/2 z-[5] flex w-[88%] max-w-[280px] -translate-x-1/2 flex-col items-center justify-center rounded-2xl border border-amber-200/80 bg-amber-50/95 px-4 py-3 text-center shadow-md backdrop-blur-xs transition-all duration-700 ${isCoverLifted ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}>
               <h3 className={`mb-2 break-words font-bold leading-snug tracking-tight text-amber-950 ${titleFontSize}`}>
                 {recipeTitle}
               </h3>
@@ -96,7 +116,7 @@ export default function TudungSajiModal({
             <button type="button" onClick={reroll} className="rounded-xl border border-amber-300 bg-amber-50 px-6 py-3 font-semibold text-amber-900 hover:bg-amber-100">{activeLanguage === "en" ? "Try Again" : "Angkat Lagi"}</button>
           </div>
         ) : (
-          <button type="button" onClick={() => setIsCoverLifted(true)} disabled={!hasRecipe} className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-amber-600 px-6 py-3 font-semibold text-white shadow-md transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50">{activeLanguage === "en" ? "Lift Food Cover 🍲" : "Buka Tudung Saji 🍲"}</button>
+          <button type="button" onClick={() => setIsCoverLifted(true)} disabled={!hasRecipe || isRerolling} className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-amber-600 px-6 py-3 font-semibold text-white shadow-md transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50">{activeLanguage === "en" ? "Lift Food Cover 🍲" : "Buka Tudung Saji 🍲"}</button>
         )}
       </section>
     </div>
