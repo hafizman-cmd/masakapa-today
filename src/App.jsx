@@ -20,6 +20,7 @@ import TudungSajiModal from "./components/TudungSajiModal";
 import GroceryListView from "./components/GroceryList";
 import FeedbackModal from "./components/FeedbackModal";
 import Admin from "./components/Admin";
+import SplashScreen from "./components/SplashScreen";
 import { text, translations } from "./data/translations";
 import useRecipes from "./hooks/useRecipes";
 import useFavorites from "./hooks/useFavorites";
@@ -1058,19 +1059,7 @@ export default function App() {
   if (currentScreen === "admin" || isAdminRoute()) {
     return <Admin onBackToApp={goToApp} />;
   }
-  if (loading)
-    return (
-      <div className="app-shell">
-        <div className="max-w-md md:max-w-4xl lg:max-w-6xl mx-auto h-screen md:h-[92vh] md:my-[4vh] md:rounded-2xl md:shadow-2xl flex flex-col overflow-hidden bg-[#FDFBF7] relative items-center justify-center">
-          <div className="flex flex-col items-center gap-3 text-stone-500">
-            <div className="h-8 w-8 animate-spin rounded-full border-4 border-stone-200 border-t-[#d6573a]" />
-            <p className="text-sm">
-             {translations[lang].ui.loading}
-            </p>
-          </div>
-        </div>
-      </div>
-    );
+  if (loading) return <SplashScreen />;
   const view = activeRecipe ? (
     <RecipeDetail
       recipe={activeRecipe}
