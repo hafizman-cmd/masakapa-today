@@ -1,8 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { ChevronRight, Clock3, Heart, Sparkles, Utensils } from 'lucide-react'
 import { text, translations } from '../data/translations'
+import './RecipeCard.css'
 
 const accents = { sunset: 'from-[#ff9f68] to-[#e85d3f]', lime: 'from-[#b5cc67] to-[#49734b]', coral: 'from-[#ee8069] to-[#a83242]', chilli: 'from-[#f27657] to-[#b92931]', gold: 'from-[#f2c15f] to-[#d77736]', yellow: 'from-[#f3d067] to-[#d89231]', orange: 'from-[#e8a45d] to-[#c65e33]', brown: 'from-[#b88865] to-[#754538]', honey: 'from-[#e8b55a] to-[#bd682f]', pepper: 'from-[#879d91] to-[#364f48]' }
+const burstParticles = [
+  { x: -22, scale: 0.8, delay: 0 },
+  { x: -14, scale: 1, delay: 35 },
+  { x: -7, scale: 0.72, delay: 70 },
+  { x: 7, scale: 0.9, delay: 20 },
+  { x: 14, scale: 0.75, delay: 55 },
+  { x: 22, scale: 1, delay: 90 },
+  { x: 0, scale: 0.68, delay: 110 },
+]
 
 export function AnimatedMatchBadge({ targetPercentage }) {
   const target = Math.max(0, Math.min(100, Number(targetPercentage) || 0))
@@ -60,6 +70,29 @@ export default function RecipeCard({ recipe, match, isFavorite = false, onToggle
   const t = translations[lang]; const name = text(recipe.name, lang); const initials = name.split(' ').slice(0, 2).map(word => word[0]).join('')
   const optionalNote = match?.missingOptional?.length ? `${t.ui.missingLabel}: ${match.missingOptional.map(item => text(item.name, lang)).join(', ')}` : ''
   const percentage = match?.matchPercentage ?? 100
+  const [showBurst, setShowBurst] = useState(false)
+  const burstTimerRef = useRef(null)
+
+  useEffect(() => () => {
+    if (burstTimerRef.current) window.clearTimeout(burstTimerRef.current)
+  }, [])
+
+  const handleFavorite = event => {
+    event.stopPropagation()
+    if (!isFavorite) {
+      if (typeof window !== 'undefined' && 'vibrate' in navigator) {
+        try {
+          navigator.vibrate(12)
+        } catch {
+          // Haptics may be blocked by browser policy.
+        }
+      }
+      setShowBurst(true)
+      if (burstTimerRef.current) window.clearTimeout(burstTimerRef.current)
+      burstTimerRef.current = window.setTimeout(() => setShowBurst(false), 600)
+    }
+    onToggleFavorite(recipe)
+  }
 
   return <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-stone-100 shadow-sm gap-3 hover:bg-stone-50 transition-colors text-left w-full" role="button" tabIndex="0" onClick={() => onClick(recipe, match?.missingCore)} onKeyDown={event => event.key === 'Enter' && onClick(recipe, match?.missingCore)}>
     <span className={`w-10 h-10 rounded-full shrink-0 flex items-center justify-center font-bold text-xs text-white bg-gradient-to-br ${accents[recipe.accent] || accents.sunset}`}>{initials}</span>
@@ -71,11 +104,27 @@ export default function RecipeCard({ recipe, match, isFavorite = false, onToggle
         <span className="flex items-center gap-1 truncate"><Utensils size={12} /> {recipe.equipment.map(item => text(item, lang)).join(' / ')}</span>
       </div>
       {optionalNote && <p className="text-[10px] text-stone-400 truncate mt-0.5">{optionalNote}</p>}
-    </div>
-    <div className="flex items-center gap-2 shrink-0">
-       <AnimatedMatchBadge targetPercentage={percentage} />
-       <button className={`card-heart ${isFavorite ? 'text-rose-500' : ''}`} onClick={event => { event.stopPropagation(); onToggleFavorite(recipe) }} aria-label={isFavorite ? t.ui.removeFavorite : t.ui.saveRecipe}><Heart size={17} fill={isFavorite ? 'currentColor' : 'none'} /></button>
-      <ChevronRight size={16} className="text-stone-400" />
-    </div>
+     </div>
+     <div className="flex items-center gap-2 shrink-0">
+        <AnimatedMatchBadge targetPercentage={percentage} />
+        <span className="favorite-burst-container">
+          <button className={`card-heart ${isFavorite ? 'text-rose-500' : ''}`} onClick={handleFavorite} aria-label={isFavorite ? t.ui.removeFavorite : t.ui.saveRecipe}><Heart size={17} fill={isFavorite ? 'currentColor' : 'none'} /></button>
+          {showBurst && burstParticles.map((particle, index) => (
+            <Heart
+              key={`${particle.x}-${index}`}
+              size={8}
+              fill="currentColor"
+              aria-hidden="true"
+              className="heart-burst-particle"
+              style={{
+                '--burst-x': `${particle.x}px`,
+                '--burst-scale': particle.scale,
+                animationDelay: `${particle.delay}ms`,
+              }}
+            />
+          ))}
+        </span>
+       <ChevronRight size={16} className="text-stone-400" />
+      </div>
   </div>
 }

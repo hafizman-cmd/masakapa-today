@@ -1,0 +1,33 @@
+.favorite-burst-container {
+  position: relative;
+  display: inline-flex;
+}
+
+.heart-burst-particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  margin: -4px 0 0 -4px;
+  color: #e11d48;
+  pointer-events: none;
+  animation: heartBurst 600ms ease-out forwards;
+}
+
+@keyframes heartBurst {
+  0% {
+    transform: scale(1) translate(0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(var(--burst-scale)) translate(var(--burst-x), -30px);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heart-burst-particle {
+    animation: none;
+    opacity: 0;
+  }
+}

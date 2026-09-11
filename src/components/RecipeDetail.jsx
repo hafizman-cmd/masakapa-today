@@ -171,7 +171,8 @@ export default function RecipeDetail({
   stapleIngredients = [],
 }) {
   const t = translations[lang];
-  const [checked, setChecked] = useState([]);
+  const [checkedIngredients, setCheckedIngredients] = useState(new Set());
+  const [checkedSteps, setCheckedSteps] = useState(new Set());
   const [selectedServings, setSelectedServings] = useState(
     recipe.defaultServings,
   );
@@ -198,10 +199,37 @@ export default function RecipeDetail({
   const missingIngredients = recipe.ingredients.filter(
     (item) => !pantryIds.has(item.id),
   );
-  const toggle = (id) =>
-    setChecked((items) =>
-      items.includes(id) ? items.filter((item) => item !== id) : [...items, id],
-    );
+  const triggerChecklistHaptic = () => {
+    if (typeof window !== "undefined" && "vibrate" in navigator) {
+      try {
+        navigator.vibrate(10);
+      } catch {
+        // Haptics may be blocked by browser policy.
+      }
+    }
+  };
+  const toggleIngredient = (index) => {
+    if (!checkedIngredients.has(index)) triggerChecklistHaptic();
+    setCheckedIngredients((items) => {
+      const next = new Set(items);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  };
+  const toggleStep = (index) => {
+    if (!checkedSteps.has(index)) triggerChecklistHaptic();
+    setCheckedSteps((items) => {
+      const next = new Set(items);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  };
+  const instructions = recipe.instructions || recipe.steps || [];
+  const stepProgress = instructions.length
+    ? (checkedSteps.size / instructions.length) * 100
+    : 0;
   const pairings = (recipe.pairings || [])
     .map((id) => recipes.find((item) => item.id === id))
     .filter(Boolean);
@@ -269,7 +297,7 @@ export default function RecipeDetail({
               <h2>{t.ui.ingredients}</h2>
             </div>
             <span className="progress">
-              {checked.length}/{recipe.ingredients.length}
+               {checkedIngredients.size}/{recipe.ingredients.length}
             </span>
           </div>
           <div className="portion-bar">
@@ -304,23 +332,35 @@ export default function RecipeDetail({
               const substitutionKey = `${item.id}-${index}`;
               const isSubstitutionOpen = openSubstitution === substitutionKey;
               const isAvailable = pantryIds.has(item.id);
-              const rowClass = `${checked.includes(index) ? "check-row checked" : "check-row"}${!isAvailable ? " bg-orange-50/50" : ""}`;
+               const isChecked = checkedIngredients.has(index);
+               const rowClass = `${isChecked ? "check-row checked" : "check-row"}${!isAvailable ? " bg-orange-50/50" : ""}`;
               return (
                 <div key={substitutionKey}>
                   <div
                     role="button"
                     tabIndex={0}
-                    onClick={() => toggle(index)}
+                     onClick={() => toggleIngredient(index)}
                     onKeyDown={(event) =>
-                      event.key === "Enter" && toggle(index)
+                      (event.key === "Enter" || event.key === " ") &&
+                      toggleIngredient(index)
                     }
+                    aria-pressed={isChecked}
                     className={rowClass}
                   >
-                    <span className="check-box">
-                      {checked.includes(index) && <Check size={14} />}
+                    <span
+                      className={`check-box h-6 w-6 rounded-full border-2 ${isChecked ? "border-amber-500 bg-amber-500 text-white" : "border-stone-300 bg-white text-transparent"}`}
+                    >
+                      {isChecked ? <Check size={14} /> : index + 1}
                     </span>
                     <span className="flex min-w-0 flex-1 items-center gap-2">
-                      <span>{text(item.name, lang)}</span>
+                      <span
+                        className={`relative inline-block transition-colors duration-300 ${isChecked ? "text-gray-400" : "text-gray-800"}`}
+                      >
+                        {text(item.name, lang)}
+                        <span
+                          className={`absolute left-0 top-1/2 h-[1.5px] bg-gray-400 transition-all duration-300 ease-out ${isChecked ? "w-full" : "w-0"}`}
+                        />
+                      </span>
                       <span
                         className={
                           isAvailable
@@ -379,19 +419,59 @@ export default function RecipeDetail({
           />
         </section>
         <section className="detail-section min-w-0">
-           <h2>{t.ui.instructions}</h2>
-          <ol className="mt-5 space-y-4">
-            {recipe.steps.map((step, index) => (
-              <li className="flex items-start gap-3 w-full max-w-full min-w-0 mb-4" key={index}>
-                <div className="shrink-0 w-7 h-7 rounded-full bg-[#E05A47] text-white font-bold text-xs flex items-center justify-center mt-0.5">
-                  {index + 1}
-                </div>
-                <p className="flex-1 min-w-0 w-0 break-words whitespace-normal text-sm text-gray-700 leading-relaxed">
-                  {text(step, lang)}
-                </p>
-              </li>
-            ))}
-          </ol>
+           <div className="sticky top-0 z-10 mb-4 border-b border-gray-100 bg-white/90 py-3 backdrop-blur-md">
+             <div className="mb-1.5 flex items-center justify-between">
+               <span className="text-sm font-bold text-amber-900">
+                 {lang === "en" ? "Cooking Progress" : "Kemajuan Memasak"}
+               </span>
+               <span className="text-xs font-semibold text-amber-600">
+                 {checkedSteps.size} / {instructions.length}{" "}
+                 {lang === "en" ? "steps" : "langkah"}
+               </span>
+             </div>
+             <div className="h-2 w-full overflow-hidden rounded-full bg-amber-100">
+               <div
+                 className="h-full rounded-full bg-amber-500 transition-all duration-500 ease-out"
+                 style={{ width: `${stepProgress}%` }}
+               />
+             </div>
+           </div>
+           <ol className="space-y-1">
+             {instructions.map((step, index) => {
+               const isChecked = checkedSteps.has(index);
+               return (
+                 <li key={index}>
+                   <div
+                     role="button"
+                     tabIndex={0}
+                     aria-pressed={isChecked}
+                     onClick={() => toggleStep(index)}
+                     onKeyDown={(event) => {
+                       if (event.key === "Enter" || event.key === " ") {
+                         event.preventDefault();
+                         toggleStep(index);
+                       }
+                     }}
+                     className="flex min-w-0 w-full items-start gap-3 py-3 text-left"
+                   >
+                     <span
+                       className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors duration-300 ${isChecked ? "border-amber-500 bg-amber-500 text-white" : "border-[#E05A47] text-[#E05A47]"}`}
+                     >
+                       {isChecked ? <Check size={14} /> : index + 1}
+                     </span>
+                     <span
+                       className={`relative inline-block min-w-0 flex-1 break-words whitespace-normal text-sm leading-relaxed transition-colors duration-300 ${isChecked ? "text-gray-400" : "text-gray-700"}`}
+                     >
+                       {text(step, lang)}
+                       <span
+                         className={`absolute left-0 top-1/2 h-[1.5px] bg-gray-400 transition-all duration-300 ease-out ${isChecked ? "w-full" : "w-0"}`}
+                       />
+                     </span>
+                   </div>
+                 </li>
+               );
+             })}
+           </ol>
           <div className="mt-6 flex items-start space-x-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900 w-full min-w-0 break-words">
             <Sparkles size={18} className="mt-0.5 shrink-0" />
             <div className="min-w-0 break-words">
