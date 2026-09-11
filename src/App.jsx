@@ -5,6 +5,7 @@ import {
   Heart,
   Leaf,
   MessageSquarePlus,
+  RotateCcw,
   Search,
   Sparkles,
   ToggleLeft,
@@ -76,6 +77,37 @@ function matchesFilter(recipe, query, filter, favorites, lang) {
   return searchable.includes(query.toLowerCase()) && category;
 }
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+const QUICK_FILTERS = [
+  { id: "all", labelMs: "Semua", labelEn: "All" },
+  { id: "air_fryer", labelMs: "Air Fryer 🌀", labelEn: "Air Fryer 🌀" },
+  { id: "tanpa_santan", labelMs: "Tanpa Santan 🥥", labelEn: "Coconut-Free 🥥" },
+  { id: "quick", labelMs: "Bawah 20 Min ⏱️", labelEn: "Under 20 Min ⏱️" },
+  { id: "kid_friendly", labelMs: "Budak Suka 👶", labelEn: "Kid-Friendly 👶" },
+];
+function matchesQuickFilter(recipe, filter) {
+  if (filter === "all") return true;
+  const tags = Array.isArray(recipe.tags)
+    ? recipe.tags.map((tag) => String(tag).toLowerCase())
+    : [];
+  const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
+  const ingredientText = ingredients
+    .map((item) => `${item.id || ""} ${text(item.name, "ms") || ""}`)
+    .join(" ")
+    .toLowerCase();
+  if (filter === "air_fryer") {
+    return tags.includes("air_fryer") || recipe.appliance === "air_fryer" || recipe.airFryer === true;
+  }
+  if (filter === "tanpa_santan") {
+    return tags.includes("tanpa_santan") || !ingredientText.includes("santan");
+  }
+  if (filter === "quick") {
+    return recipe.cooking_time <= 20 || recipe.prep_time <= 20 || recipe.time <= 20;
+  }
+  if (filter === "kid_friendly") {
+    return tags.includes("kid_friendly") || tags.includes("budak_suka") || recipe.is_spicy === false;
+  }
+  return true;
+}
 const isAdminRoute = () =>
   window.location.pathname.toLowerCase().replace(/\/$/, "") === "/admin";
 
@@ -175,6 +207,8 @@ function IngredientSelector({
   selected,
   setSelected,
   lang,
+  selectedQuickFilter,
+  setSelectedQuickFilter,
 }) {
   const isMalay = lang === "ms";
   const [category, setCategory] = useState("all");
@@ -248,16 +282,59 @@ function IngredientSelector({
   const ingredientsToShow = isExpanded
     ? unselectedIngredients
     : unselectedIngredients.slice(0, ingredientGridLimit);
+  const handleClearAll = () => {
+    setSelected([]);
+    setSelectedQuickFilter("all");
+  };
   return (
     <section className="ingredient-section">
-      <div className="section-heading">
+      <div className="mt-1 mb-3.5 flex items-center justify-between">
         <div>
-          <span className="section-kicker">{translations[lang].ui.fridge}</span>
-          <h2>{translations[lang].ui.chooseIngredients}</h2>
+          <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800/70">
+            {translations[lang].ui.fridge}
+          </span>
+          <h2 className="font-serif text-xl font-bold text-amber-950">
+            {translations[lang].ui.chooseIngredients}
+          </h2>
         </div>
-        <button className="clear-all-button" onClick={() => setSelected([])}>
-          {translations[lang].ui.clearIngredients}
-        </button>
+        {(selectedIngredients.length > 0 || selectedQuickFilter !== "all") && (
+          <button
+            type="button"
+            onClick={handleClearAll}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-rose-200/80 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 shadow-sm transition-all duration-150 hover:bg-rose-100 active:scale-95"
+            title={lang === "en" ? "Clear all selections" : "Kosongkan semua pilihan"}
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+            <span>
+              {lang === "en"
+                ? `Clear (${selectedIngredients.length})`
+                : `Kosongkan (${selectedIngredients.length})`}
+            </span>
+          </button>
+        )}
+      </div>
+      <div className="scrollbar-none -mx-4 mb-4 flex gap-2 overflow-x-auto px-4 pb-3 pt-1 sm:mx-0 sm:px-0">
+        {QUICK_FILTERS.map((quickFilter) => {
+          const isActive = selectedQuickFilter === quickFilter.id;
+          return (
+            <button
+              key={quickFilter.id}
+              type="button"
+              onClick={() =>
+                setSelectedQuickFilter(
+                  isActive && quickFilter.id !== "all" ? "all" : quickFilter.id,
+                )
+              }
+              className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-medium transition-all duration-200 ${
+                isActive
+                  ? "scale-[1.02] bg-amber-600 text-white shadow-sm"
+                  : "border border-amber-200/70 bg-amber-50/80 text-amber-900 hover:bg-amber-100/60"
+              }`}
+            >
+              {lang === "en" ? quickFilter.labelEn : quickFilter.labelMs}
+            </button>
+          );
+        })}
       </div>
       <div className="flex gap-2 overflow-x-auto scrollbar-none py-3 -mx-1 px-1">
         {tabs.map(([value, label]) => (
@@ -533,6 +610,7 @@ function Matcher({
     ]),
   );
   const [showSpinner, setShowSpinner] = useState(false);
+  const [selectedQuickFilter, setSelectedQuickFilter] = useState("all");
   useEffect(() => writeStorage("masakapa-staples-on", staplesOn), [staplesOn]);
   useEffect(
     () => writeStorage("masakapa-selected-ingredients", selected),
@@ -564,7 +642,9 @@ function Matcher({
         })
         .filter(
           (match) =>
-            match.missingCore.length <= 2 && match.matchPercentage >= 40,
+            match.missingCore.length <= 2 &&
+            match.matchPercentage >= 40 &&
+            matchesQuickFilter(match.recipe, selectedQuickFilter),
         )
         .sort(
           (a, b) =>
@@ -572,7 +652,7 @@ function Matcher({
             (a.recipe.cookTimeMins ?? a.recipe.time) -
               (b.recipe.cookTimeMins ?? b.recipe.time),
         ),
-    [selected, staplesOn, recipes, allStapleIds],
+    [selected, staplesOn, recipes, allStapleIds, selectedQuickFilter],
   );
   const visible = matches.filter((match) =>
     matchesFilter(match.recipe, query, filter, favorites, lang),
@@ -633,6 +713,8 @@ function Matcher({
               selected={selected}
               setSelected={setSelected}
               lang={lang}
+              selectedQuickFilter={selectedQuickFilter}
+              setSelectedQuickFilter={setSelectedQuickFilter}
             />
           </div>
           <section
