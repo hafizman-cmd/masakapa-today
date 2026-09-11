@@ -127,6 +127,7 @@ Run `node scripts/seed-supabase.js` after creating the tables above and ensuring
 - `src/components/RecipeDetail.jsx`: `RecipeDetail` plus `PairingSection` and `MissingIngredients` exports.
 - `src/utils/portion.js`: pure ingredient quantity scaling and clean fraction formatting.
 - `src/components/BottomNav.jsx`: mobile navigation.
+- `src/components/OnboardingModal.jsx`: first-run onboarding slides; opening the modal or changing language resets it to slide 1, and dot buttons use zero-based slide indexes.
 - `src/index.css`: visual system and responsive mobile frame.
 - `vite.config.js`: VitePWA manifest, precache, runtime font caching, and prompt update registration.
 - `capacitor.config.json`: mobile packaging identity and `dist` web directory.
@@ -172,5 +173,6 @@ Run `node scripts/seed-supabase.js` after creating the tables above and ensuring
 - `BottomNav` is a frame-bound shrink-to-content footer bar with exactly four evenly spaced tabs: Peti Sejuk, Cari Resepi, Senarai Pasar, and Kegemaran. The grocery tab shows the persisted item count badge; Kegemaran opens the dedicated Favorites view.
 - Language state is stored under `masakapa-language`, defaults to `ms`, and flows from `App` through headers, navigation, recipe cards/details, and grocery content. The header BM/EN toggle updates it immediately.
 - UI copy is centralized in `src/data/translations.js`; recipe equipment, sides, steps, tips, ingredients, and metadata are normalized with BM/EN values so changing language does not fall back to the other language.
+- Onboarding slide state starts at index `0` and resets whenever the modal is open and the language changes; keep dot navigation aligned directly with `currentSlide`.
 - Opening a recipe pushes `{ view: 'detail' }` into browser history; the `popstate` listener closes the detail view for browser and Android back actions.
 - Fridge ingredients and Search recipes use `sortByActiveName` for locale-aware A-Z ordering in the active BM/EN language. Both views expose a horizontally scrollable All/A-Z letter filter below their search input.

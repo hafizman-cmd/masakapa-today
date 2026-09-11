@@ -3,6 +3,7 @@ import {
   Check,
   ChevronRight,
   Heart,
+  HelpCircle,
   Leaf,
   MessageSquarePlus,
   RotateCcw,
@@ -21,6 +22,7 @@ import GroceryListView from "./components/GroceryList";
 import FeedbackModal from "./components/FeedbackModal";
 import Admin from "./components/Admin";
 import SplashScreen from "./components/SplashScreen";
+import OnboardingModal from "./components/OnboardingModal";
 import { text, translations } from "./data/translations";
 import useRecipes from "./hooks/useRecipes";
 import useFavorites from "./hooks/useFavorites";
@@ -167,7 +169,14 @@ function Filters({ query, setQuery, filter, setFilter, lang, letter, setLetter }
     </>
   );
 }
-function Header({ title, subtitle, lang, onToggleLanguage, onOpenFeedback }) {
+function Header({
+  title,
+  subtitle,
+  lang,
+  onToggleLanguage,
+  onOpenFeedback,
+  onOpenOnboarding,
+}) {
   return (
     <div className="shrink-0">
       <header className="page-header">
@@ -193,6 +202,15 @@ function Header({ title, subtitle, lang, onToggleLanguage, onOpenFeedback }) {
             aria-label="Maklum Balas"
           >
             <MessageSquarePlus size={17} />
+          </button>
+          <button
+            type="button"
+            onClick={onOpenOnboarding}
+            className="p-1.5 rounded-full text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-all"
+            title={lang === "en" ? "How it works" : "Cara guna"}
+            aria-label={lang === "en" ? "How it works" : "Cara guna"}
+          >
+            <HelpCircle size={17} />
           </button>
         </div>
         <h1>{title}</h1>
@@ -458,6 +476,7 @@ function GroceryListLegacy({
   lang,
   onToggleLanguage,
   onOpenFeedback,
+  onOpenOnboarding,
 }) {
   const t = translations[lang];
   const [showShare, setShowShare] = useState(false);
@@ -499,6 +518,7 @@ function GroceryListLegacy({
         lang={lang}
         onToggleLanguage={onToggleLanguage}
         onOpenFeedback={onOpenFeedback}
+        onOpenOnboarding={onOpenOnboarding}
       />
       <main className="content grocery-content">
         <div className="grocery-toolbar">
@@ -614,6 +634,7 @@ function Matcher({
   lang,
   onToggleLanguage,
   onOpenFeedback,
+  onOpenOnboarding,
 }) {
   const t = translations[lang];
   const allStapleIds = stapleIngredients.map((item) => item.id);
@@ -685,6 +706,7 @@ function Matcher({
         lang={lang}
         onToggleLanguage={onToggleLanguage}
         onOpenFeedback={onOpenFeedback}
+        onOpenOnboarding={onOpenOnboarding}
       />
       <main className="content pb-24">
         <div className="grid md:grid-cols-12 gap-6">
@@ -819,6 +841,7 @@ function Discover({
   lang,
   onToggleLanguage,
   onOpenFeedback,
+  onOpenOnboarding,
 }) {
   const t = translations[lang];
   const [letter, setLetter] = useState("");
@@ -837,6 +860,7 @@ function Discover({
         lang={lang}
         onToggleLanguage={onToggleLanguage}
         onOpenFeedback={onOpenFeedback}
+        onOpenOnboarding={onOpenOnboarding}
       />
       <main className="content pb-24">
         <Filters
@@ -892,6 +916,7 @@ function Favorites({
   lang,
   onToggleLanguage,
   onOpenFeedback,
+  onOpenOnboarding,
   onExplore,
 }) {
   const [isOffline, setIsOffline] = useState(() => navigator.onLine === false);
@@ -920,6 +945,7 @@ function Favorites({
         lang={lang}
         onToggleLanguage={onToggleLanguage}
         onOpenFeedback={onOpenFeedback}
+        onOpenOnboarding={onOpenOnboarding}
       />
       <main className="content pb-24">
         {favorites.length ? (
@@ -979,6 +1005,7 @@ export default function App() {
     recipeId: null,
     recipeTitle: "",
   });
+  const [onboardingForcedOpen, setOnboardingForcedOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("Semua");
   const { favorites, toggleFavorite, isFavorite } = useFavorites();
@@ -1071,6 +1098,7 @@ export default function App() {
   const closeFeedback = () => {
     setFeedbackState({ isOpen: false, recipeId: null, recipeTitle: "" });
   };
+  const openOnboarding = () => setOnboardingForcedOpen(true);
   const goToApp = () => {
     window.history.pushState({}, "", "/");
     setCurrentScreen("main");
@@ -1128,6 +1156,7 @@ export default function App() {
       lang={lang}
       onToggleLanguage={onToggleLanguage}
       onOpenFeedback={openFeedback}
+      onOpenOnboarding={openOnboarding}
     />
   ) : screen === "grocery" ? (
     <GroceryList
@@ -1147,6 +1176,7 @@ export default function App() {
       lang={lang}
       onToggleLanguage={onToggleLanguage}
       onOpenFeedback={openFeedback}
+      onOpenOnboarding={openOnboarding}
     />
   ) : screen === "favorites" ? (
     <Favorites
@@ -1156,6 +1186,7 @@ export default function App() {
       lang={lang}
       onToggleLanguage={onToggleLanguage}
       onOpenFeedback={openFeedback}
+      onOpenOnboarding={openOnboarding}
       onExplore={() => handleNavigate("discover")}
     />
   ) : (
@@ -1171,6 +1202,7 @@ export default function App() {
       lang={lang}
       onToggleLanguage={onToggleLanguage}
       onOpenFeedback={openFeedback}
+      onOpenOnboarding={openOnboarding}
     />
   );
   return (
@@ -1192,6 +1224,11 @@ export default function App() {
             language={language}
           />
         )}
+        <OnboardingModal
+          language={language}
+          forceOpen={onboardingForcedOpen}
+          onClose={() => setOnboardingForcedOpen(false)}
+        />
       </div>
     </div>
   );

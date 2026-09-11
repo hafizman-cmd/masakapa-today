@@ -1,0 +1,20 @@
+.onboarding-slide {
+  animation: onboardingSlide 350ms ease-out;
+}
+
+@keyframes onboardingSlide {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-slide {
+    animation: none;
+  }
+}
