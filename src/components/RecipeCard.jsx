@@ -21,7 +21,7 @@ export default function RecipeCard({ recipe, match, isFavorite = false, onToggle
     </div>
     <div className="flex items-center gap-2 shrink-0">
       <span className={`rounded-full px-2 py-1 text-[10px] font-bold ${percentage === 100 ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}`}>{percentage}%</span>
-      <button className="card-heart" onClick={event => { event.stopPropagation(); onToggleFavorite(recipe.id) }} aria-label={isFavorite ? t.ui.removeFavorite : t.ui.saveRecipe}><Heart size={17} fill={isFavorite ? 'currentColor' : 'none'} /></button>
+       <button className={`card-heart ${isFavorite ? 'text-rose-500' : ''}`} onClick={event => { event.stopPropagation(); onToggleFavorite(recipe) }} aria-label={isFavorite ? t.ui.removeFavorite : t.ui.saveRecipe}><Heart size={17} fill={isFavorite ? 'currentColor' : 'none'} /></button>
       <ChevronRight size={16} className="text-stone-400" />
     </div>
   </div>

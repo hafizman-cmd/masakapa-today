@@ -240,10 +240,10 @@ export default function RecipeDetail({
         )}
         <button
           className="like-button"
-          onClick={() => onToggleFavorite(recipe.id)}
+           onClick={() => onToggleFavorite(recipe)}
           aria-label={isFavorite ? t.ui.removeFavorite : t.ui.saveRecipe}
         >
-          <Heart size={20} fill={isFavorite ? "currentColor" : "none"} />
+           <Heart className={isFavorite ? "text-rose-500" : ""} size={20} fill={isFavorite ? "currentColor" : "none"} />
         </button>
         <div className="hero-caption">
           <span>{text(recipe.style, lang)}</span>
@@ -295,9 +295,7 @@ export default function RecipeDetail({
           </div>
           <div className="mb-3 flex items-center justify-between rounded-xl bg-amber-50/70 p-3 text-xs font-medium text-amber-900">
             <span>
-                 {lang === "ms"
-                   ? `Ada ${availableIngredients.length} daripada ${recipe.ingredients.length} bahan dalam peti kamu`
-                   : `You have ${availableIngredients.length} of ${recipe.ingredients.length} ingredients`}
+                 {t.ui.availability(availableIngredients.length)} / {recipe.ingredients.length}
             </span>
           </div>
           <div className="checklist">
@@ -419,9 +417,7 @@ export default function RecipeDetail({
             }
             className="w-full py-2.5 mt-6 border border-dashed border-amber-300 bg-amber-50/50 hover:bg-amber-50 text-amber-900 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all md:col-span-2"
           >
-            {lang === "en"
-              ? "Flag an Issue with this Recipe"
-              : "Nampak Kesilapan Dalam Resipi Ini?"}
+             {t.ui.flagIssue}
           </button>
         )}
       </main>

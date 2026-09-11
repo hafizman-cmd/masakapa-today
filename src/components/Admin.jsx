@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ExternalLink, LockKeyhole, LogOut, RefreshCw, Trash2 } from "lucide-react";
 import { supabase } from "../lib/supabase";
 
@@ -69,7 +69,7 @@ function whatsappUrl(value) {
 }
 
 function FeedbackCard({ item, onStatusChange, onDelete }) {
-  const presets = normalizePresets(item.issue_template);
+  const presets = [...new Set(normalizePresets(item.issue_template))];
   const phoneUrl = whatsappUrl(item.contact);
   const type = item.type || "suggestion";
   const status = item.status || "new";
@@ -95,7 +95,7 @@ function FeedbackCard({ item, onStatusChange, onDelete }) {
       </div>
       {presets.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {presets.map((preset, index) => <span key={`${preset}-${index}`} className="rounded-md bg-stone-100 px-2 py-1 text-[11px] text-stone-600">{preset}</span>)}
+           {presets.map((preset) => <span key={preset} className="rounded-md bg-stone-100 px-2 py-1 text-[11px] text-stone-600">{preset}</span>)}
         </div>
       )}
       {item.description && <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-stone-700">{item.description}</p>}
@@ -127,24 +127,50 @@ export default function Admin({ onBackToApp }) {
   const [error, setError] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
 
-  const fetchFeedbacks = async () => {
+  const mountedRef = useRef(true);
+  const requestControllersRef = useRef(new Set());
+  const fetchFeedbacks = useCallback(async () => {
     if (!supabase) {
-      setError("Supabase is not configured.");
+      if (mountedRef.current) setError("Supabase is not configured.");
       return;
     }
-    setLoading(true);
-    setError("");
-    const { data, error: fetchError } = await supabase.from("feedbacks").select("*").order("created_at", { ascending: false });
-    if (fetchError) setError(fetchError.message);
-    else setFeedbacks(data || []);
-    setLoading(false);
-  };
+    const controller = new AbortController();
+    requestControllersRef.current.add(controller);
+    if (mountedRef.current) {
+      setLoading(true);
+      setError("");
+    }
+    try {
+      const { data, error: fetchError } = await supabase
+        .from("feedbacks")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .abortSignal(controller.signal);
+      if (!mountedRef.current) return;
+      if (fetchError) setError(fetchError.message);
+      else setFeedbacks(Array.isArray(data) ? data : []);
+    } catch (fetchError) {
+      if (mountedRef.current && fetchError?.name !== "AbortError") {
+        setError(navigator.onLine === false ? "You appear to be offline." : fetchError.message || "Unable to load feedback.");
+      }
+    } finally {
+      requestControllersRef.current.delete(controller);
+      if (mountedRef.current) setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
+    mountedRef.current = true;
     if (!isAuthenticated) return undefined;
-    const timer = window.setTimeout(fetchFeedbacks, 0);
-    return () => window.clearTimeout(timer);
-  }, [isAuthenticated]);
+    const controllers = requestControllersRef.current;
+    const timer = window.setTimeout(() => fetchFeedbacks(), 0);
+    return () => {
+      mountedRef.current = false;
+      window.clearTimeout(timer);
+      controllers.forEach((controller) => controller.abort());
+      controllers.clear();
+    };
+  }, [fetchFeedbacks, isAuthenticated]);
 
   const metrics = useMemo(() => ({
     total: feedbacks.length,
@@ -181,18 +207,26 @@ export default function Admin({ onBackToApp }) {
   const updateStatus = async (item, status) => {
     if (!supabase) return;
     setFeedbacks((items) => items.map((entry) => entry.id === item.id ? { ...entry, status } : entry));
-    const { error: updateError } = await supabase.from("feedbacks").update({ status }).eq("id", item.id);
-    if (updateError) {
-      setError(updateError.message);
-      fetchFeedbacks();
+    try {
+      const { error: updateError } = await supabase.from("feedbacks").update({ status }).eq("id", item.id);
+      if (updateError) throw updateError;
+    } catch (updateError) {
+      if (mountedRef.current) {
+        setError(updateError.message || "Unable to update feedback.");
+        fetchFeedbacks();
+      }
     }
   };
 
   const handleDelete = async (id) => {
     if (!supabase) return;
-    const { error: deleteError } = await supabase.from("feedbacks").delete().eq("id", id);
-    if (deleteError) setError(deleteError.message);
-    else setFeedbacks((items) => items.filter((entry) => entry.id !== id));
+    try {
+      const { error: deleteError } = await supabase.from("feedbacks").delete().eq("id", id);
+      if (deleteError) throw deleteError;
+      if (mountedRef.current) setFeedbacks((items) => items.filter((entry) => entry.id !== id));
+    } catch (deleteError) {
+      if (mountedRef.current) setError(deleteError.message || "Unable to delete feedback.");
+    }
   };
 
   if (!isAuthenticated) {

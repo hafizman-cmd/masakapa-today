@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { CheckCircle2, Send, X } from "lucide-react";
 import { supabase } from "../lib/supabase";
@@ -42,7 +42,19 @@ export default function FeedbackModal({
   const [description, setDescription] = useState("");
   const [contact, setContact] = useState("");
   const [status, setStatus] = useState("idle");
+  const closeTimerRef = useRef(null);
+  const requestControllerRef = useRef(null);
+  const mountedRef = useRef(true);
   const currentPresets = PRESETS[selectedCategory]?.[activeLang] || [];
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      window.clearTimeout(closeTimerRef.current);
+      requestControllerRef.current?.abort();
+    };
+  }, []);
 
   if (!isOpen) return null;
 
@@ -58,6 +70,8 @@ export default function FeedbackModal({
     event.preventDefault();
     if (status === "submitting") return;
     setStatus("submitting");
+    const controller = new AbortController();
+    requestControllerRef.current = controller;
     try {
       if (supabase) {
         const { error } = await supabase.from("feedbacks").insert([
@@ -70,14 +84,17 @@ export default function FeedbackModal({
             contact: contact || "",
             status: "new",
           },
-        ]);
+        ]).abortSignal(controller.signal);
         if (error) throw error;
       }
-      setStatus("success");
-      window.setTimeout(onClose, 1500);
+       if (!mountedRef.current) return;
+       setStatus("success");
+       closeTimerRef.current = window.setTimeout(onClose, 1500);
     } catch (error) {
       console.error("Feedback submit error:", error);
-      setStatus("error");
+      if (mountedRef.current && error?.name !== "AbortError") setStatus("error");
+    } finally {
+      if (requestControllerRef.current === controller) requestControllerRef.current = null;
     }
   };
 
@@ -143,8 +160,8 @@ export default function FeedbackModal({
                 <p className="text-xs font-semibold text-gray-700">
                   {activeLang === "en" ? "2. Select what applies" : "2. Pilih yang berkenaan"}
                 </p>
-                {currentPresets.map((preset, idx) => (
-                  <label key={idx} className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer p-2 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100">
+                {currentPresets.map((preset) => (
+                   <label key={`${selectedCategory}-${preset}`} className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer p-2 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100">
                     <input type="checkbox" checked={selectedPresets.includes(preset)} onChange={() => togglePreset(preset)} className="rounded text-amber-600 focus:ring-amber-500" />
                     <span>{preset}</span>
                   </label>

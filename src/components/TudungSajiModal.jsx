@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Check, Sparkles, X } from "lucide-react";
-import { text } from "../data/translations";
+import { text, translations } from "../data/translations";
 
 function chooseRecipe(recipes) {
   const pool = Array.isArray(recipes) ? recipes.filter(Boolean) : [];
@@ -20,6 +20,7 @@ export default function TudungSajiModal({
   onSelectRecipe,
 }) {
   const activeLanguage = language === "en" ? "en" : "ms";
+  const t = translations[activeLanguage].ui.tudung;
   const [isCoverLifted, setIsCoverLifted] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState(() => chooseRecipe(recipes));
   const [isRerolling, setIsRerolling] = useState(false);
@@ -73,12 +74,12 @@ export default function TudungSajiModal({
       <section className="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-3xl bg-[#fffdf8] p-5 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="tudung-saji-title">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <span className="section-kicker">{activeLanguage === "en" ? "A SURPRISE FROM THE KITCHEN" : "KEJUTAN DARI DAPUR"}</span>
+             <span className="section-kicker">{t.kicker}</span>
             <h2 id="tudung-saji-title" className="mt-1 text-xl font-bold text-stone-900">
-              {activeLanguage === "en" ? "Today’s Mystery Dish" : "Sajian Rahsia Hari Ini"}
+              {t.title}
             </h2>
           </div>
-          <button type="button" onClick={onClose} className="rounded-full p-2 text-stone-500 hover:bg-stone-100" aria-label={activeLanguage === "en" ? "Close" : "Tutup"}>
+           <button type="button" onClick={onClose} className="rounded-full p-2 text-stone-500 hover:bg-stone-100" aria-label={t.close}>
             <X size={20} />
           </button>
         </div>
@@ -108,15 +109,15 @@ export default function TudungSajiModal({
           <div className="absolute bottom-2 left-4 text-2xl">🍽️</div><div className="absolute bottom-3 right-5 text-xl">🌿</div>
         </div>
 
-        {!hasRecipe && <p className="mt-4 text-center text-sm text-stone-500">{activeLanguage === "en" ? "No recipes available right now." : "Tiada resipi buat masa ini."}</p>}
+         {!hasRecipe && <p className="mt-4 text-center text-sm text-stone-500">{t.noRecipes}</p>}
 
         {isCoverLifted ? (
           <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
-            <button type="button" onClick={openRecipe} className="rounded-xl bg-amber-600 px-6 py-3 font-semibold text-white shadow-md hover:bg-amber-700">{activeLanguage === "en" ? "View Recipe" : "Lihat Resipi"}</button>
-            <button type="button" onClick={reroll} className="rounded-xl border border-amber-300 bg-amber-50 px-6 py-3 font-semibold text-amber-900 hover:bg-amber-100">{activeLanguage === "en" ? "Try Again" : "Angkat Lagi"}</button>
+             <button type="button" onClick={openRecipe} className="rounded-xl bg-amber-600 px-6 py-3 font-semibold text-white shadow-md hover:bg-amber-700">{t.viewRecipe}</button>
+             <button type="button" onClick={reroll} className="rounded-xl border border-amber-300 bg-amber-50 px-6 py-3 font-semibold text-amber-900 hover:bg-amber-100">{t.tryAgain}</button>
           </div>
         ) : (
-          <button type="button" onClick={() => setIsCoverLifted(true)} disabled={!hasRecipe || isRerolling} className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-amber-600 px-6 py-3 font-semibold text-white shadow-md transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50">{activeLanguage === "en" ? "Lift Food Cover 🍲" : "Buka Tudung Saji 🍲"}</button>
+           <button type="button" onClick={() => setIsCoverLifted(true)} disabled={!hasRecipe || isRerolling} className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-amber-600 px-6 py-3 font-semibold text-white shadow-md transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50">{t.liftCover}</button>
         )}
       </section>
     </div>

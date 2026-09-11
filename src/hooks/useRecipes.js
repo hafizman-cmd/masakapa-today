@@ -97,60 +97,72 @@ export default function useRecipes() {
     if (!isSupabaseConfigured || !isOnline()) return
 
     let cancelled = false
+    const controller = new AbortController()
+    const timeout = window.setTimeout(() => controller.abort(), 10000)
 
     async function load() {
-      const [ingredientsResult, recipesResult] = await Promise.all([
-        supabase.from('ingredients').select('*'),
-        supabase.from('recipes').select('*'),
-      ])
+      try {
+        const [ingredientsResult, recipesResult] = await Promise.all([
+          supabase.from('ingredients').select('*').abortSignal(controller.signal),
+          supabase.from('recipes').select('*').abortSignal(controller.signal),
+        ])
 
-      if (cancelled) return
+        if (cancelled) return
 
-      if (ingredientsResult.error || recipesResult.error) {
-        setState(current => ({
-          ...current,
+        if (ingredientsResult.error || recipesResult.error) {
+          setState(current => ({
+            ...current,
+            loading: false,
+            error: ingredientsResult.error || recipesResult.error,
+            isOffline: false,
+          }))
+          return
+        }
+
+        const ingredientRows = Array.isArray(ingredientsResult.data)
+          ? ingredientsResult.data
+          : []
+        const recipeRows = Array.isArray(recipesResult.data)
+          ? recipesResult.data
+          : []
+        const stapleIngredients = ingredientRows.length
+          ? transformIngredients(ingredientRows.filter(row => row.is_staple))
+          : staticStapleIngredients
+        const ingredientOptions = ingredientRows.length
+          ? transformIngredients(ingredientRows.filter(row => !row.is_staple))
+          : staticIngredientOptions
+        const recipes = recipeRows.length ? transformRecipes(recipeRows) : staticRecipes
+
+        const nextState = {
+          recipes,
+          ingredientOptions,
+          stapleIngredients,
+          groups: staticGroups,
           loading: false,
-          error: ingredientsResult.error || recipesResult.error,
+          error: null,
           isOffline: false,
-        }))
-        return
+        }
+
+        writeCache(nextState)
+        setState(nextState)
+      } catch (error) {
+        if (!cancelled) {
+          setState(current => ({
+            ...current,
+            loading: false,
+            error,
+            isOffline: !isOnline(),
+          }))
+        }
       }
-
-      const stapleIngredients = transformIngredients(
-        ingredientsResult.data.filter(row => row.is_staple),
-      )
-      const ingredientOptions = transformIngredients(
-        ingredientsResult.data.filter(row => !row.is_staple),
-      )
-      const recipes = transformRecipes(recipesResult.data)
-
-      const nextState = {
-        recipes,
-        ingredientOptions,
-        stapleIngredients,
-        groups: staticGroups,
-        loading: false,
-        error: null,
-        isOffline: false,
-      }
-
-      writeCache(nextState)
-      setState(nextState)
     }
 
-    load().catch(error => {
-      if (!cancelled) {
-        setState(current => ({
-          ...current,
-          loading: false,
-          error,
-          isOffline: !isOnline(),
-        }))
-      }
-    })
+    load()
 
     return () => {
       cancelled = true
+      window.clearTimeout(timeout)
+      controller.abort()
     }
   }, [])
 
