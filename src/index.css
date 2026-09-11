@@ -6,6 +6,12 @@
 body { margin: 0; min-width: 320px; background: #f4efe7; }
 button, input { font: inherit; }
 button { cursor: pointer; }
+@keyframes badgePop { 0% { transform: scale(1); } 40% { transform: scale(1.15); } 70% { transform: scale(.96); } 100% { transform: scale(1); } }
+.animate-badge-pop { animation: badgePop 350ms cubic-bezier(.34, 1.56, .64, 1) forwards; }
+@keyframes pulseOnce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+.animate-pulse-once { animation: pulseOnce 500ms ease-out 1; }
+@keyframes sparkleFloat { 0% { opacity: 0; transform: scale(.5) translateY(3px); } 35% { opacity: 1; transform: scale(1) translateY(0); } 100% { opacity: 0; transform: scale(.7) translateY(-4px); } }
+.animate-sparkle-float { animation: sparkleFloat 700ms ease-out forwards; }
 .app-shell { min-height: 100vh; background: #ece5d8; }
 .screen { min-height: 100vh; }
 .content { padding: 0 20px 104px; }

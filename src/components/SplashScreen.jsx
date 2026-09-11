@@ -1,10 +1,10 @@
 import { CookingPot } from "lucide-react";
 import "./SplashScreen.css";
 
-export default function SplashScreen() {
+export default function SplashScreen({ isFadingOut = false }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-amber-50 splash-screen"
+      className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-amber-50 splash-screen transition-opacity duration-300 ${isFadingOut ? "opacity-0 pointer-events-none" : "opacity-100"}`}
       role="status"
       aria-live="polite"
       aria-label="Masak Apa Hari Ini sedang dimuatkan"

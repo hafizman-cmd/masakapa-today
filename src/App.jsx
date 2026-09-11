@@ -269,6 +269,16 @@ function IngredientSelector({
         ? items.filter((value) => value !== id)
         : [...items, id],
     );
+  const handleIngredientClick = (ingredient) => {
+    if (typeof window !== "undefined" && "vibrate" in navigator) {
+      try {
+        navigator.vibrate(12);
+      } catch {
+        // Ignore vibration failures caused by browser policy.
+      }
+    }
+    toggleIngredient(ingredient.id);
+  };
   const selectedIngredients = selectableIngredients.filter((item) =>
     selected.includes(item.id),
   );
@@ -370,8 +380,11 @@ function IngredientSelector({
         {"⚡"} {translations[lang].ui.autoStaples}
       </button>
       <div className="mt-4 flex items-center justify-between">
-        <span className="selected-count">
-          {translations[lang].ui.selectedCount(selected.length)}
+         <span
+           key={selectedIngredients.length}
+           className="animate-badge-pop origin-left inline-flex items-center rounded-md bg-amber-500 px-2.5 py-1 text-xs font-bold text-white shadow-sm transform-gpu"
+         >
+           {selectedIngredients.length} {lang === "en" ? "selected" : "bahan dipilih"}
         </span>
         <span className="text-[10px] text-stone-400">
           {translations[lang].ui.shownCount(selectedIngredients.length)}
@@ -382,8 +395,8 @@ function IngredientSelector({
           {selectedIngredients.map((item) => (
             <button
               key={item.id}
-              onClick={() => toggleIngredient(item.id)}
-              className="flex shrink-0 items-center gap-1 rounded-full bg-green-50 px-2.5 py-1 text-[10px] font-medium text-green-700"
+               onClick={() => handleIngredientClick(item)}
+               className="flex shrink-0 transform-gpu items-center gap-1 rounded-full bg-green-50 px-2.5 py-1 text-[10px] font-medium text-green-700 transition-all duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-90 hover:scale-[1.02]"
             >
               {text(item.name, lang)}
               <X size={12} />
@@ -396,8 +409,12 @@ function IngredientSelector({
           {ingredientsToShow.map((item) => (
             <button
               key={item.id}
-              onClick={() => toggleIngredient(item.id)}
-              className="ingredient-chip"
+               onClick={() => handleIngredientClick(item)}
+               className={`ingredient-chip transform-gpu transition-all duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-90 hover:scale-[1.02] ${
+                 selected.includes(item.id)
+                   ? "scale-[1.02] shadow-md shadow-amber-500/10 ring-2 ring-amber-500/80"
+                   : ""
+               }`}
             >
               {text(item.name, lang)}
             </button>
@@ -943,6 +960,10 @@ export default function App() {
   const mainRef = useRef(null);
   const { recipes, ingredientOptions, stapleIngredients, loading } =
     useRecipes();
+  const [showSplash, setShowSplash] = useState(true);
+  const [isSplashFadingOut, setIsSplashFadingOut] = useState(false);
+  const [minimumSplashTimeElapsed, setMinimumSplashTimeElapsed] =
+    useState(false);
   const [lang, setLang] = useState(() =>
     readStorage("masakapa-language", "ms") === "en" ? "en" : "ms",
   );
@@ -979,6 +1000,21 @@ export default function App() {
   useEffect(() => {
     if (mainRef.current) mainRef.current.scrollTop = 0;
   }, [screen, activeRecipe]);
+  useEffect(() => {
+    const timer = window.setTimeout(() => setMinimumSplashTimeElapsed(true), 1200);
+    return () => window.clearTimeout(timer);
+  }, []);
+  useEffect(() => {
+    if (loading || !minimumSplashTimeElapsed || !showSplash) return undefined;
+
+    const fadeTimer = window.setTimeout(() => setIsSplashFadingOut(true), 0);
+    const hideTimer = window.setTimeout(() => setShowSplash(false), 300);
+
+    return () => {
+      window.clearTimeout(fadeTimer);
+      window.clearTimeout(hideTimer);
+    };
+  }, [loading, minimumSplashTimeElapsed, showSplash]);
   useEffect(() => {
     const timer = window.setTimeout(() => {
       if (isAdminRoute()) setCurrentScreen("admin");
@@ -1056,10 +1092,10 @@ export default function App() {
       <button onClick={() => updateSW(true)}>{t.ui.refresh}</button>
     </div>
   );
+  if (showSplash) return <SplashScreen isFadingOut={isSplashFadingOut} />;
   if (currentScreen === "admin" || isAdminRoute()) {
     return <Admin onBackToApp={goToApp} />;
   }
-  if (loading) return <SplashScreen />;
   const view = activeRecipe ? (
     <RecipeDetail
       recipe={activeRecipe}
