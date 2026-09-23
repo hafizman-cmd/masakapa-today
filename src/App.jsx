@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import React, { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronRight,
   Heart,
@@ -19,13 +19,12 @@ import RecipeDetail from "./components/RecipeDetail";
 import TudungSajiModal from "./components/TudungSajiModal";
 import GroceryListView from "./components/GroceryList";
 import FeedbackModal from "./components/FeedbackModal";
-import Admin from "./components/Admin";
 import SplashScreen from "./components/SplashScreen";
 import OnboardingModal from "./components/OnboardingModal";
 import { text, translations } from "./data/translations";
 import useRecipes from "./hooks/useRecipes";
 import useFavorites from "./hooks/useFavorites";
-import { readUrlGrocery } from "./utils/groceryShare";
+import { decodeCompactGrocery } from "./utils/whatsappShare";
 import { scaleIngredientAmount } from "./utils/portion";
 import { logVisit } from "./utils/analytics";
 import {
@@ -34,14 +33,14 @@ import {
   sortByActiveName,
 } from "./components/Matcher";
 
+const Admin = lazy(() => import("./components/Admin"));
+
 const GROCERY_LIMIT = 300;
 const readStorage = (key, fallback) => {
   try {
     const value = window.localStorage.getItem(key);
     const stored = value === null ? fallback : JSON.parse(value);
-    return key === "masakapa-grocery-list"
-      ? sanitizeGroceryList(readUrlGrocery(sanitizeGroceryList(stored)))
-      : stored;
+    return key === "masakapa-grocery-list" ? sanitizeGroceryList(stored) : stored;
   } catch {
     return fallback;
   }
@@ -222,6 +221,7 @@ function Header({
   subtitle,
   lang,
   onToggleLanguage,
+  onOpenTudungSaji,
   onOpenFeedback,
   onOpenOnboarding,
 }) {
@@ -241,8 +241,21 @@ function Header({
             <b className={lang === "ms" ? "active" : ""}>BM</b>
             <span>|</span>
             <b className={lang === "en" ? "active" : ""}>EN</b>
-          </button>
-          <button
+           </button>
+           {onOpenTudungSaji && (
+             <button
+               type="button"
+               onClick={onOpenTudungSaji}
+               className="flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1.5 text-sm font-medium text-amber-900 shadow-sm transition-colors hover:bg-amber-200 active:scale-95"
+               title={lang === "en" ? "Surprise Recipe" : "Resipi Kejutan"}
+             >
+               <span className="text-base">🍲</span>
+               <span className="hidden sm:inline">
+                 {lang === "en" ? "Surprise Me" : "Tudung Saji"}
+               </span>
+             </button>
+           )}
+           <button
             type="button"
             onClick={() => onOpenFeedback()}
             className="p-1.5 rounded-full text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-all"
@@ -580,7 +593,6 @@ function Matcher({
   const visible = matches.filter((match) =>
     matchesFilter(match.recipe, query, filter, favorites, lang),
   );
-  const hasSelected = selected.length > 0;
   const showMatchCta = selected.length > 0 && visible.length > 0;
   return (
     <div className="screen">
@@ -589,6 +601,7 @@ function Matcher({
         subtitle={t.headers.matcher[1]}
         lang={lang}
         onToggleLanguage={onToggleLanguage}
+        onOpenTudungSaji={() => setShowSpinner(true)}
         onOpenFeedback={onOpenFeedback}
         onOpenOnboarding={onOpenOnboarding}
       />
@@ -692,23 +705,6 @@ function Matcher({
           </span>
         </button>
       )}
-        <button
-          type="button"
-          onClick={() => setShowSpinner(true)}
-          title={lang === "en" ? "Surprise Me!" : "Tak Tahu Nak Masak?"}
-           className={`fixed md:absolute bottom-24 right-4 z-40 flex max-w-[calc(100vw-2rem)] items-center justify-center rounded-full shadow-lg bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white transform hover:scale-105 active:scale-95 transition-all duration-300 ease-in-out ${hasSelected ? "w-12 h-12 p-0" : "gap-2 px-4 py-3"}`}
-        >
-          {hasSelected ? (
-            <Sparkles className="w-6 h-6 text-yellow-100" />
-          ) : (
-            <>
-              <Sparkles className="w-5 h-5 text-yellow-200" />
-              <span className="font-bold text-sm tracking-wide">
-                {lang === "en" ? "Surprise Me!" : "Tak Tahu Nak Masak?"}
-              </span>
-            </>
-          )}
-        </button>
     </div>
   );
 }
@@ -896,6 +892,7 @@ export default function App() {
   const [groceryList, setGroceryList] = useState(() =>
     readStorage("masakapa-grocery-list", []),
   );
+  const [importToast, setImportToast] = useState("");
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const visitLoggedRef = useRef(false);
   const [updateSW] = useState(() =>
@@ -990,6 +987,22 @@ export default function App() {
       if (!additions.length) return existing;
       return [...existing, ...additions];
     });
+  useEffect(() => {
+    const payload = new URLSearchParams(window.location.search).get("g");
+    if (!payload) return undefined;
+
+    window.history.replaceState({}, "", `${window.location.pathname}${window.location.hash}`);
+    try {
+      const importedItems = decodeCompactGrocery(payload);
+      if (!importedItems.length) return undefined;
+      mergeGroceryItems(importedItems);
+      setImportToast(lang === "en" ? "Grocery list imported successfully!" : "Senarai pasar berjaya diimport!");
+      const timer = window.setTimeout(() => setImportToast(""), 2800);
+      return () => window.clearTimeout(timer);
+    } catch {
+      return undefined;
+    }
+  }, [lang]);
   const openRecipe = (recipe, missingCore) => {
     window.history.pushState({ view: "detail" }, "");
     setActiveRecipe({
@@ -1043,7 +1056,20 @@ export default function App() {
   );
   if (showSplash) return <SplashScreen isFadingOut={isSplashFadingOut} />;
   if (currentScreen === "admin" || isAdminRoute()) {
-    return <Admin onBackToApp={goToApp} />;
+    return (
+      <Suspense
+        fallback={
+          <div className="flex min-h-screen items-center justify-center bg-[#faf9f6]">
+            <div className="flex flex-col items-center">
+              <div className="mb-4 h-10 w-10 animate-spin rounded-full border-4 border-amber-200 border-t-amber-600" />
+              <p className="font-medium text-amber-800">Memuatkan Admin...</p>
+            </div>
+          </div>
+        }
+      >
+        <Admin onBackToApp={goToApp} />
+      </Suspense>
+    );
   }
   const view = activeRecipe ? (
     <RecipeDetail
@@ -1134,9 +1160,10 @@ export default function App() {
           {view}
         </main>
         <footer className="shrink-0 border-t border-stone-200 bg-white z-50">
-          {nav}
+         {nav}
         </footer>
         {toast}
+        {importToast && <div className="update-toast">{importToast}</div>}
         {feedbackState.isOpen && (
           <FeedbackModal
             isOpen={feedbackState.isOpen}

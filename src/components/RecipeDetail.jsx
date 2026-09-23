@@ -8,6 +8,7 @@ import {
   Flame,
   Heart,
   Lightbulb,
+  MessageCircle,
   Plus,
   Soup,
   Sparkles,
@@ -16,6 +17,7 @@ import {
 import { text, translations } from "../data/translations";
 import { SUBSTITUTIONS } from "../data/substitutions";
 import { scaleIngredientAmount } from "../utils/portion";
+import { shareRecipeToWhatsApp } from "../utils/whatsappShare";
 
 const formatAmount = (amountStr, lang) => {
   if (!amountStr || lang !== "en") return amountStr;
@@ -489,6 +491,16 @@ export default function RecipeDetail({
           onOpenRecipe={onOpenRecipe}
           lang={lang}
         />
+        <div className="flex flex-wrap items-center gap-3 md:col-span-2">
+          <button
+            type="button"
+            onClick={() => shareRecipeToWhatsApp(recipe, lang)}
+            className="flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 font-medium text-white shadow-xs transition-transform transform-gpu hover:bg-emerald-700 active:scale-95"
+          >
+            <MessageCircle size={18} />
+            {lang === "en" ? "Share to WhatsApp" : "Kongsi ke WhatsApp"}
+          </button>
+        </div>
         {onOpenFeedback && (
           <button
             type="button"

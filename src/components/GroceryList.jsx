@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { Check, Leaf, MessageSquarePlus } from 'lucide-react'
-import { decodeGrocery, encodeGrocery, formatGrocery } from '../utils/groceryShare'
+import { Check, Leaf, MessageCircle, MessageSquarePlus } from 'lucide-react'
+import { decodeGrocery, parseGroceryText } from '../utils/groceryShare'
 import { getGroceryIngredientName, translateGroceryAmount } from '../utils/groceryTranslation'
 import { text, translations } from '../data/translations'
+import { decodeCompactGrocery, shareGroceryToWhatsApp } from '../utils/whatsappShare'
 
 export default function GroceryList({ groceryList = [], ingredients = [], onToggleItem, onClearChecked, onClearAll, onMergeItems, lang, onToggleLanguage, onOpenFeedback }) {
   const t = translations[lang]
@@ -13,8 +14,6 @@ export default function GroceryList({ groceryList = [], ingredients = [], onTogg
   const toastTimerRef = useRef(null)
   const validList = (groceryList || []).filter(Boolean)
   const unchecked = validList.filter(item => !item.checked)
-  const code = encodeGrocery(unchecked)
-  const shareText = `${formatGrocery(unchecked, lang)}\n${window.location.origin}/?import_grocery=${encodeURIComponent(code)}`
 
   useEffect(() => () => window.clearTimeout(toastTimerRef.current), [])
 
@@ -24,25 +23,12 @@ export default function GroceryList({ groceryList = [], ingredients = [], onTogg
     toastTimerRef.current = window.setTimeout(() => setToast(''), 2400)
   }
 
-  const share = async () => {
+  const shareToWhatsApp = () => {
     if (!unchecked.length) {
       showToast(t.ui.shareEmpty)
       return
     }
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: t.headers.grocery[0], text: shareText })
-        return
-      } catch (shareError) {
-        if (shareError?.name === 'AbortError') return
-      }
-    }
-    try {
-      await navigator.clipboard.writeText(shareText)
-      showToast(t.ui.shareCopied)
-    } catch {
-      showToast(t.ui.shareCopyFailed)
-    }
+    shareGroceryToWhatsApp(unchecked, lang)
   }
 
   const importItems = () => {
@@ -55,7 +41,17 @@ export default function GroceryList({ groceryList = [], ingredients = [], onTogg
       return
     }
     try {
-      onMergeItems(decodeGrocery(importCode))
+      let items
+      try {
+        items = decodeGrocery(importCode)
+      } catch {
+        try {
+          items = decodeCompactGrocery(importCode)
+        } catch {
+          items = parseGroceryText(importCode)
+        }
+      }
+      onMergeItems(items)
       setImportCode('')
       setError('')
       setShowShare(false)
@@ -86,7 +82,7 @@ export default function GroceryList({ groceryList = [], ingredients = [], onTogg
         <div className="grocery-toolbar">
           <span>{unchecked.length} {t.ui.groceryCount}</span>
           <div className="flex items-center gap-3">
-            <button type="button" onClick={share}>{t.ui.shareWhatsApp}</button>
+             <button type="button" onClick={shareToWhatsApp} className="flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 font-medium text-white shadow-xs transition-transform transform-gpu hover:bg-emerald-700 active:scale-95"><MessageCircle size={17} /> {t.ui.shareWhatsApp}</button>
             <button type="button" onClick={() => setShowShare(true)}>{t.ui.importTitle}</button>
             {validList.some(item => item.checked) && <button type="button" onClick={onClearChecked}>{t.ui.clearChecked}</button>}
           </div>

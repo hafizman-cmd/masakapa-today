@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ExternalLink, LockKeyhole, LogOut, RefreshCw, Trash2 } from "lucide-react";
+import { Activity, Calendar, Download, ExternalLink, LockKeyhole, LogOut, MessageCircle, RefreshCw, Trash2, TrendingUp, Users } from "lucide-react";
 import { supabase } from "../lib/supabase";
 
 const STATUS_OPTIONS = ["all", "new", "investigating", "resolved"];
@@ -55,15 +55,6 @@ function rowDate(row) {
   return date && !Number.isNaN(date.getTime()) ? date : null;
 }
 
-function startOfWeek(date) {
-  const start = new Date(date);
-  const day = start.getDay();
-  const daysSinceMonday = (day + 6) % 7;
-  start.setDate(start.getDate() - daysSinceMonday);
-  start.setHours(0, 0, 0, 0);
-  return start;
-}
-
 function uniqueVisitorCount(rows) {
   return new Set(rows.map((row) => row.visitor_id).filter(Boolean)).size;
 }
@@ -72,8 +63,10 @@ function buildAnalyticsSummary(rows) {
   const now = new Date();
   const today = new Date(now);
   today.setHours(0, 0, 0, 0);
-  const week = startOfWeek(now);
-  const month = new Date(now.getFullYear(), now.getMonth(), 1);
+  const week = new Date(now);
+  week.setDate(week.getDate() - 7);
+  const month = new Date(now);
+  month.setDate(month.getDate() - 30);
   const recentRows = rows
     .map((row) => ({ row, date: rowDate(row) }))
     .filter(({ date }) => date);
@@ -106,6 +99,7 @@ function buildAnalyticsSummary(rows) {
     dau: countSince(today),
     wau: countSince(week),
     mau: countSince(month),
+    totalSessions: recentRows.filter(({ date, row }) => date >= today && row.id != null).length,
     pwa: pwaVisitors,
     devices: deviceBreakdown,
     browsers: browserBreakdown.slice(0, 5),
@@ -173,7 +167,7 @@ function AnalyticsBreakdown({ title, items }) {
                 <span>{item.label}</span>
                 <span>{item.count} ({percentage}%)</span>
               </div>
-              <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-stone-100">
+              <div className="mt-2 h-2 rounded-full bg-gray-100 overflow-hidden">
                 <div className="h-full rounded-full bg-amber-500 transition-all" style={{ width: `${percentage}%` }} />
               </div>
             </div>
@@ -181,6 +175,18 @@ function AnalyticsBreakdown({ title, items }) {
         }) : <p className="text-xs text-stone-400">No analytics data yet.</p>}
       </div>
     </section>
+  );
+}
+
+function MetricCard({ label, value, icon: Icon, color }) {
+  return (
+    <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-xs font-bold uppercase tracking-wide text-stone-500">{label}</p>
+        <Icon className={`h-5 w-5 ${color}`} aria-hidden="true" />
+      </div>
+      <p className="mt-3 text-3xl font-bold text-stone-800">{value}</p>
+    </div>
   );
 }
 
@@ -254,7 +260,7 @@ function AuthGate({ onBackToApp }) {
 
 export default function Admin({ onBackToApp }) {
   const [session, setSession] = useState(null);
-  const [authReady, setAuthReady] = useState(!supabase);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [feedbacks, setFeedbacks] = useState([]);
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -264,6 +270,7 @@ export default function Admin({ onBackToApp }) {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [analyticsRows, setAnalyticsRows] = useState([]);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("analytics");
 
   const mountedRef = useRef(true);
   const requestControllersRef = useRef(new Set());
@@ -277,21 +284,27 @@ export default function Admin({ onBackToApp }) {
   }, []);
 
   useEffect(() => {
-    if (!supabase) return undefined;
+    if (!supabase) {
+      setIsAuthChecking(false);
+      return undefined;
+    }
+
     let active = true;
-    supabase.auth
-      .getSession()
-      .then(({ data }) => {
-        if (!active) return;
-        setSession(data?.session ?? null);
-        setAuthReady(true);
-      })
-      .catch(() => {
-        if (active) setAuthReady(true);
-      });
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession ?? null);
-      setAuthReady(true);
+    const checkSession = async () => {
+      try {
+        const { data: { session: nextSession } } = await supabase.auth.getSession();
+        if (active) setSession(nextSession);
+      } catch {
+        if (active) setSession(null);
+      } finally {
+        if (active) setIsAuthChecking(false);
+      }
+    };
+    checkSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession);
+      setIsAuthChecking(false);
       if (!nextSession) {
         setFeedbacks([]);
         setAnalyticsRows([]);
@@ -299,7 +312,7 @@ export default function Admin({ onBackToApp }) {
     });
     return () => {
       active = false;
-      authListener?.subscription?.unsubscribe();
+      subscription.unsubscribe();
     };
   }, []);
 
@@ -314,7 +327,7 @@ export default function Admin({ onBackToApp }) {
       for (let offset = 0; ; offset += pageSize) {
         const { data, error: analyticsError } = await supabase
           .from("app_analytics")
-          .select("visitor_id, device_type, os, browser, is_pwa, created_at")
+          .select("id, visitor_id, device_type, os, browser, is_pwa, created_at")
           .order("created_at", { ascending: false })
           .range(offset, offset + pageSize - 1)
           .abortSignal(controller.signal);
@@ -432,10 +445,13 @@ export default function Admin({ onBackToApp }) {
     }
   };
 
-  if (!authReady) {
+  if (isAuthChecking) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#FAF7F2] px-4 text-sm font-semibold text-stone-500">
-        Checking session...
+      <div className="flex min-h-screen items-center justify-center bg-[#FAF7F2] px-4 text-stone-500">
+        <div className="flex items-center gap-3 rounded-2xl border border-stone-200 bg-white px-5 py-4 text-sm font-semibold shadow-sm">
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-amber-200 border-t-amber-600" aria-hidden="true" />
+          Checking session...
+        </div>
       </div>
     );
   }
@@ -449,13 +465,21 @@ export default function Admin({ onBackToApp }) {
       <header className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 border-b border-stone-200 pb-5">
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Masak Apa Hari Ini</p>
-          <h1 className="mt-1 text-3xl font-bold">Feedback Dashboard</h1>
+           <h1 className="mt-1 text-3xl font-bold">Admin Dashboard</h1>
           <p className="mt-1 truncate text-xs font-semibold text-stone-500">{session?.user?.email || "Signed in"}</p>
         </div>
         <div className="flex items-center gap-2"><button type="button" onClick={onBackToApp} className="rounded-full border border-stone-200 bg-white px-3 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-50">Go to App</button><button type="button" onClick={logout} title="Log out" aria-label="Log out" className="rounded-full border border-stone-200 bg-white p-2 text-stone-500 hover:text-stone-800"><LogOut size={16} /></button></div>
-      </header>
-      <main className="mx-auto max-w-7xl py-6">
-        <section aria-labelledby="analytics-heading">
+       </header>
+       <nav className="mx-auto mt-5 flex max-w-7xl rounded-2xl border border-stone-200 bg-white p-1.5 shadow-sm" aria-label="Dashboard sections">
+         <button type="button" onClick={() => setActiveTab("analytics")} className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition ${activeTab === "analytics" ? "bg-stone-800 text-white shadow-sm" : "text-stone-500 hover:bg-stone-50 hover:text-stone-800"}`} aria-current={activeTab === "analytics" ? "page" : undefined}>
+           <Activity size={16} aria-hidden="true" /> Analytics
+         </button>
+         <button type="button" onClick={() => setActiveTab("feedback")} className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition ${activeTab === "feedback" ? "bg-stone-800 text-white shadow-sm" : "text-stone-500 hover:bg-stone-50 hover:text-stone-800"}`} aria-current={activeTab === "feedback" ? "page" : undefined}>
+           <MessageCircle size={16} aria-hidden="true" /> Feedback ({metrics.total})
+         </button>
+       </nav>
+       <main className="mx-auto max-w-7xl py-6">
+         {activeTab === "analytics" && <section aria-labelledby="analytics-heading">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-wide text-amber-700">Visitor Analytics</p>
@@ -463,27 +487,36 @@ export default function Admin({ onBackToApp }) {
             </div>
             {analyticsLoading && <span className="text-xs font-semibold text-stone-400">Loading...</span>}
           </div>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {[["Today's Active Visitors (DAU)", analytics.dau, "bg-white"], ["This Week's Visitors (WAU)", analytics.wau, "bg-amber-50"], ["This Month's Visitors (MAU)", analytics.mau, "bg-green-50"], ["PWA Installs Count", analytics.pwa, "bg-blue-50"]].map(([label, value, color]) => (
+           <div className="hidden">
+             {[["Today's Active Visitors (DAU)", analytics.dau, "bg-white"], ["This Week's Visitors (WAU)", analytics.wau, "bg-amber-50"], ["This Month's Visitors (MAU)", analytics.mau, "bg-green-50"], ["Total Sessions", analytics.totalSessions, "bg-blue-50"]].map(([label, value, color]) => (
               <div key={label} className={`rounded-2xl border border-stone-200 ${color} p-5`}>
                 <p className="text-xs font-bold uppercase tracking-wide text-stone-500">{label}</p>
                 <p className="mt-2 text-3xl font-bold text-stone-800">{value}</p>
               </div>
             ))}
           </div>
-          <div className="mt-4 grid gap-4 lg:grid-cols-2">
+           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+             <MetricCard label="Daily Active Users" value={analytics.dau} icon={Users} color="text-amber-500" />
+             <MetricCard label="Weekly Active Users" value={analytics.wau} icon={TrendingUp} color="text-amber-500" />
+             <MetricCard label="Monthly Active Users" value={analytics.mau} icon={Calendar} color="text-emerald-500" />
+             <MetricCard label="PWA Installs" value={analytics.pwa} icon={Download} color="text-indigo-500" />
+             <MetricCard label="Total Sessions" value={analytics.totalSessions} icon={Activity} color="text-sky-500" />
+           </div>
+           <div className="mt-4 grid gap-4 lg:grid-cols-2">
             <AnalyticsBreakdown title="Devices" items={analytics.devices} />
             <AnalyticsBreakdown title="Top Browsers" items={analytics.browsers} />
           </div>
-        </section>
-        <div className="grid gap-3 sm:grid-cols-3">
+         </section>}
+         {activeTab === "feedback" && <>
+         <div className="grid gap-3 sm:grid-cols-3">
           {[['Total Feedbacks', metrics.total, 'bg-white'], ['New Issues', metrics.newIssues, 'bg-amber-50'], ['Resolved Issues', metrics.resolved, 'bg-green-50']].map(([label, value, color]) => <div key={label} className={`rounded-2xl border border-stone-200 ${color} p-5`}><p className="text-xs font-bold uppercase tracking-wide text-stone-500">{label}</p><p className="mt-2 text-3xl font-bold text-stone-800">{value}</p></div>)}
         </div>
         <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-stone-200 bg-white p-4 md:flex-row"><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search feedback..." className="min-w-0 flex-1 rounded-xl border border-stone-200 px-3 py-2 text-sm outline-none focus:border-amber-400" /><select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} className="rounded-xl border border-stone-200 px-3 py-2 text-sm"><option value="all">All Statuses</option>{STATUS_OPTIONS.slice(1).map((value) => <option key={value} value={value}>{statusLabels[value]}</option>)}</select><select value={typeFilter} onChange={(event) => setTypeFilter(event.target.value)} className="rounded-xl border border-stone-200 px-3 py-2 text-sm"><option value="all">All Types</option>{TYPE_OPTIONS.slice(1).map((value) => <option key={value} value={value}>{typeLabels[value]}</option>)}</select><button type="button" onClick={fetchFeedbacks} title="Refresh" aria-label="Refresh" className="rounded-xl border border-stone-200 p-2 text-stone-500 hover:bg-stone-50"><RefreshCw size={17} className={loading ? "animate-spin" : ""} /></button></div>
         {error && <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
         <p className="mt-5 text-xs font-semibold text-stone-500">{filteredFeedbacks.length} feedback record{filteredFeedbacks.length === 1 ? "" : "s"}</p>
         <div className="mt-3 grid gap-3 lg:grid-cols-2">{filteredFeedbacks.map((item) => <FeedbackCard key={item.id} item={item} onStatusChange={updateStatus} onDelete={setDeleteTarget} />)}</div>
-        {!loading && filteredFeedbacks.length === 0 && <div className="mt-3 rounded-2xl border border-dashed border-stone-300 bg-white p-10 text-center text-sm text-stone-500">No feedback matches the current filters.</div>}
+         {!loading && filteredFeedbacks.length === 0 && <div className="mt-3 rounded-2xl border border-dashed border-stone-300 bg-white p-10 text-center text-sm text-stone-500">No feedback matches the current filters.</div>}
+         </>}
       </main>
       {deleteTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs animate-fadeIn">
