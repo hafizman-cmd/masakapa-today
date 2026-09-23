@@ -195,7 +195,7 @@ function Filters({ query, setQuery, filter, setFilter, lang, letter, setLetter }
   ];
   return (
     <>
-      <div className="search-box">
+      <div className="search-box w-full">
         <Search size={19} />
         <input
           value={query}
@@ -206,7 +206,7 @@ function Filters({ query, setQuery, filter, setFilter, lang, letter, setLetter }
       </div>
       {setLetter && <LetterFilter value={letter} onChange={setLetter} />}
       <div className="relative w-full overflow-hidden">
-        <div className="filter-row flex flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap px-4 py-1 pr-6 scrollbar-none sm:gap-2 sm:py-1.5">
+        <div className="filter-row flex w-full flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap py-1 pl-1 pr-4 scrollbar-none sm:gap-2 sm:py-1.5">
           {options.map(([label, value]) => (
             <button
               key={value}
@@ -707,41 +707,43 @@ function Matcher({
               setSelectedQuickFilter={setSelectedQuickFilter}
             />
           </div>
-          <section
-            id="recipe-results"
-            ref={recipeSectionRef}
-            className="results-section md:col-span-5 md:sticky md:top-4 md:self-start"
-          >
-            <Filters
-              query={query}
-              setQuery={setQuery}
-              filter={filter}
-              setFilter={setFilter}
-              lang={lang}
-            />
-            <div className="section-heading results-heading">
-              <div>
-                <span className="section-kicker">{t.ui.recommendations}</span>
-                <h2>
-                  {visible.length} {t.ui.matches}
-                </h2>
-              </div>
-              <Sparkles size={21} className="sparkle" />
-            </div>
-            <div className="recipe-list flex flex-col space-y-2 px-4 pb-24">
-              {visible.map((match) => (
-                <RecipeCard
-                  key={match.recipe.id}
-                  recipe={match.recipe}
-                  match={match}
-                  isFavorite={favorites.some((favorite) => favorite.id === match.recipe.id)}
-                  onToggleFavorite={toggleFavorite}
-                  onClick={openRecipe}
-                  lang={lang}
-                />
-              ))}
-            </div>
-          </section>
+           <section
+             id="recipe-results"
+             ref={recipeSectionRef}
+             className="results-section md:col-span-5 md:sticky md:top-4 md:self-start"
+           >
+             <div className="flex w-full flex-col gap-4 px-4 sm:px-6">
+               <Filters
+                 query={query}
+                 setQuery={setQuery}
+                 filter={filter}
+                 setFilter={setFilter}
+                 lang={lang}
+               />
+               <div className="section-heading results-heading w-full text-left">
+                 <div>
+                   <span className="section-kicker">{t.ui.recommendations}</span>
+                   <h2>
+                     {visible.length} {t.ui.matches}
+                   </h2>
+                 </div>
+                 <Sparkles size={21} className="sparkle" />
+               </div>
+               <div className="recipe-list flex w-full flex-col space-y-2 pb-24">
+                 {visible.map((match) => (
+                   <RecipeCard
+                     key={match.recipe.id}
+                     recipe={match.recipe}
+                     match={match}
+                     isFavorite={favorites.some((favorite) => favorite.id === match.recipe.id)}
+                     onToggleFavorite={toggleFavorite}
+                     onClick={openRecipe}
+                     lang={lang}
+                   />
+                 ))}
+               </div>
+             </div>
+           </section>
         </div>
       </main>
       {showMatchCta && (
