@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { Check, Leaf, MessageCircle, MessageSquarePlus } from 'lucide-react'
+import { Check, Leaf, MessageCircle, MessageSquarePlus, Shield } from 'lucide-react'
 import { decodeGrocery, parseGroceryText } from '../utils/groceryShare'
 import { getGroceryIngredientName, translateGroceryAmount } from '../utils/groceryTranslation'
 import { text, translations } from '../data/translations'
 import { decodeCompactGrocery, shareGroceryToWhatsApp } from '../utils/whatsappShare'
 
-export default function GroceryList({ groceryList = [], ingredients = [], onToggleItem, onClearChecked, onClearAll, onMergeItems, lang, onToggleLanguage, onOpenFeedback }) {
+export default function GroceryList({ groceryList = [], ingredients = [], onToggleItem, onClearChecked, onClearAll, onMergeItems, lang, onToggleLanguage, onOpenAdmin, onOpenFeedback }) {
   const t = translations[lang]
   const [showShare, setShowShare] = useState(false)
   const [importCode, setImportCode] = useState('')
@@ -70,6 +70,7 @@ export default function GroceryList({ groceryList = [], ingredients = [], onTogg
             <button className="language-toggle" onClick={onToggleLanguage} aria-label={lang === 'ms' ? 'Tukar ke English' : 'Switch to Bahasa Melayu'}>
               <b className={lang === 'ms' ? 'active' : ''}>BM</b><span>|</span><b className={lang === 'en' ? 'active' : ''}>EN</b>
             </button>
+            {onOpenAdmin && <button type="button" onClick={onOpenAdmin} className="p-2 text-gray-400 hover:text-amber-600 rounded-full hover:bg-amber-50 transition-colors" title="Admin Dashboard" aria-label="Admin Dashboard"><Shield className="w-5 h-5" /></button>}
             <button type="button" onClick={() => onOpenFeedback()} className="p-1.5 rounded-full text-gray-500 hover:text-gray-800 hover:bg-gray-100 transition-all" title="Maklum Balas" aria-label="Maklum Balas">
               <MessageSquarePlus size={17} />
             </button>

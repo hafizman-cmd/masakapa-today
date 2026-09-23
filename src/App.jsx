@@ -7,6 +7,7 @@ import {
   MessageSquarePlus,
   RotateCcw,
   Search,
+  Shield,
   Sparkles,
   ToggleLeft,
   ToggleRight,
@@ -222,6 +223,7 @@ function Header({
   lang,
   onToggleLanguage,
   onOpenTudungSaji,
+  onOpenAdmin,
   onOpenFeedback,
   onOpenOnboarding,
 }) {
@@ -253,6 +255,17 @@ function Header({
                <span className="hidden sm:inline">
                  {lang === "en" ? "Surprise Me" : "Tudung Saji"}
                </span>
+             </button>
+           )}
+           {onOpenAdmin && (
+             <button
+               type="button"
+               onClick={onOpenAdmin}
+               className="rounded-full p-2 text-gray-400 transition-colors hover:bg-amber-50 hover:text-amber-600"
+               title="Admin Dashboard"
+               aria-label="Admin Dashboard"
+             >
+               <Shield className="h-5 w-5" />
              </button>
            )}
            <button
@@ -530,6 +543,7 @@ function Matcher({
   toggleFavorite,
   lang,
   onToggleLanguage,
+  onOpenAdmin,
   onOpenFeedback,
   onOpenOnboarding,
 }) {
@@ -626,6 +640,7 @@ function Matcher({
         lang={lang}
         onToggleLanguage={onToggleLanguage}
         onOpenTudungSaji={() => setShowSpinner(true)}
+        onOpenAdmin={onOpenAdmin}
         onOpenFeedback={onOpenFeedback}
         onOpenOnboarding={onOpenOnboarding}
       />
@@ -745,6 +760,7 @@ function Discover({
   toggleFavorite,
   lang,
   onToggleLanguage,
+  onOpenAdmin,
   onOpenFeedback,
   onOpenOnboarding,
 }) {
@@ -764,6 +780,7 @@ function Discover({
         subtitle={t.headers.discover[1]}
         lang={lang}
         onToggleLanguage={onToggleLanguage}
+        onOpenAdmin={onOpenAdmin}
         onOpenFeedback={onOpenFeedback}
         onOpenOnboarding={onOpenOnboarding}
       />
@@ -820,6 +837,7 @@ function Favorites({
   toggleFavorite,
   lang,
   onToggleLanguage,
+  onOpenAdmin,
   onOpenFeedback,
   onOpenOnboarding,
   onExplore,
@@ -847,9 +865,10 @@ function Favorites({
       <Header
          title={translations[lang].ui.favoriteTitle}
          subtitle={translations[lang].ui.favoriteSubtitle}
-        lang={lang}
-        onToggleLanguage={onToggleLanguage}
-        onOpenFeedback={onOpenFeedback}
+         lang={lang}
+         onToggleLanguage={onToggleLanguage}
+         onOpenAdmin={onOpenAdmin}
+         onOpenFeedback={onOpenFeedback}
         onOpenOnboarding={onOpenOnboarding}
       />
       <main className="content pb-24">
@@ -1063,6 +1082,10 @@ export default function App() {
     setCurrentScreen("main");
     setScreen("matcher");
   };
+  const onOpenAdmin = () => {
+    window.history.pushState({}, "", "/admin");
+    setCurrentScreen("admin");
+  };
   const language = lang;
   const t = translations[lang];
   const nav = (
@@ -1109,9 +1132,9 @@ export default function App() {
           : setActiveRecipe(null)
       }
       onAddMissing={addMissing}
-      lang={lang}
-      onToggleLanguage={onToggleLanguage}
-      onOpenFeedback={openFeedback}
+       lang={lang}
+       onToggleLanguage={onToggleLanguage}
+       onOpenFeedback={openFeedback}
     />
   ) : screen === "matcher" ? (
     <Matcher
@@ -1125,9 +1148,10 @@ export default function App() {
       setFilter={setFilter}
       favorites={favorites}
       toggleFavorite={toggleFavorite}
-      lang={lang}
-      onToggleLanguage={onToggleLanguage}
-      onOpenFeedback={openFeedback}
+       lang={lang}
+       onOpenAdmin={onOpenAdmin}
+       onToggleLanguage={onToggleLanguage}
+       onOpenFeedback={openFeedback}
       onOpenOnboarding={openOnboarding}
     />
   ) : screen === "grocery" ? (
@@ -1146,9 +1170,10 @@ export default function App() {
       }
       onClearAll={() => setGroceryList([])}
       onMergeItems={mergeGroceryItems}
-      lang={lang}
-      onToggleLanguage={onToggleLanguage}
-      onOpenFeedback={openFeedback}
+       lang={lang}
+       onToggleLanguage={onToggleLanguage}
+       onOpenAdmin={onOpenAdmin}
+       onOpenFeedback={openFeedback}
       onOpenOnboarding={openOnboarding}
     />
   ) : screen === "favorites" ? (
@@ -1156,9 +1181,10 @@ export default function App() {
       openRecipe={openRecipe}
       favorites={favorites}
       toggleFavorite={toggleFavorite}
-      lang={lang}
-      onToggleLanguage={onToggleLanguage}
-      onOpenFeedback={openFeedback}
+       lang={lang}
+       onToggleLanguage={onToggleLanguage}
+       onOpenAdmin={onOpenAdmin}
+       onOpenFeedback={openFeedback}
       onOpenOnboarding={openOnboarding}
       onExplore={() => handleNavigate("discover")}
     />
@@ -1170,11 +1196,12 @@ export default function App() {
       setQuery={setQuery}
       filter={filter}
       setFilter={setFilter}
-      favorites={favorites}
-      toggleFavorite={toggleFavorite}
-      lang={lang}
-      onToggleLanguage={onToggleLanguage}
-      onOpenFeedback={openFeedback}
+       favorites={favorites}
+       toggleFavorite={toggleFavorite}
+       lang={lang}
+       onToggleLanguage={onToggleLanguage}
+       onOpenAdmin={onOpenAdmin}
+       onOpenFeedback={openFeedback}
       onOpenOnboarding={openOnboarding}
     />
   );
