@@ -395,21 +395,21 @@ function IngredientSelector({
     setSelectedQuickFilter("all");
   };
   return (
-    <section className="ingredient-section w-full max-w-full overflow-x-hidden">
-      <div className="mb-3 flex w-full items-center justify-between px-1">
-        <div>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800/60">
+    <section className="ingredient-section w-full max-w-full overflow-hidden">
+      <div className="mb-3 flex w-full max-w-full shrink-0 items-center justify-between overflow-hidden px-1">
+        <div className="min-w-0 flex-1 pr-2">
+          <span className="block truncate text-[10px] font-bold uppercase tracking-wider text-amber-800/60">
             {translations[lang].ui.fridge}
           </span>
-          <h2 className="font-serif text-lg font-bold text-gray-900">
+          <h2 className="truncate font-serif text-base font-bold text-gray-900 sm:text-lg">
             {translations[lang].ui.chooseIngredients}
           </h2>
         </div>
-        {(selectedIngredients.length > 0 || selectedQuickFilter !== "all") && (
+        {selectedIngredients.length > 0 && (
           <button
             type="button"
             onClick={handleClearAll}
-            className="flex shrink-0 items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-xs font-medium text-rose-600 transition-colors hover:bg-rose-100 active:scale-95"
+            className="flex shrink-0 items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-600 shadow-xs transition-colors hover:bg-rose-100 active:scale-95"
             title={lang === "en" ? "Clear all selections" : "Kosongkan semua pilihan"}
           >
             <RotateCcw className="h-3 w-3" />
@@ -662,7 +662,7 @@ function Matcher({
       />
       <main className="content pb-24">
         <div className="grid md:grid-cols-12 gap-6">
-           <div ref={topSectionRef} className="md:col-span-7">
+            <div ref={topSectionRef} className="w-full max-w-full overflow-hidden md:col-span-7">
             <TudungSajiModal
               recipes={recipes}
               language={lang}
