@@ -164,21 +164,23 @@ const isAdminRoute = () =>
 
 function LetterFilter({ value, onChange }) {
   return (
-    <div className="flex overflow-x-auto flex-nowrap scrollbar-none gap-1 px-4 py-2">
-      {["All", ...ALPHABET].map((letter) => (
-        <button
-          key={letter}
-          type="button"
-          onClick={() => onChange(letter === "All" ? "" : letter)}
-          className={`shrink-0 px-3 py-1 text-xs rounded-full border transition-all ${
-            (value || "All") === letter
-              ? "border-[#d6573a] bg-[#d6573a] text-white"
-              : "border-stone-200 bg-white text-stone-600 hover:border-[#d6573a]"
-          }`}
-        >
-          {letter}
-        </button>
-      ))}
+    <div className="w-full px-4 py-2">
+      <div className="grid w-full grid-cols-7 gap-1 sm:grid-cols-14 sm:gap-1.5">
+        {["All", ...ALPHABET].map((letter) => (
+          <button
+            key={letter}
+            type="button"
+            onClick={() => onChange(letter === "All" ? "" : letter)}
+            className={`flex h-8 w-full items-center justify-center rounded-full border text-xs font-medium transition-all ${
+              (value || "All") === letter
+                ? "border-[#d6573a] bg-[#d6573a] text-white"
+                : "border-stone-200 bg-white text-stone-600 hover:border-[#d6573a]"
+            }`}
+          >
+            {letter}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -203,16 +205,19 @@ function Filters({ query, setQuery, filter, setFilter, lang, letter, setLetter }
         <kbd>/</kbd>
       </div>
       {setLetter && <LetterFilter value={letter} onChange={setLetter} />}
-      <div className="filter-row flex overflow-x-auto flex-nowrap scrollbar-none px-4 pr-8 py-2 space-x-2 w-full items-center">
-        {options.map(([label, value]) => (
-          <button
-            key={value}
-            onClick={() => setFilter(value)}
-            className={filter === value ? "filter-chip active" : "filter-chip"}
-          >
-            {label}
-          </button>
-        ))}
+      <div className="relative w-full overflow-hidden">
+        <div className="filter-row flex flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap px-4 py-1 pr-6 scrollbar-none sm:gap-2 sm:py-1.5">
+          {options.map(([label, value]) => (
+            <button
+              key={value}
+              onClick={() => setFilter(value)}
+              className={`shrink-0 text-xs sm:text-sm ${filter === value ? "filter-chip active" : "filter-chip"}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-8 rounded-r-xl bg-gradient-to-l from-[#FAF7F2] to-transparent" />
       </div>
     </>
   );
@@ -416,43 +421,49 @@ function IngredientSelector({
           </button>
         )}
       </div>
-      <div className="scrollbar-none -mx-4 mb-4 flex gap-2 overflow-x-auto px-4 pb-3 pt-1 sm:mx-0 sm:px-0">
-        {QUICK_FILTERS.map((quickFilter) => {
-          const isActive = selectedQuickFilter === quickFilter.id;
-          return (
-            <button
-              key={quickFilter.id}
-              type="button"
-              onClick={() =>
-                setSelectedQuickFilter(
-                  isActive && quickFilter.id !== "all" ? "all" : quickFilter.id,
-                )
-              }
-              className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-medium transition-all duration-200 ${
-                isActive
-                  ? "scale-[1.02] bg-amber-600 text-white shadow-sm"
-                  : "border border-amber-200/70 bg-amber-50/80 text-amber-900 hover:bg-amber-100/60"
-              }`}
-            >
-              {lang === "en" ? quickFilter.labelEn : quickFilter.labelMs}
-            </button>
-          );
-        })}
+      <div className="relative w-full -mx-4 mb-4 overflow-hidden sm:mx-0">
+        <div className="scrollbar-none flex flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap px-4 py-1 pr-6 sm:gap-2 sm:px-0 sm:py-1.5 sm:pr-6">
+          {QUICK_FILTERS.map((quickFilter) => {
+            const isActive = selectedQuickFilter === quickFilter.id;
+            return (
+              <button
+                key={quickFilter.id}
+                type="button"
+                onClick={() =>
+                  setSelectedQuickFilter(
+                    isActive && quickFilter.id !== "all" ? "all" : quickFilter.id,
+                  )
+                }
+                className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium transition-all duration-200 sm:px-3 sm:py-1.5 sm:text-sm ${
+                  isActive
+                    ? "scale-[1.02] bg-amber-600 text-white shadow-sm"
+                    : "border border-amber-200/70 bg-amber-50/80 text-amber-900 hover:bg-amber-100/60"
+                }`}
+              >
+                {lang === "en" ? quickFilter.labelEn : quickFilter.labelMs}
+              </button>
+            );
+          })}
+        </div>
+        <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-8 rounded-r-xl bg-gradient-to-l from-[#FAF7F2] to-transparent" />
       </div>
-      <div className="flex gap-2 overflow-x-auto scrollbar-none py-3 -mx-1 px-1">
-        {tabs.map(([value, label]) => (
-          <button
-            key={value}
-            onClick={() => setCategory(value)}
-            className={
-              category === value
-                ? "filter-chip active whitespace-nowrap"
-                : "filter-chip whitespace-nowrap"
-            }
-          >
-            {label}
-          </button>
-        ))}
+      <div className="relative w-full -mx-1 overflow-hidden">
+        <div className="flex flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap px-1 py-1 pr-6 scrollbar-none sm:gap-2 sm:py-1.5">
+          {tabs.map(([value, label]) => (
+            <button
+              key={value}
+              onClick={() => setCategory(value)}
+              className={
+                category === value
+                  ? "filter-chip active shrink-0 whitespace-nowrap px-2.5 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm"
+                  : "filter-chip shrink-0 whitespace-nowrap px-2.5 py-1 text-xs sm:px-3 sm:py-1.5 sm:text-sm"
+              }
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-8 rounded-r-xl bg-gradient-to-l from-[#FAF7F2] to-transparent" />
       </div>
       <div className="search-box">
         <Search size={18} />
@@ -483,17 +494,20 @@ function IngredientSelector({
         </span>
       </div>
       {selectedIngredients.length > 0 && (
-        <div className="mt-2 flex gap-2 overflow-x-auto scrollbar-none pb-2">
-          {selectedIngredients.map((item) => (
-            <button
-              key={item.id}
-               onClick={() => handleIngredientClick(item)}
-               className="flex shrink-0 transform-gpu items-center gap-1 rounded-full bg-green-50 px-2.5 py-1 text-[10px] font-medium text-green-700 transition-all duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-90 hover:scale-[1.02]"
-            >
-              {text(item.name, lang)}
-              <X size={12} />
-            </button>
-          ))}
+        <div className="relative mt-2">
+          <div className="flex gap-2 overflow-x-auto pb-2 pr-6 scrollbar-none">
+            {selectedIngredients.map((item) => (
+              <button
+                key={item.id}
+                 onClick={() => handleIngredientClick(item)}
+                 className="flex shrink-0 transform-gpu items-center gap-1 rounded-full bg-green-50 px-2.5 py-1 text-[10px] font-medium text-green-700 transition-all duration-200 ease-[cubic-bezier(0.34,1.56,0.64,1)] active:scale-90 hover:scale-[1.02]"
+              >
+                {text(item.name, lang)}
+                <X size={12} />
+              </button>
+            ))}
+          </div>
+          <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-10 rounded-r-xl bg-gradient-to-l from-[#FAF7F2] to-transparent" />
         </div>
       )}
       <div className={`relative ${isExpanded ? "" : "max-h-56 overflow-hidden"}`}>
