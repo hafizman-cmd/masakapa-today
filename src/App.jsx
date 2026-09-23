@@ -547,6 +547,9 @@ function Matcher({
   );
   const [showSpinner, setShowSpinner] = useState(false);
   const [selectedQuickFilter, setSelectedQuickFilter] = useState("all");
+  const topSectionRef = useRef(null);
+  const recipeSectionRef = useRef(null);
+  const [isRecipeVisible, setIsRecipeVisible] = useState(false);
   useEffect(() => writeStorage("masakapa-staples-on", staplesOn), [staplesOn]);
   useEffect(
     () => writeStorage("masakapa-selected-ingredients", selected),
@@ -593,7 +596,28 @@ function Matcher({
   const visible = matches.filter((match) =>
     matchesFilter(match.recipe, query, filter, favorites, lang),
   );
+  useEffect(() => {
+    const section = recipeSectionRef.current;
+    if (!section) return undefined;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsRecipeVisible(entry.isIntersecting),
+      { threshold: 0.15 },
+    );
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [visible.length]);
   const showMatchCta = selected.length > 0 && visible.length > 0;
+  const handleScrollToggle = () => {
+    if (isRecipeVisible) {
+      topSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      const mainContainer = document.querySelector(".overflow-y-auto") || window;
+      if (mainContainer.scrollTo) {
+        mainContainer.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    } else {
+      recipeSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
   return (
     <div className="screen">
       <Header
@@ -607,7 +631,7 @@ function Matcher({
       />
       <main className="content pb-24">
         <div className="grid md:grid-cols-12 gap-6">
-          <div className="md:col-span-7">
+           <div ref={topSectionRef} className="md:col-span-7">
             <TudungSajiModal
               recipes={recipes}
               language={lang}
@@ -656,6 +680,7 @@ function Matcher({
           </div>
           <section
             id="recipe-results"
+            ref={recipeSectionRef}
             className="results-section md:col-span-5 md:sticky md:top-4 md:self-start"
           >
             <Filters
@@ -693,15 +718,15 @@ function Matcher({
       {showMatchCta && (
         <button
           type="button"
-          onClick={() => {
-            document
-              .getElementById("recipe-results")
-              ?.scrollIntoView({ behavior: "smooth" });
-          }}
-          className="fixed md:absolute bottom-20 left-1/2 -translate-x-1/2 z-30 flex items-center gap-2 px-5 py-2.5 bg-[#E05A47] hover:bg-[#c84e3c] text-white rounded-full shadow-xl font-bold text-xs tracking-wide animate-bounce transition-all"
+          onClick={handleScrollToggle}
+          className="fixed bottom-20 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2 rounded-full bg-[#E05A47] px-5 py-2.5 text-xs font-bold tracking-wide text-white shadow-xl transition-all hover:bg-[#c84e3c] md:hidden"
         >
           <span className="max-w-[85vw] truncate">
-            {t.ui.viewMatchedRecipes(visible.length)}
+            {isRecipeVisible
+              ? lang === "en"
+                ? "Choose Ingredients ↑"
+                : "Pilih Bahan ↑"
+              : t.ui.viewMatchedRecipes(visible.length)}
           </span>
         </button>
       )}
