@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Check, Leaf, MessageCircle, MessageSquarePlus, Shield } from 'lucide-react'
+import { ArrowLeftRight, Check, Leaf, MessageCircle, MessageSquarePlus, Shield } from 'lucide-react'
 import { decodeGrocery, parseGroceryText } from '../utils/groceryShare'
 import { getGroceryIngredientName, translateGroceryAmount } from '../utils/groceryTranslation'
 import { text, translations } from '../data/translations'
@@ -80,13 +80,37 @@ export default function GroceryList({ groceryList = [], ingredients = [], onTogg
         </header>
       </div>
       <main className="content grocery-content">
-        <div className="grocery-toolbar">
-          <span>{unchecked.length} {t.ui.groceryCount}</span>
-          <div className="flex items-center gap-3">
-             <button type="button" onClick={shareToWhatsApp} className="flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 font-medium text-white shadow-xs transition-transform transform-gpu hover:bg-emerald-700 active:scale-95"><MessageCircle size={17} /> {t.ui.shareWhatsApp}</button>
-            <button type="button" onClick={() => setShowShare(true)}>{t.ui.importTitle}</button>
-            {validList.some(item => item.checked) && <button type="button" onClick={onClearChecked}>{t.ui.clearChecked}</button>}
+        <div className="mt-2 mb-4 w-full max-w-full">
+          <span className="block min-w-0 truncate text-xs font-medium text-gray-500">
+            {unchecked.length} {t.ui.groceryCount}
+          </span>
+          <div className="my-3 grid w-full max-w-full grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={shareToWhatsApp}
+              className="flex min-w-0 w-full items-center justify-center gap-1.5 rounded-xl border border-emerald-200/80 bg-emerald-50 px-2.5 py-2.5 text-xs font-semibold text-emerald-800 shadow-xs transition-all hover:bg-emerald-100 active:scale-95 sm:text-sm"
+            >
+              <MessageCircle className="h-4 w-4 shrink-0 text-emerald-600" />
+              <span className="truncate">{t.ui.shareWhatsApp}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowShare(true)}
+              className="flex min-w-0 w-full items-center justify-center gap-1.5 rounded-xl border border-gray-200 bg-white px-2.5 py-2.5 text-xs font-semibold text-gray-700 shadow-xs transition-all hover:bg-gray-50 active:scale-95 sm:text-sm"
+            >
+              <ArrowLeftRight className="h-4 w-4 shrink-0 text-gray-500" />
+              <span className="truncate">{t.ui.importTitle}</span>
+            </button>
           </div>
+          {validList.some(item => item.checked) && (
+            <button
+              type="button"
+              onClick={onClearChecked}
+              className="ml-auto block rounded-xl px-3 py-2 text-xs font-semibold text-[#d6573a] transition-colors hover:bg-red-50 active:scale-95"
+            >
+              {t.ui.clearChecked}
+            </button>
+          )}
         </div>
         {validList.length ? (
           <>

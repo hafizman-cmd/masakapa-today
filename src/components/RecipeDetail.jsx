@@ -421,20 +421,20 @@ export default function RecipeDetail({
           />
         </section>
         <section className="detail-section min-w-0">
-           <div className="sticky top-0 z-10 mb-4 border-b border-gray-100 bg-white/90 py-3 backdrop-blur-md">
-             <div className="mb-1.5 flex items-center justify-between">
-               <span className="text-sm font-bold text-amber-900">
-                 {lang === "en" ? "Cooking Progress" : "Kemajuan Memasak"}
-               </span>
-               <span className="text-xs font-semibold text-amber-600">
+           <div className="w-full rounded-2xl border border-gray-100 bg-white p-4 shadow-xs mb-6">
+             <div className="mb-2 flex items-center justify-between">
+               <h3 className="text-sm font-bold text-gray-900 sm:text-base">
+                  {lang === "en" ? "Cooking Progress" : "Kemajuan Memasak"}
+               </h3>
+               <span className="text-xs font-semibold text-amber-600 sm:text-sm">
                  {checkedSteps.size} / {instructions.length}{" "}
                  {lang === "en" ? "steps" : "langkah"}
                </span>
              </div>
-             <div className="h-2 w-full overflow-hidden rounded-full bg-amber-100">
+             <div className="h-2.5 w-full overflow-hidden rounded-full bg-gray-100">
                <div
-                 className="h-full rounded-full bg-amber-500 transition-all duration-500 ease-out"
-                 style={{ width: `${stepProgress}%` }}
+                  className="h-2.5 rounded-full bg-amber-500 transition-all duration-300"
+                  style={{ width: `${stepProgress}%` }}
                />
              </div>
            </div>
@@ -460,15 +460,12 @@ export default function RecipeDetail({
                        className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold transition-colors duration-300 ${isChecked ? "border-amber-500 bg-amber-500 text-white" : "border-[#E05A47] text-[#E05A47]"}`}
                      >
                        {isChecked ? <Check size={14} /> : index + 1}
-                     </span>
-                     <span
-                       className={`relative inline-block min-w-0 flex-1 break-words whitespace-normal text-sm leading-relaxed transition-colors duration-300 ${isChecked ? "text-gray-400" : "text-gray-700"}`}
-                     >
-                       {text(step, lang)}
-                       <span
-                         className={`absolute left-0 top-1/2 h-[1.5px] bg-gray-400 transition-all duration-300 ease-out ${isChecked ? "w-full" : "w-0"}`}
-                       />
-                     </span>
+                      </span>
+                      <span
+                        className={`block min-w-0 flex-1 break-words whitespace-normal text-sm leading-relaxed transition-all duration-200 sm:text-base ${isChecked ? "line-through text-gray-400 decoration-2 decoration-gray-400/80" : "text-gray-800"}`}
+                      >
+                        {text(step, lang)}
+                      </span>
                    </div>
                  </li>
                );
@@ -491,15 +488,17 @@ export default function RecipeDetail({
           onOpenRecipe={onOpenRecipe}
           lang={lang}
         />
-        <div className="flex flex-wrap items-center gap-3 md:col-span-2">
-          <button
-            type="button"
-            onClick={() => shareRecipeToWhatsApp(recipe, lang)}
-            className="flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 font-medium text-white shadow-xs transition-transform transform-gpu hover:bg-emerald-700 active:scale-95"
-          >
-            <MessageCircle size={18} />
-            {lang === "en" ? "Share to WhatsApp" : "Kongsi ke WhatsApp"}
-          </button>
+         <div className="flex flex-wrap items-center gap-3 md:col-span-2">
+           <button
+             type="button"
+             onClick={() => shareRecipeToWhatsApp(recipe, lang)}
+             className="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-4 py-3 font-semibold text-white shadow-xs transition-colors hover:bg-emerald-700 active:scale-[0.98]"
+           >
+             <MessageCircle className="h-5 w-5" />
+             <span>
+               {lang === "en" ? "Share to WhatsApp" : "Kongsi ke WhatsApp"}
+             </span>
+           </button>
         </div>
         {onOpenFeedback && (
           <button
