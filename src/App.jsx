@@ -395,13 +395,13 @@ function IngredientSelector({
     setSelectedQuickFilter("all");
   };
   return (
-    <section className="ingredient-section">
-      <div className="mt-1 mb-3.5 flex items-center justify-between">
+    <section className="ingredient-section w-full max-w-full overflow-x-hidden">
+      <div className="mb-3 flex w-full items-center justify-between px-1">
         <div>
-          <span className="text-[11px] font-bold uppercase tracking-wider text-amber-800/70">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800/60">
             {translations[lang].ui.fridge}
           </span>
-          <h2 className="font-serif text-xl font-bold text-amber-950">
+          <h2 className="font-serif text-lg font-bold text-gray-900">
             {translations[lang].ui.chooseIngredients}
           </h2>
         </div>
@@ -409,10 +409,10 @@ function IngredientSelector({
           <button
             type="button"
             onClick={handleClearAll}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-rose-200/80 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 shadow-sm transition-all duration-150 hover:bg-rose-100 active:scale-95"
+            className="flex shrink-0 items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-xs font-medium text-rose-600 transition-colors hover:bg-rose-100 active:scale-95"
             title={lang === "en" ? "Clear all selections" : "Kosongkan semua pilihan"}
           >
-            <RotateCcw className="h-3.5 w-3.5" />
+            <RotateCcw className="h-3 w-3" />
             <span>
               {lang === "en"
                 ? `Clear (${selectedIngredients.length})`
@@ -421,8 +421,9 @@ function IngredientSelector({
           </button>
         )}
       </div>
-      <div className="relative w-full -mx-4 mb-4 overflow-hidden sm:mx-0">
-        <div className="scrollbar-none flex flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap px-4 py-1 pr-6 sm:gap-2 sm:px-0 sm:py-1.5 sm:pr-6">
+      <div className="relative w-full overflow-hidden">
+        <div className="pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-6 bg-gradient-to-r from-[#FAF7F2] to-transparent" />
+        <div className="scrollbar-none flex w-full flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap px-4 py-1 pr-6 sm:gap-2 sm:py-1.5">
           {QUICK_FILTERS.map((quickFilter) => {
             const isActive = selectedQuickFilter === quickFilter.id;
             return (
@@ -445,10 +446,11 @@ function IngredientSelector({
             );
           })}
         </div>
-        <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-8 rounded-r-xl bg-gradient-to-l from-[#FAF7F2] to-transparent" />
+        <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-6 bg-gradient-to-l from-[#FAF7F2] to-transparent" />
       </div>
-      <div className="relative w-full -mx-1 overflow-hidden">
-        <div className="flex flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap px-1 py-1 pr-6 scrollbar-none sm:gap-2 sm:py-1.5">
+      <div className="relative mt-1 w-full overflow-hidden">
+        <div className="pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-6 bg-gradient-to-r from-[#FAF7F2] to-transparent" />
+        <div className="flex w-full flex-nowrap items-center gap-1.5 overflow-x-auto whitespace-nowrap px-4 py-1 pr-6 scrollbar-none sm:gap-2 sm:py-1.5">
           {tabs.map(([value, label]) => (
             <button
               key={value}
@@ -463,9 +465,9 @@ function IngredientSelector({
             </button>
           ))}
         </div>
-        <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-8 rounded-r-xl bg-gradient-to-l from-[#FAF7F2] to-transparent" />
+        <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-6 bg-gradient-to-l from-[#FAF7F2] to-transparent" />
       </div>
-      <div className="search-box">
+      <div className="search-box w-full">
         <Search size={18} />
         <input
           value={search}
