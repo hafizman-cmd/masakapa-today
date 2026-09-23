@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Check, Leaf, MessageSquarePlus } from 'lucide-react'
 import { decodeGrocery, encodeGrocery, formatGrocery } from '../utils/groceryShare'
 import { getGroceryIngredientName, translateGroceryAmount } from '../utils/groceryTranslation'
@@ -9,14 +9,49 @@ export default function GroceryList({ groceryList = [], ingredients = [], onTogg
   const [showShare, setShowShare] = useState(false)
   const [importCode, setImportCode] = useState('')
   const [error, setError] = useState('')
+  const [toast, setToast] = useState('')
+  const toastTimerRef = useRef(null)
   const validList = (groceryList || []).filter(Boolean)
   const unchecked = validList.filter(item => !item.checked)
   const code = encodeGrocery(unchecked)
   const shareText = `${formatGrocery(unchecked, lang)}\n${window.location.origin}/?import_grocery=${encodeURIComponent(code)}`
 
+  useEffect(() => () => window.clearTimeout(toastTimerRef.current), [])
+
+  const showToast = message => {
+    setToast(message)
+    window.clearTimeout(toastTimerRef.current)
+    toastTimerRef.current = window.setTimeout(() => setToast(''), 2400)
+  }
+
+  const share = async () => {
+    if (!unchecked.length) {
+      showToast(t.ui.shareEmpty)
+      return
+    }
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: t.headers.grocery[0], text: shareText })
+        return
+      } catch (shareError) {
+        if (shareError?.name === 'AbortError') return
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(shareText)
+      showToast(t.ui.shareCopied)
+    } catch {
+      showToast(t.ui.shareCopyFailed)
+    }
+  }
+
   const importItems = () => {
     if (!importCode.trim()) {
       setError(t.ui.pasteGroceryCode)
+      return
+    }
+    if (typeof onMergeItems !== 'function') {
+      setError(t.ui.invalidImportDetail)
       return
     }
     try {
@@ -51,9 +86,9 @@ export default function GroceryList({ groceryList = [], ingredients = [], onTogg
         <div className="grocery-toolbar">
           <span>{unchecked.length} {t.ui.groceryCount}</span>
           <div className="flex items-center gap-3">
-            <button onClick={() => navigator.share?.({ title: t.headers.grocery[0], text: shareText })}>{t.ui.shareWhatsApp}</button>
-            <button onClick={() => setShowShare(true)}>{t.ui.importTitle}</button>
-            {validList.some(item => item.checked) && <button onClick={onClearChecked}>{t.ui.clearChecked}</button>}
+            <button type="button" onClick={share}>{t.ui.shareWhatsApp}</button>
+            <button type="button" onClick={() => setShowShare(true)}>{t.ui.importTitle}</button>
+            {validList.some(item => item.checked) && <button type="button" onClick={onClearChecked}>{t.ui.clearChecked}</button>}
           </div>
         </div>
         {validList.length ? (
@@ -65,6 +100,7 @@ export default function GroceryList({ groceryList = [], ingredients = [], onTogg
           </>
         ) : <div className="empty-state"><span className="empty-list-icon"><Check size={22} /></span><p>{t.ui.emptyGrocery}</p><span>{t.ui.emptyGroceryHint}</span></div>}
          {showShare && <div className="fixed inset-0 z-30 flex items-center justify-center bg-stone-900/30 p-4"><div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl"><h2 className="text-lg font-semibold">{t.ui.importTitle}</h2><div className="mt-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">{t.ui.importGuide}</div>{error && <div className="p-3 mb-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center justify-between animate-fadeIn"><span>{error}</span><button onClick={() => setError('')} className="ml-2 font-bold hover:text-red-900">✕</button></div>}<textarea value={importCode} onChange={event => { setImportCode(event.target.value); setError('') }} className="mt-3 min-h-32 w-full rounded-xl border border-stone-200 p-3" placeholder={t.ui.pasteCode} /><div className="mt-3 flex justify-end gap-2"><button className="px-4 py-2.5 rounded-xl border border-gray-200 text-gray-600 bg-gray-50 hover:bg-gray-100 font-medium text-sm transition-all" onClick={() => { setError(''); setShowShare(false) }}>{t.ui.cancel}</button><button className="px-5 py-2.5 rounded-xl bg-[#E05A47] text-white font-medium text-sm shadow-sm hover:bg-[#c84e3c] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#E05A47] transition-all" disabled={!importCode.trim()} onClick={importItems}>{t.ui.importList}</button></div></div></div>}
+        {toast && <div className="pointer-events-none fixed md:absolute bottom-24 left-1/2 z-40 w-max max-w-[calc(100%-2rem)] -translate-x-1/2 rounded-full bg-stone-800/90 px-4 py-2 text-center text-xs font-semibold text-white shadow-lg animate-fadeIn">{toast}</div>}
       </main>
     </div>
   )

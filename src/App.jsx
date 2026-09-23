@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  Check,
   ChevronRight,
   Heart,
   HelpCircle,
@@ -26,18 +25,16 @@ import OnboardingModal from "./components/OnboardingModal";
 import { text, translations } from "./data/translations";
 import useRecipes from "./hooks/useRecipes";
 import useFavorites from "./hooks/useFavorites";
-import {
-  decodeGrocery,
-  encodeGrocery,
-  formatGrocery,
-  readUrlGrocery,
-} from "./utils/groceryShare";
+import { readUrlGrocery } from "./utils/groceryShare";
+import { scaleIngredientAmount } from "./utils/portion";
+import { logVisit } from "./utils/analytics";
 import {
   activeName,
   matchesIngredient,
   sortByActiveName,
 } from "./components/Matcher";
 
+const GROCERY_LIMIT = 300;
 const readStorage = (key, fallback) => {
   try {
     const value = window.localStorage.getItem(key);
@@ -56,8 +53,59 @@ const writeStorage = (key, value) => {
     /* Storage may be unavailable. */
   }
 };
+const groceryTitleKey = (value) =>
+  value && typeof value === "object"
+    ? String(value.ms ?? value.en ?? "")
+        .trim()
+        .toLowerCase()
+    : String(value ?? "")
+        .trim()
+        .toLowerCase();
+const groceryLabel = (value, fallback) => {
+  if (value && typeof value === "object") {
+    return { ms: String(value.ms ?? ""), en: String(value.en ?? "") };
+  }
+  const label = String(value ?? "").trim();
+  return label || fallback;
+};
+const normalizeGroceryItem = (item) => {
+  if (!item || typeof item !== "object" || !item.id) return null;
+  const ingredientId =
+    typeof item.ingredientId === "string" && item.ingredientId.trim()
+      ? item.ingredientId
+      : String(item.id);
+  return {
+    id: String(item.id),
+    ingredientId,
+    recipeId: typeof item.recipeId === "string" ? item.recipeId : "",
+    name: groceryLabel(item.name, ingredientId),
+    amount: typeof item.amount === "string" ? item.amount : "",
+    recipeTitle: groceryLabel(item.recipeTitle ?? item.recipeName, ""),
+    checked: Boolean(item.checked),
+  };
+};
+const groceryKey = (item) =>
+  `${item?.recipeId || groceryTitleKey(item?.recipeTitle)}::${
+    item?.ingredientId || item?.id || ""
+  }`;
 const sanitizeGroceryList = (items) =>
-  Array.isArray(items) ? items.filter((item) => item && item.id) : [];
+  Array.isArray(items)
+    ? items
+        .map(normalizeGroceryItem)
+        .filter(Boolean)
+        .slice(0, GROCERY_LIMIT)
+    : [];
+const scaledAmount = (amount, defaultServings, servings) => {
+  const value = typeof amount === "string" ? amount : "";
+  const base = Number(defaultServings) > 0 ? Number(defaultServings) : 1;
+  const target = Number(servings) > 0 ? Number(servings) : base;
+  if (!value || target === base) return value;
+  try {
+    return scaleIngredientAmount(value, base, target) || value;
+  } catch {
+    return value;
+  }
+};
 function matchesFilter(recipe, query, filter, favorites, lang) {
   const name = text(recipe.name, lang);
   const style = text(recipe.style, lang);
@@ -456,170 +504,6 @@ function IngredientSelector({
   );
 }
 
-function GroceryListLegacy({
-  groceryList,
-  _ingredients,
-  onToggleItem,
-  onClearChecked,
-  onClearAll,
-  onMergeItems = (items) => {
-    const ids = new Set(groceryList.map((item) => item.id));
-    window.localStorage.setItem(
-      "masakapa-grocery-list",
-      JSON.stringify([
-        ...groceryList,
-        ...items.filter((item) => item && !ids.has(item.id)),
-      ]),
-    );
-    window.location.reload();
-  },
-  lang,
-  onToggleLanguage,
-  onOpenFeedback,
-  onOpenOnboarding,
-}) {
-  const t = translations[lang];
-  const [showShare, setShowShare] = useState(false);
-  const [importCode, setImportCode] = useState("");
-  const unchecked = groceryList.filter((item) => !item.checked);
-  const code = encodeGrocery(unchecked);
-  const shareText = `${formatGrocery(unchecked, lang)}\n${window.location.origin}/?import_grocery=${encodeURIComponent(code)}`;
-  const share = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: "Senarai Pasar", text: shareText });
-      } catch {
-        /* User cancelled sharing. */
-      }
-    } else
-      window.open(
-        `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`,
-        "_blank",
-        "noopener,noreferrer",
-      );
-  };
-  const importItems = () => {
-    try {
-      const items = decodeGrocery(importCode);
-      onMergeItems(items);
-      setImportCode("");
-      setShowShare(false);
-    } catch {
-      window.alert(
-        lang === "ms" ? "Kod import tidak sah." : "Invalid import code.",
-      );
-    }
-  };
-  return (
-    <div className="screen">
-      <Header
-        title={t.headers.grocery[0]}
-        subtitle={t.headers.grocery[1]}
-        lang={lang}
-        onToggleLanguage={onToggleLanguage}
-        onOpenFeedback={onOpenFeedback}
-        onOpenOnboarding={onOpenOnboarding}
-      />
-      <main className="content grocery-content">
-        <div className="grocery-toolbar">
-          <span>
-            {unchecked.length} {t.ui.groceryCount}
-          </span>
-          <div className="flex items-center gap-3">
-            <button onClick={share}>
-              {lang === "ms" ? "Kongsi ke WhatsApp" : "Share to WhatsApp"}
-            </button>
-            <button onClick={() => setShowShare(true)}>
-              {lang === "ms" ? "Eksport / Import" : "Export / Import"}
-            </button>
-            {groceryList.some((item) => item.checked) && (
-              <button onClick={onClearChecked}>{t.ui.clearChecked}</button>
-            )}
-          </div>
-        </div>
-        {groceryList.length ? (
-          <>
-            <div className="grocery-items">
-              {groceryList.map((item) => (
-                <button
-                  key={item.id}
-                  className={
-                    item.checked ? "grocery-item checked" : "grocery-item"
-                  }
-                  onClick={() => onToggleItem(item.id)}
-                >
-                  <span className="check-box">
-                    {item.checked && <Check size={14} />}
-                  </span>
-                  <span>
-                    <strong>{text(item.name, lang)}</strong>
-                    <small>
-                      {item.amount} | {text(item.recipeTitle, lang)}
-                    </small>
-                  </span>
-                </button>
-              ))}
-            </div>
-            <button className="clear-all-button" onClick={onClearAll}>
-              {t.ui.clearAll}
-            </button>
-          </>
-        ) : (
-          <div className="empty-state">
-            <span className="empty-list-icon">
-              <Check size={22} />
-            </span>
-            <p>{t.ui.emptyGrocery}</p>
-            <span>{t.ui.emptyGroceryHint}</span>
-          </div>
-        )}
-        {showShare && (
-          <div className="fixed inset-0 z-30 flex items-center justify-center bg-stone-900/30 p-4">
-            <div className="w-full max-w-md rounded-2xl bg-white p-5 shadow-xl">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-bold text-stone-800">
-                  Eksport / Import
-                </h2>
-                <button onClick={() => setShowShare(false)}>X</button>
-              </div>
-              <p className="mt-4 text-xs font-bold text-stone-600">
-                Export code
-              </p>
-              <textarea
-                readOnly
-                value={code}
-                className="mt-2 h-24 w-full rounded-lg border border-stone-200 p-2 text-[10px]"
-                onFocus={(event) => event.target.select()}
-              />
-              <button
-                className="mt-2 rounded-lg bg-green-700 px-3 py-2 text-xs font-bold text-white"
-                onClick={() => navigator.clipboard?.writeText(code)}
-              >
-                Copy code
-              </button>
-              <p className="mt-5 text-xs font-bold text-stone-600">
-                Import code
-              </p>
-              <textarea
-                value={importCode}
-                onChange={(event) => setImportCode(event.target.value)}
-                placeholder="Paste export code"
-                className="mt-2 h-20 w-full rounded-lg border border-stone-200 p-2 text-[10px]"
-              />
-              <button
-                className="mt-2 rounded-lg bg-[#d6573a] px-3 py-2 text-xs font-bold text-white"
-                onClick={importItems}
-              >
-                Import
-              </button>
-            </div>
-          </div>
-        )}
-      </main>
-    </div>
-  );
-}
-
 function Matcher({
   recipes,
   stapleIngredients,
@@ -1013,6 +897,7 @@ export default function App() {
     readStorage("masakapa-grocery-list", []),
   );
   const [updateAvailable, setUpdateAvailable] = useState(false);
+  const visitLoggedRef = useRef(false);
   const [updateSW] = useState(() =>
     registerSW({
       immediate: true,
@@ -1043,31 +928,67 @@ export default function App() {
     };
   }, [loading, minimumSplashTimeElapsed, showSplash]);
   useEffect(() => {
+    if (showSplash || visitLoggedRef.current) return;
+    visitLoggedRef.current = true;
+    void logVisit();
+  }, [showSplash]);
+  useEffect(() => {
     const timer = window.setTimeout(() => {
       if (isAdminRoute()) setCurrentScreen("admin");
     }, 0);
     return () => window.clearTimeout(timer);
   }, []);
-  const addMissing = (recipe, ingredients) =>
+  const addMissing = (recipe, ingredients, servings) =>
     setGroceryList((items) => {
-      const recipeName = recipe.name_ms || recipe.name || "";
-      const additions = ingredients
-        .filter(
-          (ing) =>
-            !items.some(
-              (item) =>
-                item?.ingredientId === ing.id && item?.recipeName === recipeName,
-            ),
-        )
+      const existing = items.filter(Boolean);
+      const recipeId = typeof recipe?.id === "string" ? recipe.id : "";
+      const seen = new Set(existing.map(groceryKey));
+      const additions = (Array.isArray(ingredients) ? ingredients : [])
+        .filter((ing) => ing && ing.id)
         .map((ing) => ({
-          id: `${ing.id}-${Date.now()}`,
+          id: `${recipeId || "recipe"}-${ing.id}-${Date.now()}`,
           ingredientId: ing.id,
+          recipeId,
           name: ing.name || ing.id,
-          amount: ing.amount || "",
-          recipeName,
+          amount: scaledAmount(ing.amount, recipe?.defaultServings, servings),
+          recipeTitle: recipe?.name || "",
           checked: false,
-        }));
-      return [...items.filter(Boolean), ...additions];
+        }))
+        .filter((item) => {
+          const key = groceryKey(item);
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+      if (!additions.length) return existing;
+      return [...existing, ...additions].slice(0, GROCERY_LIMIT);
+    });
+  const mergeGroceryItems = (items) =>
+    setGroceryList((current) => {
+      const existing = current.filter(Boolean);
+      const seen = new Set(existing.map(groceryKey));
+      const usedIds = new Set(existing.map((item) => item.id));
+      const additions = (Array.isArray(items) ? items : [])
+        .map(normalizeGroceryItem)
+        .filter(Boolean)
+        .filter((item) => {
+          const key = groceryKey(item);
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        })
+        .map((item) => ({
+          ...item,
+          id: usedIds.has(item.id)
+            ? `${item.ingredientId}-${Date.now()}-${Math.random()
+                .toString(36)
+                .slice(2, 8)}`
+            : item.id,
+          checked: false,
+        }))
+        .slice(0, Math.max(0, GROCERY_LIMIT - existing.length));
+      if (!additions.length) return existing;
+      return [...existing, ...additions];
     });
   const openRecipe = (recipe, missingCore) => {
     window.history.pushState({ view: "detail" }, "");
@@ -1159,7 +1080,7 @@ export default function App() {
       onOpenOnboarding={openOnboarding}
     />
   ) : screen === "grocery" ? (
-    <GroceryList
+    <GroceryListView
       groceryList={groceryList}
       ingredients={[...stapleIngredients, ...ingredientOptions]}
       onToggleItem={(id) =>
@@ -1173,6 +1094,7 @@ export default function App() {
         setGroceryList((items) => items.filter((item) => !item.checked))
       }
       onClearAll={() => setGroceryList([])}
+      onMergeItems={mergeGroceryItems}
       lang={lang}
       onToggleLanguage={onToggleLanguage}
       onOpenFeedback={openFeedback}
@@ -1231,15 +1153,5 @@ export default function App() {
         />
       </div>
     </div>
-  );
-}
-function GroceryList({ ingredients, ...props }) {
-  const { ingredientOptions, stapleIngredients } = useRecipes();
-  const View = GroceryListView || GroceryListLegacy;
-  return (
-    <View
-      {...props}
-      ingredients={ingredients || [...stapleIngredients, ...ingredientOptions]}
-    />
   );
 }

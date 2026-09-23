@@ -2,8 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ExternalLink, LockKeyhole, LogOut, RefreshCw, Trash2 } from "lucide-react";
 import { supabase } from "../lib/supabase";
 
-const ADMIN_PASSCODE = String(import.meta.env.VITE_ADMIN_PASSCODE || "masakapa2026").trim();
-const AUTH_KEY = "masakapa-admin-authed";
 const STATUS_OPTIONS = ["all", "new", "investigating", "resolved"];
 const TYPE_OPTIONS = ["all", "missing_ingredient", "recipe_issue", "app_bug", "suggestion"];
 
@@ -27,23 +25,6 @@ const statusLabels = {
   resolved: "Resolved",
 };
 
-function readAuth() {
-  try {
-    return window.sessionStorage.getItem(AUTH_KEY) === "true";
-  } catch {
-    return false;
-  }
-}
-
-function writeAuth(value) {
-  try {
-    if (value) window.sessionStorage.setItem(AUTH_KEY, "true");
-    else window.sessionStorage.removeItem(AUTH_KEY);
-  } catch {
-    // Session storage may be unavailable in private browsing.
-  }
-}
-
 function normalizePresets(value) {
   if (Array.isArray(value)) return value;
   if (typeof value !== "string" || !value.trim()) return [];
@@ -66,6 +47,69 @@ function formatDate(value) {
 function whatsappUrl(value) {
   const digits = String(value || "").replace(/[^\d+]/g, "").replace(/^\+/, "");
   return digits.length >= 8 ? `https://wa.me/${digits}` : null;
+}
+
+function rowDate(row) {
+  const value = row.created_at || row.visited_at || row.timestamp;
+  const date = value ? new Date(value) : null;
+  return date && !Number.isNaN(date.getTime()) ? date : null;
+}
+
+function startOfWeek(date) {
+  const start = new Date(date);
+  const day = start.getDay();
+  const daysSinceMonday = (day + 6) % 7;
+  start.setDate(start.getDate() - daysSinceMonday);
+  start.setHours(0, 0, 0, 0);
+  return start;
+}
+
+function uniqueVisitorCount(rows) {
+  return new Set(rows.map((row) => row.visitor_id).filter(Boolean)).size;
+}
+
+function buildAnalyticsSummary(rows) {
+  const now = new Date();
+  const today = new Date(now);
+  today.setHours(0, 0, 0, 0);
+  const week = startOfWeek(now);
+  const month = new Date(now.getFullYear(), now.getMonth(), 1);
+  const recentRows = rows
+    .map((row) => ({ row, date: rowDate(row) }))
+    .filter(({ date }) => date);
+  const countSince = (boundary) =>
+    uniqueVisitorCount(
+      recentRows.filter(({ date }) => date >= boundary).map(({ row }) => row),
+    );
+  const breakdown = (getValue) => {
+    const counts = new Map();
+    rows.forEach((row) => {
+      const value = getValue(row) || "Other";
+      if (!counts.has(value)) counts.set(value, new Set());
+      if (row.visitor_id) counts.get(value).add(row.visitor_id);
+    });
+    return [...counts.entries()]
+      .map(([label, visitors]) => ({ label, count: visitors.size }))
+      .sort((a, b) => b.count - a.count);
+  };
+  const deviceBreakdown = breakdown((row) => {
+    if (row.os === "iOS") return "iOS";
+    if (row.os === "Android") return "Android";
+    return "Desktop";
+  });
+  const browserBreakdown = breakdown((row) => row.browser);
+  const pwaVisitors = new Set(
+    rows.filter((row) => row.is_pwa === true).map((row) => row.visitor_id).filter(Boolean),
+  ).size;
+
+  return {
+    dau: countSince(today),
+    wau: countSince(week),
+    mau: countSince(month),
+    pwa: pwaVisitors,
+    devices: deviceBreakdown,
+    browsers: browserBreakdown.slice(0, 5),
+  };
 }
 
 function FeedbackCard({ item, onStatusChange, onDelete }) {
@@ -115,10 +159,102 @@ function FeedbackCard({ item, onStatusChange, onDelete }) {
   );
 }
 
+function AnalyticsBreakdown({ title, items }) {
+  const total = items.reduce((sum, item) => sum + item.count, 0);
+  return (
+    <section className="rounded-2xl border border-stone-200 bg-white p-5" aria-label={title}>
+      <h3 className="text-sm font-bold text-stone-800">{title}</h3>
+      <div className="mt-4 space-y-3">
+        {items.length ? items.map((item) => {
+          const percentage = total ? Math.round((item.count / total) * 100) : 0;
+          return (
+            <div key={item.label}>
+              <div className="flex items-center justify-between text-xs font-semibold text-stone-600">
+                <span>{item.label}</span>
+                <span>{item.count} ({percentage}%)</span>
+              </div>
+              <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-stone-100">
+                <div className="h-full rounded-full bg-amber-500 transition-all" style={{ width: `${percentage}%` }} />
+              </div>
+            </div>
+          );
+        }) : <p className="text-xs text-stone-400">No analytics data yet.</p>}
+      </div>
+    </section>
+  );
+}
+
+function AuthGate({ onBackToApp }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [authError, setAuthError] = useState("");
+  const [isSigningIn, setIsSigningIn] = useState(false);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  if (!supabase) {
+    return (
+      <div className="min-h-screen bg-[#FAF7F2] px-4 py-8 text-stone-800">
+        <div className="mx-auto flex min-h-[80vh] max-w-sm items-center">
+          <div className="w-full rounded-3xl border border-stone-200 bg-white p-7 shadow-xl">
+            <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-red-100 text-red-700"><LockKeyhole size={22} /></div>
+            <h1 className="text-2xl font-bold">Admin Unavailable</h1>
+            <p className="mt-2 text-sm text-stone-500">Supabase is not configured for this build, so the feedback dashboard cannot be authenticated or loaded.</p>
+            <button type="button" onClick={onBackToApp} className="mt-6 w-full rounded-xl bg-[#d6573a] py-3 text-sm font-bold text-white hover:bg-[#c84e3c]">Go to App</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    if (isSigningIn) return;
+    setIsSigningIn(true);
+    setAuthError("");
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      if (error) throw error;
+    } catch (error) {
+      if (mountedRef.current) setAuthError(error?.message || "Unable to sign in.");
+    } finally {
+      if (mountedRef.current) setIsSigningIn(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#FAF7F2] px-4 py-8 text-stone-800">
+      <div className="mx-auto flex min-h-[80vh] max-w-sm items-center">
+        <form onSubmit={handleLogin} className="w-full rounded-3xl border border-stone-200 bg-white p-7 shadow-xl">
+          <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 text-amber-800"><LockKeyhole size={22} /></div>
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Masak Apa Hari Ini</p>
+          <h1 className="mt-2 text-2xl font-bold">Admin Feedback</h1>
+          <p className="mt-2 text-sm text-stone-500">Sign in with an authorized Supabase account to continue.</p>
+          <label className="mt-5 block text-[11px] font-bold uppercase tracking-wide text-stone-400" htmlFor="admin-email">Email</label>
+          <input id="admin-email" autoFocus type="email" autoComplete="username" required value={email} onChange={(event) => setEmail(event.target.value)} placeholder="admin@example.com" className="mt-1.5 w-full rounded-xl border border-stone-200 px-3 py-3 outline-none focus:border-amber-400" />
+          <label className="mt-4 block text-[11px] font-bold uppercase tracking-wide text-stone-400" htmlFor="admin-password">Password</label>
+          <input id="admin-password" type="password" autoComplete="current-password" required value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Password" className="mt-1.5 w-full rounded-xl border border-stone-200 px-3 py-3 outline-none focus:border-amber-400" />
+          {authError && <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-xs font-semibold text-red-600">{authError}</p>}
+          <button type="submit" disabled={isSigningIn} className="mt-4 w-full rounded-xl bg-[#d6573a] py-3 text-sm font-bold text-white hover:bg-[#c84e3c] disabled:cursor-not-allowed disabled:opacity-50">{isSigningIn ? "Signing in..." : "Unlock Dashboard"}</button>
+          <button type="button" onClick={onBackToApp} className="mt-3 w-full text-xs font-semibold text-stone-500 hover:text-stone-800">Go to App</button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export default function Admin({ onBackToApp }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(readAuth);
-  const [passcode, setPasscode] = useState("");
-  const [passcodeError, setPasscodeError] = useState(false);
+  const [session, setSession] = useState(null);
+  const [authReady, setAuthReady] = useState(!supabase);
   const [feedbacks, setFeedbacks] = useState([]);
   const [statusFilter, setStatusFilter] = useState("all");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -126,9 +262,77 @@ export default function Admin({ onBackToApp }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [analyticsRows, setAnalyticsRows] = useState([]);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
 
   const mountedRef = useRef(true);
   const requestControllersRef = useRef(new Set());
+  const isAuthenticated = Boolean(session?.access_token);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!supabase) return undefined;
+    let active = true;
+    supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        if (!active) return;
+        setSession(data?.session ?? null);
+        setAuthReady(true);
+      })
+      .catch(() => {
+        if (active) setAuthReady(true);
+      });
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      setSession(nextSession ?? null);
+      setAuthReady(true);
+      if (!nextSession) {
+        setFeedbacks([]);
+        setAnalyticsRows([]);
+      }
+    });
+    return () => {
+      active = false;
+      authListener?.subscription?.unsubscribe();
+    };
+  }, []);
+
+  const fetchAnalytics = useCallback(async () => {
+    if (!supabase) return;
+    const controller = new AbortController();
+    requestControllersRef.current.add(controller);
+    if (mountedRef.current) setAnalyticsLoading(true);
+    try {
+      const pageSize = 1000;
+      const rows = [];
+      for (let offset = 0; ; offset += pageSize) {
+        const { data, error: analyticsError } = await supabase
+          .from("app_analytics")
+          .select("visitor_id, device_type, os, browser, is_pwa, created_at")
+          .order("created_at", { ascending: false })
+          .range(offset, offset + pageSize - 1)
+          .abortSignal(controller.signal);
+        if (analyticsError) throw analyticsError;
+        if (Array.isArray(data)) rows.push(...data);
+        if (!Array.isArray(data) || data.length < pageSize) break;
+      }
+      if (mountedRef.current) setAnalyticsRows(rows);
+    } catch (analyticsError) {
+      if (mountedRef.current && analyticsError?.name !== "AbortError") {
+        setError(analyticsError.message || "Unable to load analytics.");
+      }
+    } finally {
+      requestControllersRef.current.delete(controller);
+      if (mountedRef.current) setAnalyticsLoading(false);
+    }
+  }, []);
+
   const fetchFeedbacks = useCallback(async () => {
     if (!supabase) {
       if (mountedRef.current) setError("Supabase is not configured.");
@@ -160,17 +364,17 @@ export default function Admin({ onBackToApp }) {
   }, []);
 
   useEffect(() => {
-    mountedRef.current = true;
     if (!isAuthenticated) return undefined;
     const controllers = requestControllersRef.current;
     const timer = window.setTimeout(() => fetchFeedbacks(), 0);
+    const analyticsTimer = window.setTimeout(() => fetchAnalytics(), 0);
     return () => {
-      mountedRef.current = false;
       window.clearTimeout(timer);
+      window.clearTimeout(analyticsTimer);
       controllers.forEach((controller) => controller.abort());
       controllers.clear();
     };
-  }, [fetchFeedbacks, isAuthenticated]);
+  }, [fetchAnalytics, fetchFeedbacks, isAuthenticated]);
 
   const metrics = useMemo(() => ({
     total: feedbacks.length,
@@ -187,25 +391,24 @@ export default function Admin({ onBackToApp }) {
       return matchesStatus && matchesType && (!term || haystack.includes(term));
     });
   }, [feedbacks, search, statusFilter, typeFilter]);
+  const analytics = useMemo(
+    () => buildAnalyticsSummary(analyticsRows),
+    [analyticsRows],
+  );
 
-  const handleLogin = (event) => {
-    event.preventDefault();
-    if (String(passcode).trim() === ADMIN_PASSCODE) {
-      setIsAuthenticated(true);
-      window.sessionStorage.setItem(AUTH_KEY, "true");
-      setPasscodeError(false);
-      return;
+  const logout = async () => {
+    if (!supabase) return;
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      setSession(null);
     }
-    setPasscodeError(true);
-  };
-
-  const logout = () => {
-    writeAuth(false);
-    setIsAuthenticated(false);
+    setFeedbacks([]);
+    setAnalyticsRows([]);
   };
 
   const updateStatus = async (item, status) => {
-    if (!supabase) return;
+    if (!supabase || !isAuthenticated) return;
     setFeedbacks((items) => items.map((entry) => entry.id === item.id ? { ...entry, status } : entry));
     try {
       const { error: updateError } = await supabase.from("feedbacks").update({ status }).eq("id", item.id);
@@ -219,7 +422,7 @@ export default function Admin({ onBackToApp }) {
   };
 
   const handleDelete = async (id) => {
-    if (!supabase) return;
+    if (!supabase || !isAuthenticated) return;
     try {
       const { error: deleteError } = await supabase.from("feedbacks").delete().eq("id", id);
       if (deleteError) throw deleteError;
@@ -229,32 +432,50 @@ export default function Admin({ onBackToApp }) {
     }
   };
 
-  if (!isAuthenticated) {
+  if (!authReady) {
     return (
-      <div className="min-h-screen bg-[#FAF7F2] px-4 py-8 text-stone-800">
-        <div className="mx-auto flex min-h-[80vh] max-w-sm items-center">
-          <form onSubmit={handleLogin} className="w-full rounded-3xl border border-stone-200 bg-white p-7 shadow-xl">
-            <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 text-amber-800"><LockKeyhole size={22} /></div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Masak Apa Hari Ini</p>
-            <h1 className="mt-2 text-2xl font-bold">Admin Feedback</h1>
-            <p className="mt-2 text-sm text-stone-500">Enter the admin passcode to continue.</p>
-            <input autoFocus type="password" value={passcode} onChange={(event) => setPasscode(event.target.value)} placeholder="Passcode" className="mt-5 w-full rounded-xl border border-stone-200 px-3 py-3 outline-none focus:border-amber-400" />
-            {passcodeError && <p className="mt-2 text-xs font-semibold text-red-600">Incorrect passcode.</p>}
-            <button type="submit" className="mt-4 w-full rounded-xl bg-[#d6573a] py-3 text-sm font-bold text-white hover:bg-[#c84e3c]">Unlock Dashboard</button>
-            <button type="button" onClick={onBackToApp} className="mt-3 w-full text-xs font-semibold text-stone-500 hover:text-stone-800">Go to App</button>
-          </form>
-        </div>
+      <div className="flex min-h-screen items-center justify-center bg-[#FAF7F2] px-4 text-sm font-semibold text-stone-500">
+        Checking session...
       </div>
     );
+  }
+
+  if (!isAuthenticated) {
+    return <AuthGate onBackToApp={onBackToApp} />;
   }
 
   return (
     <div className="min-h-screen bg-[#FAF7F2] px-4 py-5 text-stone-800 sm:px-8 lg:px-12">
       <header className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 border-b border-stone-200 pb-5">
-        <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Masak Apa Hari Ini</p><h1 className="mt-1 text-3xl font-bold">Feedback Dashboard</h1></div>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Masak Apa Hari Ini</p>
+          <h1 className="mt-1 text-3xl font-bold">Feedback Dashboard</h1>
+          <p className="mt-1 truncate text-xs font-semibold text-stone-500">{session?.user?.email || "Signed in"}</p>
+        </div>
         <div className="flex items-center gap-2"><button type="button" onClick={onBackToApp} className="rounded-full border border-stone-200 bg-white px-3 py-2 text-xs font-semibold text-stone-600 hover:bg-stone-50">Go to App</button><button type="button" onClick={logout} title="Log out" aria-label="Log out" className="rounded-full border border-stone-200 bg-white p-2 text-stone-500 hover:text-stone-800"><LogOut size={16} /></button></div>
       </header>
       <main className="mx-auto max-w-7xl py-6">
+        <section aria-labelledby="analytics-heading">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wide text-amber-700">Visitor Analytics</p>
+              <h2 id="analytics-heading" className="mt-1 text-xl font-bold">App Usage</h2>
+            </div>
+            {analyticsLoading && <span className="text-xs font-semibold text-stone-400">Loading...</span>}
+          </div>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[["Today's Active Visitors (DAU)", analytics.dau, "bg-white"], ["This Week's Visitors (WAU)", analytics.wau, "bg-amber-50"], ["This Month's Visitors (MAU)", analytics.mau, "bg-green-50"], ["PWA Installs Count", analytics.pwa, "bg-blue-50"]].map(([label, value, color]) => (
+              <div key={label} className={`rounded-2xl border border-stone-200 ${color} p-5`}>
+                <p className="text-xs font-bold uppercase tracking-wide text-stone-500">{label}</p>
+                <p className="mt-2 text-3xl font-bold text-stone-800">{value}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 grid gap-4 lg:grid-cols-2">
+            <AnalyticsBreakdown title="Devices" items={analytics.devices} />
+            <AnalyticsBreakdown title="Top Browsers" items={analytics.browsers} />
+          </div>
+        </section>
         <div className="grid gap-3 sm:grid-cols-3">
           {[['Total Feedbacks', metrics.total, 'bg-white'], ['New Issues', metrics.newIssues, 'bg-amber-50'], ['Resolved Issues', metrics.resolved, 'bg-green-50']].map(([label, value, color]) => <div key={label} className={`rounded-2xl border border-stone-200 ${color} p-5`}><p className="text-xs font-bold uppercase tracking-wide text-stone-500">{label}</p><p className="mt-2 text-3xl font-bold text-stone-800">{value}</p></div>)}
         </div>

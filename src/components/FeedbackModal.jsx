@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { CheckCircle2, Send, X } from "lucide-react";
 import { supabase } from "../lib/supabase";
+import { translations } from "../data/translations";
 
 const CATEGORIES = [
   { id: "missing_ingredient", labelMs: "Bahan Tak Cukup", labelEn: "Missing Ingredient", icon: "🥬" },
@@ -69,12 +70,17 @@ export default function FeedbackModal({
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (status === "submitting") return;
+    if (!supabase) {
+      setStatus("error");
+      return;
+    }
     setStatus("submitting");
     const controller = new AbortController();
     requestControllerRef.current = controller;
     try {
-      if (supabase) {
-        const { error } = await supabase.from("feedbacks").insert([
+      const { error } = await supabase
+        .from("feedbacks")
+        .insert([
           {
             type: selectedCategory,
             recipe_id: initialRecipeId || null,
@@ -84,14 +90,13 @@ export default function FeedbackModal({
             contact: contact || "",
             status: "new",
           },
-        ]).abortSignal(controller.signal);
-        if (error) throw error;
-      }
-       if (!mountedRef.current) return;
-       setStatus("success");
-       closeTimerRef.current = window.setTimeout(onClose, 1500);
+        ])
+        .abortSignal(controller.signal);
+      if (error) throw error;
+      if (!mountedRef.current) return;
+      setStatus("success");
+      closeTimerRef.current = window.setTimeout(onClose, 1500);
     } catch (error) {
-      console.error("Feedback submit error:", error);
       if (mountedRef.current && error?.name !== "AbortError") setStatus("error");
     } finally {
       if (requestControllerRef.current === controller) requestControllerRef.current = null;
@@ -181,8 +186,19 @@ export default function FeedbackModal({
               </label>
               <input id="feedback-contact" value={contact} onChange={(event) => setContact(event.target.value)} placeholder={activeLang === "en" ? "Email or WhatsApp number (optional)" : "E-mel atau nombor WhatsApp (pilihan)"} className="mt-2 w-full rounded-xl border border-stone-200 bg-white p-3 text-sm outline-none transition focus:border-amber-400" />
             </div>
-            {status === "error" && <p className="text-xs font-semibold text-red-600">{activeLang === "en" ? "Feedback could not be sent. Please try again." : "Maklum balas tidak dapat dihantar. Sila cuba lagi."}</p>}
-            <button type="submit" disabled={status === "submitting"} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#d6573a] py-3 text-sm font-bold text-white transition hover:bg-[#c84e3c] disabled:cursor-not-allowed disabled:opacity-50">
+            {!supabase && (
+              <p className="rounded-xl bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800">
+                {translations[activeLang].feedback.unavailable}
+              </p>
+            )}
+            {status === "error" && (
+              <p className="text-xs font-semibold text-red-600">
+                {supabase
+                  ? translations[activeLang].feedback.error
+                  : translations[activeLang].feedback.unavailable}
+              </p>
+            )}
+            <button type="submit" disabled={status === "submitting" || !supabase} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#d6573a] py-3 text-sm font-bold text-white transition hover:bg-[#c84e3c] disabled:cursor-not-allowed disabled:opacity-50">
               <Send size={17} />
               {status === "submitting" ? (activeLang === "en" ? "Sending..." : "Menghantar...") : activeLang === "en" ? "Send Feedback" : "Hantar Maklum Balas"}
             </button>

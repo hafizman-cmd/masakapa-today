@@ -151,8 +151,11 @@ Run `node scripts/seed-supabase.js` after creating the tables above and ensuring
 - Use `npm run lint` and `npm run build` after changes.
 - LocalStorage keys begin with `masakapa-`.
 - Recipe `pairings` values must reference stable recipe IDs in `src/data/recipes.js`; pairing navigation passes the resolved recipe back to `App`.
-- Grocery items use `{ id, ingredientId, name, amount, recipeTitle, checked }` and persist under `masakapa-grocery-list`.
-- `addMissing` deduplicates recipe/ingredient pairs; use `npm run lint` and `npm run build` after changes.
+- Grocery items use `{ id, ingredientId, recipeId, name, amount, recipeTitle, checked }` and persist under `masakapa-grocery-list`. `name`/`recipeTitle` may be bilingual `{ ms, en }` objects.
+- Grocery identity/deduplication uses `groceryKey()` (`recipeId` + `ingredientId`, with a normalized title fallback for legacy rows). Never deduplicate on object identity or translated names.
+- `sanitizeGroceryList()`/`normalizeGroceryItem()` in `src/App.jsx` whitelist grocery fields and cap the list at `GROCERY_LIMIT`; shared codes and URL imports are untrusted input and must pass through them.
+- `addMissing(recipe, ingredients, servings)` scales amounts with `scaledAmount()` → `scaleIngredientAmount(amount, recipe.defaultServings, servings)` and deduplicates by `groceryKey()`.
+- `mergeGroceryItems(items)` is the single merge path for manual import; it must stay passed to `components/GroceryList.jsx` as `onMergeItems`.
 - PWA updates use `registerSW` in `src/App.jsx`; keep the update toast gentle and call the returned updater on refresh.
 - Recipe detail portion controls use `defaultServings` and `scaleIngredientAmount`; grocery additions must receive the currently selected serving count.
 - The product title displayed in headers and manifests is `MASAK APA HARI INI`; the short title remains `MasakApa`.
@@ -176,3 +179,54 @@ Run `node scripts/seed-supabase.js` after creating the tables above and ensuring
 - Onboarding slide state starts at index `0` and resets whenever the modal is open and the language changes; keep dot navigation aligned directly with `currentSlide`.
 - Opening a recipe pushes `{ view: 'detail' }` into browser history; the `popstate` listener closes the detail view for browser and Android back actions.
 - Fridge ingredients and Search recipes use `sortByActiveName` for locale-aware A-Z ordering in the active BM/EN language. Both views expose a horizontally scrollable All/A-Z letter filter below their search input.
+
+## Audit Notes (2026-09-23)
+
+### Fixed In This Pass
+- Manual grocery import now works: `App` renders `components/GroceryList.jsx` directly and passes `onMergeItems={mergeGroceryItems}`. The dead `GroceryListLegacy` component and the duplicate `useRecipes()` call in the former wrapper were removed, so the grocery screen no longer issues a second Supabase request.
+- Admin access no longer uses a client-side passcode. `src/components/Admin.jsx` requires a Supabase Auth session (`signInWithPassword`, `getSession`, `onAuthStateChange`, `signOut`). The `masakapa2026` fallback, `VITE_ADMIN_PASSCODE`, and the `masakapa-admin-authed` sessionStorage flag are gone. When Supabase is unconfigured the route renders an "Admin Unavailable" notice instead of a login form, and feedback data is cleared on sign-out.
+- Grocery additions scale with the selected serving count and deduplicate on stable IDs (`recipeId` + `ingredientId`) instead of bilingual object identity.
+- Imported and URL-shared grocery payloads are normalized to a whitelisted item shape and capped at `GROCERY_LIMIT` (300) before reaching localStorage.
+- `FeedbackModal` reports success only after a successful insert. When Supabase is unconfigured the submit button is disabled and `feedback.unavailable` is shown; the `console.error` output was removed.
+- Grocery sharing falls back to `navigator.clipboard.writeText` with a bilingual toast (`shareCopied` / `shareCopyFailed` / `shareEmpty`) when `navigator.share` is missing or fails. A user-cancelled share (`AbortError`) stays silent.
+- Visitor analytics now logs one post-splash visit per app mount through `src/utils/analytics.js`, using the local `masakapa-visitor-id` and device context. The authenticated Admin dashboard reads `app_analytics` and displays DAU, WAU, MAU, PWA visitors, device, and browser breakdowns.
+
+### Remaining Risks (Not Fixable In App Code)
+- Supabase RLS is the real authorization boundary and is not defined in this repository. `feedbacks` must allow anonymous INSERT only, and SELECT/UPDATE/DELETE only for the provisioned admin identity; `recipes`/`ingredients` should be anon read-only. Without these policies the admin UI change is cosmetic only.
+- An admin user must be provisioned in Supabase Auth. The dashboard currently accepts any successfully authenticated Supabase user, so disable public sign-ups or add an `app_metadata` role check backed by matching RLS.
+- There is no automated test suite. The available checks are `npm run lint`, `npm run build`, and `npm audit`; lint still reports one pre-existing `set-state-in-effect` warning in `src/components/OnboardingModal.jsx`.
+- The repository README is still the stock Vite template. It does not document the product, environment variables, Supabase schema, seeding, PWA behavior, admin provisioning, or deployment procedure.
+- Share links are built from `window.location.origin`, which is not the public web origin inside Capacitor native builds; configure an explicit web origin if native sharing must produce importable links.
+- The static data path is the operational fallback. Any Supabase schema/data change must preserve the normalized runtime shape in `useRecipes.js`; malformed nullable JSON fields can otherwise make a remote load fail and silently fall back to static data.
+- The production bundle is still above Vite's 500 kB minified chunk warning (about 630 kB for the main JavaScript chunk). Consider route/component code splitting before adding more features.
+- `dist/`, `.env`, `node_modules/`, and the UUID map are ignored by Git. Verify deployment builds from source and never commit `.env` or service-role credentials. `VITE_SUPABASE_ANON_KEY` is expected to be public, which is exactly why RLS policies are mandatory.
+
+### Analytics Schema
+
+The analytics logger expects this Supabase table:
+
+```sql
+create table app_analytics (
+  id bigint generated by default as identity primary key,
+  visitor_id text not null,
+  device_type text not null,
+  os text not null,
+  browser text not null,
+  is_pwa boolean not null default false,
+  created_at timestamp with time zone not null default now()
+);
+alter table app_analytics enable row level security;
+create policy "anonymous can insert analytics" on app_analytics for insert to anon with check (true);
+create policy "authenticated admins can read analytics" on app_analytics for select to authenticated using (auth.role() = 'authenticated');
+```
+
+- Do not expose update/delete policies for anonymous users. The analytics query currently selects up to the Supabase API page limit; add pagination or a server-side aggregate/RPC before the table grows beyond that limit.
+
+### Audit Checklist For Changes
+
+- Run `npm run lint`, `npm run build`, and `npm audit` after dependency or source changes.
+- Test both BM and EN, online and offline startup, first-run onboarding, browser back from recipe detail, favorites persistence, grocery import/export, and PWA update behavior.
+- Test `/admin` signed out (login form renders), signed in with a provisioned Supabase Auth admin user (feedback loads, status update and delete work), and confirm anonymous RLS denies reads, updates, and deletes.
+- Test grocery behavior end to end: add missing ingredients at 1/2/4 servings and confirm scaled amounts, re-import the same shared code twice and confirm no duplicates, and share with Web Share unavailable to confirm the clipboard toast.
+- Keep the static catalog and Supabase normalization compatible; test with empty tables, malformed rows, request timeout, and unavailable localStorage.
+- Add automated coverage before changing persistence, sharing, authentication, or matching logic.
