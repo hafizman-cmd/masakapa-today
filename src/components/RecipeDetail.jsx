@@ -17,25 +17,8 @@ import {
 import { text, translations } from "../data/translations";
 import { SUBSTITUTIONS } from "../data/substitutions";
 import { scaleIngredientAmount } from "../utils/portion";
+import { translateUnit } from "../utils/translateUnit";
 import { shareRecipeToWhatsApp } from "../utils/whatsappShare";
-
-const formatAmount = (amountStr, lang) => {
-  if (!amountStr || lang !== "en") return amountStr;
-
-  return amountStr
-    .replace(/sudu besar/gi, "tbsp")
-    .replace(/sudu teh/gi, "tsp")
-    .replace(/biji/gi, "pcs")
-    .replace(/ulas/gi, "cloves")
-    .replace(/batang/gi, "stalks")
-    .replace(/keping/gi, "slices")
-    .replace(/helai/gi, "leaves")
-    .replace(/cawan/gi, "cups")
-    .replace(/paket|bungkus/gi, "pack")
-    .replace(/secubit/gi, "pinch")
-    .replace(/sedikit/gi, "to taste")
-    .replace(/mangkuk/gi, "bowl");
-};
 
 const accents = {
   sunset: "from-[#ff9f68] to-[#e85d3f]",
@@ -358,7 +341,9 @@ export default function RecipeDetail({
                       <span
                         className={`relative inline-block transition-colors duration-300 ${isChecked ? "text-gray-400" : "text-gray-800"}`}
                       >
-                        {text(item.name, lang)}
+                         {typeof item.name === "object"
+                           ? item.name[lang] || item.name.en
+                           : item.name}
                         <span
                           className={`absolute left-0 top-1/2 h-[1.5px] bg-gray-400 transition-all duration-300 ease-out ${isChecked ? "w-full" : "w-0"}`}
                         />
@@ -391,7 +376,7 @@ export default function RecipeDetail({
                       )}
                     </span>
                     <small>
-                      {formatAmount(
+                       {translateUnit(
                         scaleIngredientAmount(
                           item.amount,
                           recipe.defaultServings,

@@ -1,19 +1,7 @@
-const ENGLISH_AMOUNT_REPLACEMENTS = [
-  [/\bsudu besar\b/gi, 'tbsp'],
-  [/\bsudu teh\b/gi, 'tsp'],
-  [/\bcawan\b/gi, 'cup'],
-  [/\bsecubit\b/gi, 'pinch'],
-  [/\bsedikit\b/gi, 'to taste'],
-  [/\b(?:biji|ulas|batang|helai|keping)\b/gi, ''],
-]
+import { translateUnit } from './translateUnit'
 
 export function translateGroceryAmount(amount, lang) {
-  const amountText = String(amount || '')
-  if (lang !== 'en') return amountText
-  return ENGLISH_AMOUNT_REPLACEMENTS.reduce(
-    (translated, [pattern, replacement]) => translated?.replace(pattern, replacement),
-    amountText,
-  ).replace(/\s+/g, ' ').trim()
+  return translateUnit(amount, lang)
 }
 
 export function getGroceryIngredientName(item, ingredients = [], lang) {

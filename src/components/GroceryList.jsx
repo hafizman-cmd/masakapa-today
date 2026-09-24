@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { ArrowLeftRight, Check, Leaf, MessageCircle, MessageSquarePlus, Shield } from 'lucide-react'
 import { decodeGrocery, parseGroceryText } from '../utils/groceryShare'
-import { getGroceryIngredientName, translateGroceryAmount } from '../utils/groceryTranslation'
+import { getGroceryIngredientName } from '../utils/groceryTranslation'
+import { translateUnit } from '../utils/translateUnit'
 import { text, translations } from '../data/translations'
 import { decodeCompactGrocery, shareGroceryToWhatsApp } from '../utils/whatsappShare'
 
@@ -84,22 +85,22 @@ export default function GroceryList({ groceryList = [], ingredients = [], onTogg
           <span className="block min-w-0 truncate text-xs font-medium text-gray-500">
             {unchecked.length} {t.ui.groceryCount}
           </span>
-          <div className="my-3 grid w-full max-w-full grid-cols-2 gap-2">
+          <div className="my-3 grid w-full min-w-0 max-w-full grid-cols-2 gap-2">
             <button
               type="button"
               onClick={shareToWhatsApp}
-              className="flex min-w-0 w-full items-center justify-center gap-1.5 rounded-xl border border-emerald-200/80 bg-emerald-50 px-2.5 py-2.5 text-xs font-semibold text-emerald-800 shadow-xs transition-all hover:bg-emerald-100 active:scale-95 sm:text-sm"
+              className="flex w-full min-w-0 items-center justify-center gap-1.5 overflow-hidden rounded-xl border border-emerald-200 bg-emerald-50 px-2 py-2.5 text-xs font-semibold text-emerald-800 shadow-xs transition-all hover:bg-emerald-100 active:scale-95"
             >
               <MessageCircle className="h-4 w-4 shrink-0 text-emerald-600" />
-              <span className="truncate">{t.ui.shareWhatsApp}</span>
+              <span className="min-w-0 truncate">WhatsApp</span>
             </button>
             <button
               type="button"
               onClick={() => setShowShare(true)}
-              className="flex min-w-0 w-full items-center justify-center gap-1.5 rounded-xl border border-gray-200 bg-white px-2.5 py-2.5 text-xs font-semibold text-gray-700 shadow-xs transition-all hover:bg-gray-50 active:scale-95 sm:text-sm"
+              className="flex w-full min-w-0 items-center justify-center gap-1.5 overflow-hidden rounded-xl border border-gray-200 bg-white px-2 py-2.5 text-xs font-semibold text-gray-700 shadow-xs transition-all hover:bg-gray-50 active:scale-95"
             >
               <ArrowLeftRight className="h-4 w-4 shrink-0 text-gray-500" />
-              <span className="truncate">{t.ui.importTitle}</span>
+              <span className="min-w-0 truncate">{lang === 'en' ? 'Export/Import' : 'Eksport/Import'}</span>
             </button>
           </div>
           {validList.some(item => item.checked) && (
@@ -115,7 +116,7 @@ export default function GroceryList({ groceryList = [], ingredients = [], onTogg
         {validList.length ? (
           <>
             <div className="grocery-items">
-              {validList.map(item => <button key={item.id} className={item.checked ? 'grocery-item checked' : 'grocery-item'} onClick={() => onToggleItem(item.id)}><span className="check-box">{item.checked && <Check size={14} />}</span><span><strong>{getGroceryIngredientName(item, ingredients, lang)}</strong><small>{translateGroceryAmount(item.amount, lang)} | {text(item.recipeTitle || item.recipeName, lang)}</small></span></button>)}
+              {validList.map(item => <button key={item.id} className={item.checked ? 'grocery-item checked' : 'grocery-item'} onClick={() => onToggleItem(item.id)}><span className="check-box">{item.checked && <Check size={14} />}</span><span><strong>{typeof item.name === 'object' ? item.name[lang] || item.name.en : getGroceryIngredientName(item, ingredients, lang)}</strong><small>{translateUnit(item.amount, lang)} | {text(item.recipeTitle || item.recipeName, lang)}</small></span></button>)}
             </div>
             <button className="clear-all-button" onClick={onClearAll}>{t.ui.clearAll}</button>
           </>

@@ -103,6 +103,21 @@ Object.assign(recipeTranslations, {
   cendol: ['Cendol', 'Express'],
 })
 
+Object.assign(recipeTranslations, {
+  'ikan-asam-pedas-melaka': ['Melaka Spicy Tamarind Stingray', 'Traditional'],
+  'ikan-siakap-stim-limau': ['Steamed Sea Bass with Lime', 'Traditional'],
+  'udang-sambal-petai': ['Prawns with Sambal and Stink Beans', 'Traditional'],
+  'udang-butter-garlic': ['Butter Garlic Prawns', 'Western Fusion'],
+  'sotong-masak-hitam': ['Squid in Black Sauce', 'Traditional'],
+  'ikan-cencaru-sumbat-sambal': ['Sambal-Stuffed Scad', 'Traditional'],
+  'sotong-goreng-tepung': ['Crispy Flour-Fried Squid', 'Express'],
+  'ikan-pari-bakar-sambal': ['Grilled Stingray with Sambal', 'Traditional'],
+  'udang-masak-lemak-cili-api': ['Prawns in Spicy Coconut Gravy', 'Traditional'],
+  'ikan-kembung-goreng-cili': ['Chili-Fried Mackerel', 'Traditional'],
+  'sotong-sambal-hijau': ['Squid with Green Sambal', 'Traditional'],
+  'sup-ikan-merah': ['Red Snapper Soup', 'Traditional'],
+})
+
 export const ingredientTranslations = {
   'Ikan Siakap': 'Sea bass', 'Ikan Kerapu': 'Grouper', 'Ikan Merah': 'Red snapper', 'Ikan Jenahak': 'Golden snapper', 'Ikan Bawal': 'Pomfret', 'Ikan Tongkol': 'Tuna', 'Ikan Senangin': 'Threadfin', 'Ikan Haruan': 'Snakehead fish', 'Ikan Terubuk': 'Herring', 'Ikan Pari': 'Stingray', 'Ikan Tilapia': 'Tilapia', 'Ikan Cencaru': 'Scad', 'Ikan Kembung': 'Mackerel', Sotong: 'Squid', Petai: 'Stink beans', 'Daun Kesum': 'Vietnamese coriander', 'Bunga Kantan': 'Torch ginger', 'Sos Ikan': 'Fish sauce', 'Limau Nipis': 'Lime', 'Serbuk Lada Sulah': 'Ground white pepper', 'Mentega': 'Butter', 'Daun Ketumbar': 'Coriander leaves', 'Cili Padi Hijau': 'Green bird eye chili', Bendi: 'Okra', 'Daun Pisang': 'Banana leaf', 'Tepung Beras': 'Rice flour', 'Tepung Jagung': 'Cornstarch', 'Daun Kari': 'Curry leaves', Bihun: 'Rice vermicelli', 'Kuey teow': 'Flat rice noodles', 'Mee segera / Maggi': 'Instant noodles', Sawi: 'Mustard greens', 'Daun kucai': 'Chinese chives', Fishcake: 'Fishcake', 'Lobak merah': 'Carrot', 'Pes tomyam': 'Tom yum paste', 'Sos cili': 'Chili sauce', 'Sos tiram': 'Oyster sauce', 'Serbuk lada sulah': 'Ground white pepper',
   Ayam: 'Chicken', 'Isi ayam': 'Chicken breast', 'Daging Lembu': 'Beef', 'Daging Kambing': 'Mutton', 'Kunyit hidup': 'Fresh turmeric', Kentang: 'Potato', Bawang: 'Onion', 'Bawang merah': 'Red onion', 'Bawang besar': 'Onion', Minyak: 'Oil', Garam: 'Salt', 'Daun sup': 'Celery leaves', Santan: 'Coconut milk', 'Cili padi': 'Birds eye chili', Serai: 'Lemongrass', 'Asam jawa': 'Tamarind', 'Asam gelugor': 'Garcinia cambogia slices', Tomato: 'Tomato', 'Sos tomato': 'Tomato sauce', 'Cili kisar': 'Blended chili', Udang: 'Prawns', 'Cili hiasan': 'Garnish chili', 'Nasi sejuk': 'Cold rice', Telur: 'Egg', 'Ikan merah': 'Red snapper', 'Ikan bilis': 'Anchovies', 'Kacang panjang': 'Long beans', 'Limau kasturi': 'Calamansi', 'Mee kuning': 'Yellow noodles', Taugeh: 'Bean sprouts', 'Roti panjang': 'Long bun', 'Daging kisar': 'Minced beef', 'Peha ayam': 'Chicken thighs', Madu: 'Honey', 'Bawang putih': 'Garlic', 'Dada ayam': 'Chicken breast', 'Kicap manis': 'Sweet soy sauce', 'Kicap pekat': 'Dark soy sauce', 'Sos lada hitam': 'Black pepper sauce', 'Daun limau purut': 'Kaffir lime leaves', 'Daun kesum': 'Vietnamese coriander', 'Bunga kantan': 'Torch ginger', 'Sayur campur': 'Mixed vegetables', 'Minyak bijan': 'Sesame oil', 'Daun bawang': 'Spring onion', 'Cili hijau': 'Green chili', 'Tomato hijau': 'Green tomato', 'Daging batang pinang': 'Lean beef', Kangkung: 'Water spinach', Belacan: 'Shrimp paste', 'Serbuk kari': 'Curry powder', 'Rempah kurma': 'Korma spice', 'Rempah sup / 4 beradik': 'Soup spices / whole spices', Kerisik: 'Toasted coconut', 'Daun kunyit': 'Turmeric leaf', Lengkuas: 'Galangal', Taucu: 'Fermented bean paste', 'Lada hitam': 'Black pepper', 'Serbuk lada hitam': 'Ground black pepper', Ketumbar: 'Coriander', 'Daun pandan': 'Pandan leaf', 'Gula Melaka': 'Palm sugar', Gula: 'Sugar', Tempe: 'Tempeh', Tauhu: 'Tofu', 'Bawang goreng': 'Fried shallots', Halia: 'Ginger', 'Tepung jagung': 'Cornstarch', 'Daun kari': 'Curry leaves', 'Kepak ayam': 'Chicken wings', 'Air fryer': 'Air fryer', Kuali: 'Wok', 'Dapur gas': 'Gas stove', Periuk: 'Pot', 'Lesung batu': 'Mortar and pestle', Pengisar: 'Blender', Penyepit: 'Tongs', 'Kuali leper': 'Flat pan', 'Periuk kecil': 'Small pot',
@@ -256,6 +271,21 @@ Object.assign(instructionTranslations, {
   cendol: ['Cook palm sugar with pandan and a little water into a syrup.', 'Boil the coconut milk with salt and set aside.', 'Boil the sago until translucent, then rinse in cold water.', 'Serve the sago with coconut milk, syrup and ice.'],
 })
 
+Object.assign(instructionTranslations, {
+  'ikan-asam-pedas-melaka': ['Mix the tamarind with water and strain it.', 'Saute onion, ginger, turmeric and blended chili until fragrant.', 'Add the tamarind water and stingray, then simmer.', 'Add the Vietnamese coriander, torch ginger, okra and tomato before serving.'],
+  'ikan-siakap-stim-limau': ['Clean the fish and score both sides.', 'Mix the fish sauce, lime juice, garlic and bird eye chili.', 'Place lemongrass under the fish and steam until cooked.', 'Pour the lime sauce over the fish and garnish with coriander leaves.'],
+  'udang-sambal-petai': ['Clean the prawns and split the stink beans.', 'Saute the onions, garlic and blended chili until the oil separates.', 'Add the tamarind water, sugar and salt.', 'Add the prawns and stink beans, then cook until the prawns change color.'],
+  'udang-butter-garlic': ['Season the prawns with ground white pepper and a little salt.', 'Melt the butter and saute the garlic and bird eye chili.', 'Add the curry leaves and prawns, then cook until they change color.', 'Toss until the prawns are coated in butter and serve hot.'],
+  'sotong-masak-hitam': ['Clean the squid and reserve the ink sacs.', 'Saute the onions, ginger, lemongrass, turmeric and bird eye chili until fragrant.', 'Add the squid and its ink, then stir well.', 'Cook briefly until tender and the sauce turns black.'],
+  'ikan-cencaru-sumbat-sambal': ['Split the back of the scad and clean it.', 'Saute the onions, blended chili, lemongrass and turmeric until cooked.', 'Mix in a little tamarind water and stuff the sambal into the fish.', 'Fry the fish until crisp and fully cooked.'],
+  'sotong-goreng-tepung': ['Clean the squid and cut it into rings.', 'Toss the squid with garlic, ground white pepper and salt.', 'Dip the squid in egg and coat it with the flour mixture.', 'Fry in hot oil until crisp and serve immediately.'],
+  'ikan-pari-bakar-sambal': ['Pound the onions, lemongrass, shrimp paste and blended chili into a sambal.', 'Saute the sambal until cooked and the oil separates.', 'Place the stingray on a banana leaf and spread with sambal.', 'Grill until the fish is cooked and the sambal is slightly crisp.'],
+  'udang-masak-lemak-cili-api': ['Blend the bird eye chili and turmeric until smooth.', 'Add the paste, lemongrass and coconut milk to a pot.', 'Simmer gently and stir so the coconut milk does not split.', 'Add the prawns, garcinia slices and turmeric leaf, then cook until done.'],
+  'ikan-kembung-goreng-cili': ['Clean and season the mackerel with turmeric and salt.', 'Fry the fish until golden and set aside.', 'Saute the onions and blended chili until fragrant.', 'Add the tamarind water and fried fish, then simmer until coated.'],
+  'sotong-sambal-hijau': ['Clean the squid and cut it into rings.', 'Pound the green chili, bird eye chili, onions and garlic.', 'Saute the pounded ingredients until fragrant.', 'Add the squid and calamansi juice, then cook briefly.'],
+  'sup-ikan-merah': ['Saute the soup spices, ginger, garlic and onion until fragrant.', 'Add water and simmer to make the broth.', 'Add the fish after the broth boils so it does not break apart.', 'Add the tomato, celery leaves and fried shallots, then season and serve.'],
+})
+
 export const tipTranslations = {
   'nasi-lemak': 'Use moderately thick coconut milk so the rice is rich without being heavy.',
   'nasi-dagang': 'Steam the rice with coconut milk in stages so the grains stay separate.',
@@ -286,6 +316,53 @@ export const tipTranslations = {
   'kuih-seri-muka': 'Cool fully before slicing for clean, even layers.',
   cendol: 'Chill the coconut milk before serving for a more refreshing dessert.',
 }
+
+Object.assign(tipTranslations, {
+  'ayam-goreng-kunyit': 'If fresh turmeric is unavailable, replace it with 1 tsp turmeric powder.',
+  'masak-lemak-cili-api': 'Replace the coconut milk with evaporated milk for a lighter gravy.',
+  'asam-pedas-ikan': 'Vietnamese coriander and torch ginger add a more fragrant aroma to asam pedas.',
+  'sambal-tumis-udang': 'The prawns can be replaced with squid or fish fillets.',
+  'nasi-goreng-kampung': 'Chilled rice produces fried rice that is not soggy.',
+  'telur-dadar-pedas': 'Add a little cornstarch for a fluffier omelette.',
+  'mee-goreng-mamak': 'Sprinkle in a little water while frying for softer noodles.',
+  'roti-john': 'Replace the beef with minced chicken or tuna for a lighter version.',
+  'ayam-madu-air-fryer': 'No air fryer? Bake in an oven at 200°C for 30 minutes.',
+  'chicken-chop-lada-hitam': 'Evaporated milk can replace coconut milk in the sauce for a creamy finish.',
+  'ayam-masak-kicap': 'Replace the chicken with tofu for a budget-friendly version.',
+  'telur-sambal': 'Replace boiled eggs with fried eggs for a quicker version.',
+  'nasi-goreng-cina': 'Overnight chilled rice works best because the grains stay separate.',
+  'mee-goreng-express': 'Rinse the noodles with hot water first so they do not stick.',
+  'ayam-sambal-hijau': 'Add a little lime juice for a fresher sambal.',
+  'daging-kicap-pedas': 'Slice the beef against the grain for a more tender result.',
+  'kangkung-belacan': 'Do not overcook the water spinach so it stays green and crisp.',
+  'gulai-ayam': 'Replace the coconut milk with evaporated milk for a lighter gravy.',
+  'ayam-goreng-berempah': 'An air fryer can be used at 190°C for 25 minutes.',
+  'air-fryer-chicken-wings-kicap-madu': 'Line the basket with perforated baking paper for easier cleanup.',
+  'ayam-masak-merah': 'Fry the chicken until crisp first for a more interesting texture.',
+  'ayam-rendang-minang': 'Cook slowly so the spices infuse and the rendang keeps longer.',
+  'ayam-penyet': 'Press the chicken gently with a pestle so the sambal sticks more easily.',
+  'ayam-kurma': 'Do not let the coconut milk boil vigorously or the gravy may split.',
+  'ayam-singgang': 'Add sliced fresh turmeric for a brighter color and fragrance.',
+  'ayam-pongteh': 'Fry the garlic until fragrant for a deeper pongteh flavor.',
+  'daging-masak-hitam': 'Keep some of the cooking water to loosen the gravy if needed.',
+  'daging-dendeng': 'Slice the beef after it cools so the pieces keep their shape.',
+  'daging-black-pepper': 'Use high heat so the beef stays tender and does not release too much water.',
+  'sup-daging-berempah': 'Use a pressure cooker to shorten the boiling time.',
+  'daging-singgang-terengganu': 'Serve hot with steamed rice for a refreshing meal.',
+  'kambing-perap-air-fryer': 'Slice the lamb thinly so it becomes tender quickly and cooks evenly.',
+  'ikan-asam-pedas-melaka': 'Mackerel can be used instead of stingray.',
+  'ikan-siakap-stim-limau': 'Steam the fish as soon as the water boils so the flesh stays tender.',
+  'udang-sambal-petai': 'Do not overcook the prawns so they stay sweet and tender.',
+  'udang-butter-garlic': 'Use unsalted butter to keep the prawn flavor balanced.',
+  'sotong-masak-hitam': 'Cook the squid quickly so it does not become chewy.',
+  'ikan-cencaru-sumbat-sambal': 'Split the fish from the back so the sambal does not fall out easily.',
+  'sotong-goreng-tepung': 'Dry the squid before coating it so the flour sticks better.',
+  'ikan-pari-bakar-sambal': 'Wrap the fish in aluminum foil if banana leaves are unavailable.',
+  'udang-masak-lemak-cili-api': 'Add the prawns at the end so they do not become tough.',
+  'ikan-kembung-goreng-cili': 'Fry the fish until the skin is crisp before adding it to the sambal.',
+  'sotong-sambal-hijau': 'Do not cover the pan while cooking the squid or the gravy may become watery.',
+  'sup-ikan-merah': 'Add the fish after the broth boils so the flesh does not break apart.',
+})
 
 export const text = (value, lang) => value && typeof value === 'object' ? value[lang] || value.ms : value
 
