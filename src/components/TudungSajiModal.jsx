@@ -12,6 +12,21 @@ function recipeName(recipe, language) {
   return localizedName || text(recipe?.name, language) || recipe?.name_en || recipe?.name_ms || "Recipe";
 }
 
+const SPARKLES = [
+  { left: "20%", bottom: "5.5rem", size: "text-xs", delay: "0s" },
+  { left: "33%", bottom: "7rem", size: "text-[10px]", delay: "1.1s" },
+  { left: "50%", bottom: "8rem", size: "text-[11px]", delay: ".6s" },
+  { left: "67%", bottom: "7rem", size: "text-[10px]", delay: "1.8s" },
+  { left: "79%", bottom: "5.5rem", size: "text-xs", delay: ".3s" },
+];
+
+const VAPORS = [
+  { left: "27%", delay: "0s" },
+  { left: "40%", delay: "1.4s" },
+  { left: "58%", delay: ".8s" },
+  { left: "71%", delay: "2.2s" },
+];
+
 export default function TudungSajiModal({
   isOpen,
   onClose,
@@ -27,6 +42,7 @@ export default function TudungSajiModal({
   const rerollTimerRef = useRef(null);
   const pendingRecipeRef = useRef(null);
   const hasRecipe = Boolean(selectedRecipe);
+  const showSuspense = hasRecipe && !isCoverLifted && !isRerolling;
 
   const finishReroll = () => {
     if (!pendingRecipeRef.current) return;
@@ -70,27 +86,60 @@ export default function TudungSajiModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/50 p-4">
-      <section className="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-3xl bg-[#fffdf8] p-5 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="tudung-saji-title">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+
+      <section className="relative max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-amber-100/60 bg-[#fdf6ea]/60 p-5 shadow-2xl backdrop-blur-md" role="dialog" aria-modal="true" aria-labelledby="tudung-saji-title">
         <div className="flex items-start justify-between gap-4">
           <div>
-             <span className="section-kicker">{t.kicker}</span>
-            <h2 id="tudung-saji-title" className="mt-1 text-xl font-bold text-stone-900">
+            <span className="text-amber-800 font-bold tracking-wider text-[11px] uppercase">{t.kicker}</span>
+            <h2 id="tudung-saji-title" className="mt-1.5 font-serif text-2xl font-bold leading-tight text-[#5b3a1d]">
               {t.title}
             </h2>
           </div>
-           <button type="button" onClick={onClose} className="rounded-full p-2 text-stone-500 hover:bg-stone-100" aria-label={t.close}>
-            <X size={20} />
+          <button type="button" onClick={onClose} className="rounded-full border border-amber-200/70 bg-white/50 p-2 text-amber-800/70 backdrop-blur-sm transition hover:bg-amber-100/80 hover:text-amber-900" aria-label={t.close}>
+            <X size={18} />
           </button>
         </div>
 
-        <div className="relative mt-5 h-64 overflow-hidden rounded-2xl bg-gradient-to-b from-[#f7e6bd] via-[#efd39a] to-[#c9955e]">
-          <div className="absolute inset-x-0 bottom-0 h-24 bg-[#9d673e]/25" />
-          <div className="absolute bottom-7 left-1/2 h-20 w-64 -translate-x-1/2 rounded-[50%] bg-[#fff8e5] shadow-[0_12px_20px_rgba(92,52,26,0.28)]" />
-          <div className="absolute bottom-12 left-1/2 flex h-24 w-44 -translate-x-1/2 items-center justify-center rounded-[50%] bg-gradient-to-br from-[#d96f3f] to-[#8f422c] shadow-inner">
-          </div>
+        <div className="relative mt-5 h-72 overflow-hidden rounded-2xl">
+          <div className="tudung-scene absolute inset-0" />
+          <div className="absolute -left-7 bottom-0 h-24 w-24 rounded-full bg-[#4a2a12]/70 blur-[5px]" />
+          <div className="absolute -right-8 bottom-3 h-28 w-28 rounded-2xl bg-[#3d200c]/60 blur-[6px]" />
+          <div className="absolute left-1/4 top-0 h-20 w-44 -rotate-12 bg-gradient-to-b from-[#ffd98c]/25 to-transparent blur-md" />
+          <div className="absolute bottom-2 left-3 text-xl opacity-30">🌿</div>
+          <div className="absolute bottom-3 right-4 text-lg opacity-25">🫖</div>
+
+          {showSuspense && (
+            <>
+              <div className="tudung-glow absolute bottom-[4.5rem] left-1/2 h-48 w-72 -translate-x-1/2" />
+              {SPARKLES.map((sparkle) => (
+                <span
+                  key={`${sparkle.left}-${sparkle.delay}`}
+                  className={`sparkle-particle absolute ${sparkle.size}`}
+                  style={{ left: sparkle.left, bottom: sparkle.bottom, animationDelay: sparkle.delay }}
+                >
+                  ✨
+                </span>
+              ))}
+              {VAPORS.map((vapor) => (
+                <span key={`wisp-${vapor.left}`}>
+                  <span
+                    className="vapor-wisp absolute bottom-14 h-8 w-8"
+                    style={{ left: vapor.left, animationDelay: vapor.delay }}
+                  />
+                  <span
+                    className="vapor-particle absolute bottom-[4.6rem] text-xs text-amber-100/50"
+                    style={{ left: vapor.left, animationDelay: vapor.delay }}
+                  >
+                    ♨️
+                  </span>
+                </span>
+              ))}
+            </>
+          )}
+
           {hasRecipe && (
-            <div onTransitionEnd={(event) => event.propertyName === "opacity" && finishReroll()} className={`absolute bottom-12 left-1/2 z-[5] flex w-[88%] max-w-[280px] -translate-x-1/2 flex-col items-center justify-center rounded-2xl border border-amber-200/80 bg-amber-50/95 px-4 py-3 text-center shadow-md backdrop-blur-xs transition-all duration-700 ${isCoverLifted ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}>
+            <div onTransitionEnd={(event) => event.propertyName === "opacity" && finishReroll()} className={`absolute bottom-[4.7rem] left-1/2 z-[5] flex w-[88%] max-w-[280px] -translate-x-1/2 flex-col items-center justify-center rounded-2xl border border-amber-200/80 bg-amber-50/95 px-4 py-3 text-center shadow-md backdrop-blur-xs transition-all duration-700 ${isCoverLifted ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}>
               <h3 className={`mb-2 break-words font-bold leading-snug tracking-tight text-amber-950 ${titleFontSize}`}>
                 {recipeTitle}
               </h3>
@@ -101,23 +150,37 @@ export default function TudungSajiModal({
               </div>
             </div>
           )}
-          <div className={`absolute bottom-16 left-1/2 z-10 h-36 w-52 -translate-x-1/2 rounded-[52%_52%_42%_42%] border-4 border-[#9b5b2d] bg-[repeating-linear-gradient(25deg,transparent_0_9px,#f2bd69_10px_12px),repeating-linear-gradient(155deg,#c47737_0_10px,#8d4a29_11px_13px)] shadow-[0_12px_18px_rgba(77,42,20,0.35)] transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${isCoverLifted ? "-translate-y-36 scale-105 opacity-0" : ""}`}>
-            <div className="absolute -top-5 left-1/2 h-8 w-14 -translate-x-1/2 rounded-full border-4 border-[#8d4a29] bg-[#d28a40] shadow-md" />
-            <div className="absolute bottom-2 left-1/2 h-2 w-32 -translate-x-1/2 rounded-full bg-[#f3c77e]/60" />
+
+          <div className="absolute bottom-6 left-1/2 z-[3] h-14 w-64 -translate-x-1/2 rounded-[50%]">
+            <div className="tudung-plate absolute inset-0 rounded-[50%]" />
           </div>
-          {hasRecipe && <><Sparkles className={`absolute left-1/4 top-12 text-[#fff2c9] transition-opacity duration-700 ${isCoverLifted ? "animate-pulse opacity-100" : "animate-pulse opacity-70"}`} size={16} /><span className={`absolute right-1/4 top-16 h-2 w-2 rounded-full bg-white/80 transition-opacity duration-700 ${isCoverLifted ? "animate-ping opacity-100" : "animate-ping opacity-60"}`} /><span className={`absolute left-1/2 top-9 h-1.5 w-1.5 rounded-full bg-white/80 transition-opacity duration-700 ${isCoverLifted ? "animate-pulse opacity-100" : "animate-pulse opacity-70"}`} /></>}
-          <div className="absolute bottom-2 left-4 text-2xl">🍽️</div><div className="absolute bottom-3 right-5 text-xl">🌿</div>
+
+          <div className={`absolute bottom-[3.6rem] left-1/2 z-10 -translate-x-1/2 transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${isCoverLifted ? "-translate-y-40 scale-105 opacity-0" : ""}`}>
+            <div className="tudung-dome h-36 w-52">
+              <div className="tudung-knob absolute -top-4 left-1/2 h-7 w-14 -translate-x-1/2 rounded-full" />
+              <div className="absolute bottom-2.5 left-1/2 h-2 w-32 -translate-x-1/2 rounded-full bg-[#ffe1a6]/50 blur-[2px]" />
+            </div>
+          </div>
+
+          {showSuspense && (
+            <div className="absolute bottom-1.5 left-1/2 z-10 -translate-x-1/2">
+              <div className="bg-amber-600 text-white text-xs font-semibold px-3.5 py-1 rounded-full shadow-md flex items-center gap-1.5 border border-amber-400/30">
+                <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+                <span>{t.ready}</span>
+              </div>
+            </div>
+          )}
         </div>
 
-         {!hasRecipe && <p className="mt-4 text-center text-sm text-stone-500">{t.noRecipes}</p>}
+        {!hasRecipe && <p className="mt-4 text-center text-sm text-amber-900/60">{t.noRecipes}</p>}
 
         {isCoverLifted ? (
           <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:justify-center">
-             <button type="button" onClick={openRecipe} className="rounded-xl bg-amber-600 px-6 py-3 font-semibold text-white shadow-md hover:bg-amber-700">{t.viewRecipe}</button>
-             <button type="button" onClick={reroll} className="rounded-xl border border-amber-300 bg-amber-50 px-6 py-3 font-semibold text-amber-900 hover:bg-amber-100">{t.tryAgain}</button>
+            <button type="button" onClick={openRecipe} className="rounded-xl bg-gradient-to-r from-[#d9973b] to-[#b06a24] px-6 py-3 font-semibold text-white shadow-[0_8px_20px_rgba(180,110,40,.4)] transition hover:brightness-110">{t.viewRecipe}</button>
+            <button type="button" onClick={reroll} className="rounded-xl border border-amber-300/80 bg-amber-50/80 px-6 py-3 font-semibold text-amber-900 transition hover:bg-amber-100">{t.tryAgain}</button>
           </div>
         ) : (
-           <button type="button" onClick={() => setIsCoverLifted(true)} disabled={!hasRecipe || isRerolling} className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-amber-600 px-6 py-3 font-semibold text-white shadow-md transition hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50">{t.liftCover}</button>
+          <button type="button" onClick={() => setIsCoverLifted(true)} disabled={!hasRecipe || isRerolling} className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#d9973b] to-[#b06a24] px-6 py-3 font-semibold text-white shadow-[0_8px_20px_rgba(180,110,40,.4)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50">{t.liftCover}</button>
         )}
       </section>
     </div>
